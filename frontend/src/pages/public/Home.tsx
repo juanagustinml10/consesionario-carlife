@@ -38,7 +38,7 @@ export const Home: React.FC = () => {
   return (
     <div className="bg-jay-white">
       {/* Hero */}
-      <section className="relative overflow-hidden bg-jay-black text-jay-white pt-20 pb-32 lg:pt-32 lg:pb-40">
+      <section className="relative overflow-hidden bg-jay-black pt-16 pb-16 text-jay-white md:pt-24 lg:pt-32 lg:pb-40">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_top_left,rgba(227,38,54,0.15),transparent)]" />
         <div className="container-jay relative">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
@@ -49,7 +49,7 @@ export const Home: React.FC = () => {
               <motion.h1
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="font-display text-5xl md:text-7xl font-bold leading-tight text-balance"
+                className="font-display text-4xl font-bold leading-tight text-balance sm:text-5xl md:text-6xl lg:text-7xl"
               >
                 Motocicletas{' '}
                 <span className="text-jay-red">0 km y usadas</span>
@@ -69,16 +69,16 @@ export const Home: React.FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="mt-10 flex flex-wrap gap-4"
+                className="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap"
               >
                 <Link
                   to="/motos"
-                  className="flex items-center gap-2 px-8 py-4 bg-jay-red text-jay-white font-semibold rounded-lg hover:bg-black transition-colors"
+                  className="flex items-center justify-center gap-2 rounded-lg bg-jay-red px-8 py-4 font-semibold text-jay-white transition-colors hover:bg-black"
                 >
                   Ver catálogo <ArrowRight size={20} />
                 </Link>
                 <button
-                  className="flex items-center gap-2 px-8 py-4 bg-transparent border border-white text-white font-semibold rounded-lg hover:bg-white/10 transition-colors"
+                  className="flex items-center justify-center gap-2 rounded-lg border border-white bg-transparent px-8 py-4 font-semibold text-white transition-colors hover:bg-white/10"
                   onClick={() => {
                     const el = document.getElementById('destacadas');
                     el?.scrollIntoView({ behavior: 'smooth' });
@@ -89,8 +89,8 @@ export const Home: React.FC = () => {
               </motion.div>
             </div>
 
-            <div className="relative hidden lg:block">
-              <div className="relative h-[500px] rounded-2xl overflow-hidden shadow-2xl border border-white/10">
+            <div className="relative block h-[280px] sm:h-[360px] lg:h-[500px]">
+              <div className="relative h-full rounded-2xl overflow-hidden shadow-2xl border border-white/10">
                 <ImagePlaceholderHero />
                 <div className="absolute inset-0 bg-gradient-to-t from-jay-black via-transparent to-transparent" />
                 <div className="absolute bottom-6 left-6 right-6">
@@ -115,7 +115,7 @@ export const Home: React.FC = () => {
       {/* Estadísticas rápidas */}
       <section className="border-y border-jay-black/5 bg-jay-white/50">
         <div className="container-jay py-12">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+          <div className="grid grid-cols-3 gap-4 text-center sm:gap-8">
             {stats.map((stat) => (
               <div key={stat.label} className="space-y-2">
                 <div className="flex items-center justify-center gap-2 text-jay-red">{stat.icon}</div>
@@ -130,7 +130,7 @@ export const Home: React.FC = () => {
       {/* Destacadas */}
       <section id="destacadas" className="py-24">
         <div className="container-jay">
-          <div className="flex items-center justify-between mb-10">
+          <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-2">
               <h2 className="font-display text-3xl font-bold">Motos destacadas</h2>
               <p className="text-sm text-jay-black/50">Selección del mes con entrega prioritaria</p>

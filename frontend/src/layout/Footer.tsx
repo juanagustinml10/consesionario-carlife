@@ -73,11 +73,11 @@ export const Footer: React.FC = () => (
               <li key={i} className="flex items-start gap-3 text-sm text-gray-300">
                 {item.icon}
                 {item.href ? (
-                  <a href={item.href} target={item.target} rel="noopener noreferrer" className="hover:text-jay-red transition-colors">
+                  <a href={item.href} target={item.target} rel="noopener noreferrer" className="min-w-0 break-all hover:text-jay-red transition-colors">
                     {item.label}
                   </a>
                 ) : (
-                  item.label
+                  <span className="min-w-0 break-words">{item.label}</span>
                 )}
               </li>
             ))}

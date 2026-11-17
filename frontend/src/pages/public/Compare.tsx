@@ -12,7 +12,6 @@ import {
 import { Link } from '@/components/shared/Link';
 import Button from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { WhatsAppButton } from '@/components/shared/WhatsAppButton';
 import { ImagePlaceholder } from '@/components/shared/ImagePlaceholder';
 import { useCompareStore } from '@/stores/compare';
 import type { Bike } from '@/types';
@@ -72,14 +71,17 @@ export const Compare: React.FC = () => {
     <div className="bg-jay-white">
       <section className="border-b border-jay-black/5 bg-jay-white">
         <div className="container-jay py-6">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-1">
               <h1 className="font-display text-2xl font-bold">Comparador de motos</h1>
               <p className="text-sm text-jay-black/50">{bikes.length} de 2 seleccionadas</p>
             </div>
             <div className="flex items-center gap-3">
-              <WhatsAppButton phone={import.meta.env.VITE_WHATSAPP_PHONE ?? ''} message={''} label="Consultar por estas motos" className="hidden sm:flex" />
-              <Button variant="outline" onClick={clear} size="sm">
+              <Button variant="outline" size="sm" onClick={handleWhatsApp} className="flex-1 sm:flex-none">
+                <Truck size={16} className="mr-2" />
+                Consultar por estas motos
+              </Button>
+              <Button variant="outline" onClick={clear} size="sm" className="flex-1 sm:flex-none">
                 Limpiar todo
               </Button>
             </div>
@@ -90,7 +92,7 @@ export const Compare: React.FC = () => {
       <section className="py-16">
         <div className="container-jay">
           <div className="overflow-x-auto border border-jay-black/10 rounded-xl bg-jay-white shadow-sm">
-            <table className="w-full text-left border-collapse">
+            <table className="w-full min-w-[620px] text-left border-collapse">
               <thead>
                 <tr className="border-b border-jay-black/10 bg-jay-black/5">
                   <th className="py-5 px-6 text-sm font-semibold text-jay-black/50 uppercase tracking-wider">Característica</th>
@@ -180,7 +182,7 @@ export const Compare: React.FC = () => {
           </div>
 
           {bikes.length > 0 && (
-            <div className="mt-12 flex items-center justify-between gap-4">
+            <div className="mt-12 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <Button variant="red" onClick={handleWhatsApp} className="flex-1">
                 <Truck size={20} /> Consultar por estas motos
               </Button>

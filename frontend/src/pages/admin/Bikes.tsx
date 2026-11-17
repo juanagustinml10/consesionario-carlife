@@ -7,7 +7,6 @@ import {
   Edit2,
   Trash2,
   Motorbike,
-  MoreHorizontal,
 } from 'lucide-react';
 import { Link } from '@/components/shared/Link';
 import Button from '@/components/ui/button';
@@ -24,6 +23,7 @@ export const Bikes: React.FC = () => {
   const [bikes, setBikes] = useState<Bike[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<BikeStatus | 'TODOS'>('TODOS');
+  const [query, setQuery] = useState('');
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [bikeToDelete, setBikeToDelete] = useState<Bike | null>(null);
@@ -66,14 +66,20 @@ export const Bikes: React.FC = () => {
     }
   };
 
-  const filtered = bikes.filter(
-    (b) => statusFilter === 'TODOS' || b.status === statusFilter
-  );
+  const normalizedQuery = query.trim().toLowerCase();
+  const filtered = bikes.filter((b) => {
+    if (statusFilter !== 'TODOS' && b.status !== statusFilter) return false;
+    if (!normalizedQuery) return true;
+    const haystack = [b.title, b.model, b.brand?.name ?? '', String(b.year)]
+      .join(' ')
+      .toLowerCase();
+    return haystack.includes(normalizedQuery);
+  });
 
   return (
     <div className="bg-jay-black/5">
       <div className="container-jay">
-        <div className="flex items-center justify-between mb-8">
+        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="font-display text-2xl font-bold">Motocicletas</h1>
             <p className="text-sm text-jay-black/60">
@@ -82,7 +88,7 @@ export const Bikes: React.FC = () => {
           </div>
           <Link
             to="/admin/motos/nuevo"
-            className="inline-flex items-center gap-2 px-5 py-3 rounded-lg bg-jay-red text-white font-medium hover:bg-black transition-colors"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-jay-red px-5 py-3 font-medium text-white transition-colors hover:bg-black sm:w-auto"
           >
             <Plus size={18} /> Nueva publicación
           </Link>
@@ -96,6 +102,8 @@ export const Bikes: React.FC = () => {
                 <input
                   type="search"
                   placeholder="Buscar por marca, modelo o título..."
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 rounded-lg border border-jay-black/20 bg-jay-white focus:outline-none focus:ring-2 focus:ring-jay-red/50 transition-colors"
                 />
               </div>
@@ -116,7 +124,73 @@ export const Bikes: React.FC = () => {
             </div>
           </div>
 
-          <div className="overflow-x-auto">
+          {/* Vista móvil: tarjetas */}
+          <div className="divide-y divide-jay-black/5 md:hidden">
+            {loading ? (
+              <div className="h-40 flex items-center justify-center text-sm text-jay-black/40">
+                Cargando publicaciones...
+              </div>
+            ) : filtered.length === 0 ? (
+              <div className="h-40 flex items-center justify-center text-sm text-jay-black/40">
+                No se encontraron publicaciones.
+              </div>
+            ) : (
+              filtered.map((bike) => (
+                <div key={bike.id} className="p-5">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex min-w-0 items-center gap-3">
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-jay-black/5">
+                        <Motorbike size={18} className="text-jay-black/40" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="truncate font-medium text-jay-black">{bike.title}</p>
+                        <p className="truncate text-xs text-jay-black/50">
+                          {bike.brand?.name ?? ''} {bike.model} · {bike.year}
+                        </p>
+                      </div>
+                    </div>
+                    <span
+                      className={`inline-flex shrink-0 items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border ${
+                        bike.status === 'DISPONIBLE'
+                          ? 'bg-green-500/10 text-green-700 border-green-500/30'
+                          : bike.status === 'RESERVADA'
+                            ? 'bg-amber-500/10 text-amber-700 border-amber-500/30'
+                            : 'bg-jay-red/10 text-jay-red border-jay-red/30'
+                      }`}
+                    >
+                      {STATUS_LABELS[bike.status]}
+                    </span>
+                  </div>
+                  <div className="mt-4 flex items-center justify-between gap-3">
+                    <span className="font-bold text-jay-black">
+                      {bike.price.toLocaleString('es-AR')} {bike.currency}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <Link
+                        to={`/admin/motos/${bike.id}/editar`}
+                        className="rounded-lg p-2.5 text-jay-black/60 transition-colors hover:bg-jay-black/5 hover:text-jay-red"
+                        title="Editar"
+                        aria-label="Editar publicación"
+                      >
+                        <Edit2 size={18} />
+                      </Link>
+                      <button
+                        onClick={() => handleDelete(bike)}
+                        className="rounded-lg p-2.5 text-jay-black/60 transition-colors hover:bg-jay-red hover:text-white"
+                        title="Eliminar"
+                        aria-label="Eliminar publicación"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* Vista desktop: tabla */}
+          <div className="hidden overflow-x-auto md:block">
             <table className="w-full text-left text-sm">
               <thead>
                 <tr className="border-b border-jay-black/5 bg-jay-black/3">
@@ -191,12 +265,6 @@ export const Bikes: React.FC = () => {
                           >
                             <Trash2 size={18} />
                           </button>
-                          <button
-                            className="p-2 rounded-lg text-jay-black/30 hover:bg-jay-black/10 transition-colors"
-                            aria-label="Más opciones"
-                          >
-                            <MoreHorizontal size={18} />
-                          </button>
                         </div>
                       </td>
                     </tr>
@@ -210,7 +278,7 @@ export const Bikes: React.FC = () => {
 
       {/* Modal de confirmación de eliminación */}
       {confirmOpen && bikeToDelete && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}

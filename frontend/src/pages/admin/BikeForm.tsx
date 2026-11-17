@@ -157,8 +157,8 @@ export const BikeForm: React.FC = () => {
   return (
     <div className="bg-jay-black/5">
       <div className="container-jay">
-        <div className="flex items-center justify-between mb-8">
-          <Link to="/admin/motos" className="flex items-center gap-2 text-jay-black/60 hover:text-jay-red transition-colors">
+        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <Link to="/admin/motos" className="flex items-center gap-2 text-sm text-jay-black/60 transition-colors hover:text-jay-red">
             <ArrowLeft size={18} /> Volver al listado
           </Link>
           <h1 className="font-display text-2xl font-bold">
@@ -395,21 +395,21 @@ export const BikeForm: React.FC = () => {
 
           </div>
 
-          <div className="flex justify-end gap-3 pt-4">
-            <Link
-              to="/admin/motos"
-              className="px-6 py-3 rounded-lg border border-jay-black/20 text-sm font-medium text-jay-black/70 hover:bg-jay-black/5 transition-colors"
-            >
-              Cancelar
-            </Link>
-            <Button
-              type="submit"
-              variant="red"
-              className="px-8"
-              disabled={saving}
-            >
-              {saving ? 'Guardando...' : isEdit ? 'Guardar cambios' : 'Publicar motocicleta'}
-            </Button>
+          <div className="flex flex-col-reverse gap-3 pt-4 sm:flex-row sm:justify-end sm:pt-4">
+              <Link
+                to="/admin/motos"
+                className="w-full rounded-lg border border-jay-black/20 px-6 py-3 text-center text-sm font-medium text-jay-black/70 transition-colors hover:bg-jay-black/5 sm:w-auto"
+              >
+                Cancelar
+              </Link>
+              <Button
+                type="submit"
+                variant="red"
+                className="w-full px-8 sm:w-auto"
+                disabled={saving}
+              >
+                {saving ? 'Guardando...' : isEdit ? 'Guardar cambios' : 'Publicar motocicleta'}
+              </Button>
           </div>
         </form>
       </div>

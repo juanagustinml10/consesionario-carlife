@@ -5,7 +5,8 @@ import { Link } from '@/components/shared/Link';
 import {
   LayoutDashboard,
   Motorbike,
-  ChevronLeft,
+  Menu,
+  X,
   LogOut,
   User,
 } from 'lucide-react';
@@ -17,7 +18,8 @@ const ADMIN_NAV = [
 ];
 
 export const AdminLayout: React.FC = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  // En desktop el sidebar siempre visible (md:), en mobile se abre con el botón hamburguesa
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -26,36 +28,48 @@ export const AdminLayout: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen bg-jay-black text-jay-white">
-      {/* Sidebar */}
+    <div className="flex h-screen overflow-hidden bg-jay-black text-jay-white">
+      {/* Overlay (solo mobile) */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 z-30 bg-black/60 backdrop-blur-sm md:hidden"
+          onClick={() => setSidebarOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Sidebar: fijo en mobile, estático en desktop */}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 w-64 border-r border-white/10 bg-jay-black transition-transform duration-300 ${
+        className={`fixed inset-y-0 left-0 z-40 flex w-72 max-w-[85vw] flex-col border-r border-white/10 bg-jay-black transition-transform duration-300 md:relative md:z-auto md:w-64 md:max-w-none md:translate-x-0 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } md:relative md:translate-x-0`}
+        }`}
       >
-        <div className="flex h-16 items-center justify-between px-6">
+        <div className="flex h-16 shrink-0 items-center justify-between border-b border-white/10 px-6">
           <Link to="/admin/dashboard" className="flex items-center gap-2">
-            <span className="block h-6 w-6 rounded bg-jay-red flex items-center justify-center text-[10px] font-black uppercase tracking-tighter">
+            <span className="flex h-6 w-6 items-center justify-center rounded bg-jay-red text-[10px] font-black uppercase tracking-tighter text-white">
               JM
             </span>
-            <span className="font-display text-xl font-bold tracking-tighter">JAY<span className="text-jay-red">MOTOS</span></span>
+            <span className="font-display text-xl font-bold tracking-tighter">
+              JAY<span className="text-jay-red">MOTOS</span>
+            </span>
           </Link>
           <button
             onClick={() => setSidebarOpen(false)}
-            className="md:hidden p-2 text-white hover:text-jay-red transition-colors"
+            className="rounded-lg p-2 text-white/80 transition-colors hover:text-white md:hidden"
             aria-label="Cerrar menú"
           >
-            <ChevronLeft size={24} />
+            <X size={24} />
           </button>
         </div>
-        <nav className="mt-6 space-y-1 px-3">
+
+        <nav className="mt-6 flex-1 space-y-1 overflow-y-auto px-3">
           {ADMIN_NAV.map((item) => (
             <Link
               key={item.to}
               to={item.to}
-              onClick={() => (window.innerWidth < 768 ? setSidebarOpen(false) : null)}
+              onClick={() => setSidebarOpen(false)}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+                `flex items-center gap-3 rounded-lg px-4 py-3.5 text-sm font-medium transition-colors ${
                   isActive
                     ? 'bg-jay-red text-white'
                     : 'text-gray-400 hover:bg-white/5 hover:text-white'
@@ -67,39 +81,40 @@ export const AdminLayout: React.FC = () => {
             </Link>
           ))}
         </nav>
-        <div className="mt-auto px-6 py-6 border-t border-white/10">
+
+        <div className="shrink-0 border-t border-white/10 px-4 py-5">
           <button
             onClick={handleLogout}
-            className="flex w-full items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-colors"
+            className="flex w-full items-center gap-3 rounded-lg px-4 py-3.5 text-sm font-medium text-gray-400 transition-colors hover:bg-white/5 hover:text-white"
           >
             <LogOut size={20} /> Cerrar sesión
           </button>
         </div>
       </aside>
 
-      {/* Overlay móvil */}
-      {sidebarOpen && window.innerWidth < 768 && (
-        <div
-          className="fixed inset-0 z-30 bg-black/40 md:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      {/* Contenido */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <header className="h-16 border-b border-white/10 bg-black/50 flex items-center justify-between px-6">
-          <div className="hidden md:flex items-center gap-6 text-sm text-gray-400">
-            <span>Panel administrativo — JAY MOTOS</span>
+      {/* Contenido + top bar */}
+      <div className="flex min-w-0 flex-1 flex-col">
+        <header className="flex h-16 shrink-0 items-center justify-between gap-4 border-b border-white/10 bg-black/50 px-4 sm:px-6">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="rounded-lg p-2 text-white/80 transition-colors hover:text-white md:hidden"
+              aria-label="Abrir menú"
+            >
+              <Menu size={24} />
+            </button>
+            <span className="hidden text-sm text-gray-400 md:inline">Panel administrativo — JAY MOTOS</span>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="hidden md:flex items-center gap-3 px-3 py-1.5 rounded-lg border border-white/10 bg-white/5">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2">
               <User size={16} className="text-gray-400" />
               <span className="text-sm font-medium text-gray-200">Administrador</span>
             </div>
           </div>
         </header>
-        <main className="flex-1 overflow-y-auto p-6 lg:p-8">
-          <div className="container-jay"><Outlet /></div>
+
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+          <div className="container-jay !px-0"><Outlet /></div>
         </main>
       </div>
     </div>

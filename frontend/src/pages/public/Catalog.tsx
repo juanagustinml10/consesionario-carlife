@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Search, SlidersHorizontal, X } from 'lucide-react';
+import { Search, SlidersHorizontal, X, ChevronDown } from 'lucide-react';
 
 import { BikeCard } from '@/components/public/BikeCard';
 import { bikesService, type BikeFilters } from '@/services/bikes';
@@ -20,9 +20,7 @@ export const Catalog: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<BikeFilters>({ page: 1, limit: 12 });
   const [brands, setBrands] = useState<Array<{ id: string; name: string }>>([]);
-  const [openFilters, setOpenFilters] = useState(
-    typeof window !== 'undefined' && window.innerWidth < 768
-  );
+  const [openFilters, setOpenFilters] = useState(false);
 
   const query = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
   useEffect(() => {
@@ -97,7 +95,7 @@ export const Catalog: React.FC = () => {
                 <input
                   type="search"
                   placeholder="Marca, modelo, año..."
-                  defaultValue={filters.q ?? ''}
+                  value={filters.q ?? ''}
                   onChange={(e) => setFilter('q', e.target.value)}
                   className="w-full pl-10 pr-4 py-3 rounded-lg border border-jay-black/20 bg-jay-white focus:outline-none focus:ring-2 focus:ring-jay-red/50 transition-all"
                 />
@@ -110,35 +108,36 @@ export const Catalog: React.FC = () => {
               </button>
               <button
                 onClick={() => setOpenFilters(!openFilters)}
-                className="inline-flex items-center gap-2 px-5 py-3 rounded-lg border border-jay-black/20 text-jay-black/70 font-medium hover:bg-jay-black/5 transition-colors"
+                className="inline-flex items-center justify-center gap-2 rounded-lg border border-jay-black/20 px-5 py-3 font-medium text-jay-black/70 transition-colors hover:bg-jay-black/5 md:hidden"
+                aria-expanded={openFilters}
+                aria-controls="catalogo-filtros"
               >
                 <SlidersHorizontal size={18} />
-                <span className="hidden sm:inline">Filtros</span>
-                <X size={16} className="text-jay-black/40" />
+                <span>{openFilters ? 'Ocultar filtros' : 'Mostrar filtros'}</span>
+                <ChevronDown size={16} className={`text-jay-black/40 transition-transform ${openFilters ? 'rotate-180' : ''}`} />
               </button>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Filtros desplegable (móvil) / barra (escritorio) */}
+      {/* Filtros: colapsable en móvil, fijo en escritorio */}
       <section className="border-b border-jay-black/5 bg-jay-white/30">
-        {typeof window !== 'undefined' && window.innerWidth >= 768 ? (
-          <div className="container-jay py-6">
+        <div className="container-jay">
+          <div className="hidden py-6 md:block">
             <FilterBar filters={filters} setFilter={setFilter} brands={brands} conditions={CONDITIONS} />
           </div>
-        ) : (
           <motion.div
-            initial={{ height: 0, opacity: 0 }}
+            initial={false}
             animate={openFilters ? { height: 'auto', opacity: 1 } : { height: 0, opacity: 0 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="overflow-hidden border-t border-jay-black/5"
+            className="overflow-hidden border-t border-jay-black/5 md:hidden"
           >
-            <div className="container-jay py-6">
+          <div id="catalogo-filtros" className="py-6 md:hidden">
               <FilterBar filters={filters} setFilter={setFilter} brands={brands} conditions={CONDITIONS} />
             </div>
           </motion.div>
-        )}
+        </div>
       </section>
 
       {/* Resultados */}
@@ -287,15 +286,15 @@ const FilterBar: React.FC<FilterBarProps> = ({
           <input
             type="number"
             placeholder="Desde"
-            defaultValue={String(filters.priceMin ?? '')}
-            onChange={(e) => setFilter('priceMin', e.target.value || undefined)}
+            value={filters.priceMin ?? ''}
+            onChange={(e) => setFilter('priceMin', e.target.value === '' ? undefined : Number(e.target.value))}
             className="py-3 rounded-lg border border-jay-black/20 bg-jay-white text-sm focus:outline-none focus:ring-2 focus:ring-jay-red/50"
           />
           <input
             type="number"
             placeholder="Hasta"
-            defaultValue={String(filters.priceMax ?? '')}
-            onChange={(e) => setFilter('priceMax', e.target.value || undefined)}
+            value={filters.priceMax ?? ''}
+            onChange={(e) => setFilter('priceMax', e.target.value === '' ? undefined : Number(e.target.value))}
             className="py-3 rounded-lg border border-jay-black/20 bg-jay-white text-sm focus:outline-none focus:ring-2 focus:ring-jay-red/50"
           />
         </div>
