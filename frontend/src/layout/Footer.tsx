@@ -26,24 +26,6 @@ export const Footer: React.FC = () => (
     </span>
 
     <div className="container-jay relative py-12 md:py-16">
-      {/* Cierre / WhatsApp */}
-      <div className="mb-12 flex flex-col gap-6 border-b border-white/8 pb-10 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="font-display text-[10px] font-bold uppercase tracking-[0.3em] text-jay-red">Hablemos</p>
-          <p className="mt-3 max-w-xl font-display text-4xl font-extrabold uppercase italic leading-[0.88] text-white sm:text-6xl">
-            Tu próxima moto <span className="text-jay-red">empieza acá.</span>
-          </p>
-        </div>
-        <a
-          href={buildWhatsAppLink(BUSINESS.whatsappGeneralMessage)}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="btn btn-red w-full px-7 py-4 text-xs sm:w-auto"
-        >
-          <MessageCircle size={17} /> {BUSINESS.phoneDisplay}
-        </a>
-      </div>
-
       {/* Fila principal */}
       <div className="grid gap-10 md:grid-cols-12 md:gap-8">
         {/* Marca */}
@@ -104,7 +86,7 @@ export const Footer: React.FC = () => (
       </div>
 
       {/* Barra inferior */}
-      <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-white/8 pt-6 text-[10px] leading-relaxed text-gray-600 sm:flex-row sm:text-left">
+      <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-white/8 pt-6 text-[10px] leading-relaxed text-gray-600 sm:flex-row sm:text-left">
         <p>© {CURRENT_YEAR} {BUSINESS.name} · {BUSINESS.tagline}</p>
         <p className="max-w-2xl text-center sm:text-right">
           Fotos: Beta RR Freenduro — Jimmy Boakes / Jix31 (CC BY 4.0) · KTM forest — Tim Gotzkowsky (CC BY 3.0). Precios y condiciones sujetos a confirmación.
