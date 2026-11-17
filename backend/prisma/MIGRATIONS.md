@@ -1,17 +1,39 @@
 # Migraciones de JAY MOTOS
 
-## Pendiente de aplicar: `20261117000000_add_usage_hours_draft`
+## Estado actual: aplicadas ✅
 
-Esta migración:
+Las dos migraciones están aplicadas y verificadas en la base de datos de Neon
+(proyecto `jay-motos`, branch `production`, base `neondb`). `prisma migrate status`
+informa `Database schema is up to date!`.
 
-1. Agrega `Bike.usageHours` (`DOUBLE PRECISION`, nullable) para guardar las **horas de uso** de motocicletas usadas. Las filas existentes quedan en `NULL`: no se inventan valores.
-2. Agrega el valor `BORRADOR` al enum `BikeStatus`, para poder guardar publicaciones sin exponerlas en el catálogo público.
+Orden de aplicación:
 
-**No fue aplicada** porque el `backend/.env` de este entorno tiene un `DATABASE_URL` placeholder y la base de datos no está operativa. Tampoco se modificó ningún dato existente.
+1. `20261116000000_init` — migración baseline. Crea los enums `BikeCondition` y
+   `BikeStatus` (sin `BORRADOR`), las tablas `Brand`, `Bike`, `BikeImage`,
+   `BikeFeature`, `BikeVisit`, `AdminUser` y `Session`, sus índices y foreign keys.
+   **No incluye** `usageHours` ni `BORRADOR`: esos cambios pertenecen a la
+   migración siguiente.
+2. `20261117000000_add_usage_hours_draft` — agrega `Bike.usageHours`
+   (`DOUBLE PRECISION`, nullable) y el valor `BORRADOR` al enum `BikeStatus`.
+   Las filas existentes conservan `NULL`: no se inventan valores.
 
-### Cómo aplicarla
+La baseline se generó con `prisma migrate diff --from-empty` desde un esquema
+sin esos dos cambios, y se verificó que `baseline + migración existente` produce
+exactamente el `schema.prisma` actual. No se borró ni modificó ninguna migración
+previa.
 
-Con un `DATABASE_URL` real configurado en `backend/.env`:
+### Conexión
+
+`schema.prisma` usa dos cadenas:
+
+- `DATABASE_URL`: endpoint **pooled** de Neon (hostname con `-pooler`). La usa la
+  aplicación en runtime.
+- `DATABASE_URL_UNPOOLED`: endpoint **directo** (sin `-pooler`), declarado como
+  `directUrl` en el bloque `datasource`. Lo usa el CLI de Prisma para migraciones.
+
+### Comandos
+
+Para aplicar migraciones en otro entorno con la DB ya configurada:
 
 ```bash
 cd backend
@@ -19,17 +41,18 @@ npx prisma migrate deploy
 npx prisma generate
 ```
 
-> En Windows, si hay un `tsx watch` corriendo, `prisma generate` puede fallar con `EPERM` porque el query engine está bloqueado. Detené el backend dev server antes de generar el cliente.
+> En Windows, si hay un `tsx watch` corriendo, `prisma generate` puede fallar con
+> `EPERM` porque el query engine está bloqueado. Detené el backend dev server
+> antes de generar el cliente.
 
-Si se quiere crear la migración desde cero en otra máquina (en vez de usar el SQL incluido):
+No usar `db push` ni reiniciar el historial de migraciones: las migraciones son
+la fuente de verdad del esquema.
 
-```bash
-cd backend
-npx prisma migrate dev --name add_usage_hours_draft
-```
+### Comportamiento de las columnas agregadas
 
-### Comportamiento después de aplicarla
-
-- Las motos con `usageHours` **mayor a 0** y condición `USADA` muestran el dato en la ficha pública.
+- Las motos con `usageHours` **mayor a 0** y condición `USADA` muestran el dato en
+  la ficha pública.
 - `NULL`, `0` y motos `NUEVA` nunca muestran el campo.
-- Las publicaciones `BORRADOR` no aparecen en el catálogo ni se pueden abrir por slug o por ID público; sí se ven y se pueden editar desde el panel administrativo (endpoints autenticados).
+- Las publicaciones `BORRADOR` no aparecen en el catálogo ni se pueden abrir por
+  slug o por ID público; sí se ven y se pueden editar desde el panel
+  administrativo (endpoints autenticados).
