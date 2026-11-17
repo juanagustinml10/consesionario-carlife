@@ -119,22 +119,22 @@ export const Home: React.FC = () => {
 
             </div>
           </div>
-      </section>
 
-      {/* ============ MARCAS REFERENTES DEL OFF-ROAD (franja blanca a todo ancho) ============ */}
-      <section className="overflow-hidden border-b border-white/5 bg-white py-3">
-        <div className="overflow-hidden" aria-hidden="true">
-          <div className="flex w-max animate-marquee items-center gap-12 whitespace-nowrap">
-            {[...BRANDS, ...BRANDS].map((brand, i) => (
-              <span key={i} className="font-display text-lg font-extrabold italic uppercase tracking-[0.18em] text-black/75 sm:text-xl">
-                {brand} <span className="ml-12 text-jay-red">/</span>
-              </span>
-            ))}
+          {/* Marcas referentes del off-road — franja blanca a todo ancho, visible dentro del hero */}
+          <div className="relative z-10 border-t border-white/10 bg-white py-3">
+            <div className="overflow-hidden" aria-hidden="true">
+              <div className="flex w-max animate-marquee items-center gap-12 whitespace-nowrap">
+                {[...BRANDS, ...BRANDS].map((brand, i) => (
+                  <span key={i} className="font-display text-lg font-extrabold italic uppercase tracking-[0.18em] text-black/75 sm:text-xl">
+                    {brand} <span className="ml-12 text-jay-red">/</span>
+                  </span>
+                ))}
+              </div>
+            </div>
+            <p className="container-jay pt-2 text-center text-[9px] font-semibold uppercase tracking-[0.25em] text-black/45">
+              Marcas referentes del mundo off-road · JAY MOTOS no declara representación oficial de ninguna marca
+            </p>
           </div>
-        </div>
-        <p className="container-jay pt-2 text-center text-[9px] font-semibold uppercase tracking-[0.25em] text-black/45">
-          Marcas referentes del mundo off-road · JAY MOTOS no declara representación oficial de ninguna marca
-        </p>
       </section>
 
       {/* ============ 0 KM / USADAS (Catálogo) ============ */}
