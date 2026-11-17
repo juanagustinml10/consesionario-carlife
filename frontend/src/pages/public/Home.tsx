@@ -15,11 +15,12 @@ import { Logo } from '@/components/shared/Logo';
 import { BikeCard } from '@/components/public/BikeCard';
 import { bikesService } from '@/services/bikes';
 import { BUSINESS, buildWhatsAppLink } from '@/lib/constants';
+import betaPhoto from '@/assets/beta-300rr-freenduro.jpg';
 import ktmPhoto from '@/assets/ktm-enduro-promo.jpg';
 import type { Bike } from '@/types';
 
 const BRANDS = [
-  'YAMAHA', 'HONDA', 'KAWASAKI', 'SUZUKI', 'BMW', 'KTM', 'DUCATI', 'TRIUMPH', 'APRILIA', 'HARLEY-DAVIDSON', 'ROYAL ENFIELD', 'ZONTES',
+  'KTM', 'HUSQVARNA', 'GASGAS', 'BETA', 'SHERCO', 'HONDA', 'YAMAHA', 'KAWASAKI', 'SUZUKI',
 ];
 
 export const Home: React.FC = () => {
@@ -49,24 +50,32 @@ export const Home: React.FC = () => {
     <div className="bg-jay-black text-jay-white">
       {/* ============ HERO ============ */}
       <section className="relative overflow-hidden border-b border-white/5">
-        {/* Fotografía de fondo: KTM enduro (CC BY 3.0 — Tim Gotzkowsky) */}
+        {/* Fotografía real enduro (CC BY 4.0 — Jix31 · FREENDURO 2024) */}
         <img
-          src={ktmPhoto}
-          alt="Recorrido en moto enduro por una ruta de montaña — imagen ilustrativa de la cultura JAY MOTOS"
-          className="absolute inset-0 h-full w-full object-cover object-[68%_30%] sm:object-[70%_25%] lg:object-[center_30%]"
+          src={betaPhoto}
+          alt="Beta RR enduro sobre colina con camino off-road — imagen ilustrativa del mundo enduro"
+          className="absolute inset-0 h-full w-full object-cover object-[78%_38%] sm:object-[74%_30%] lg:object-[68%_30%]"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-jay-black via-jay-black/80 to-jay-black/5" aria-hidden="true" />
-        <div className="absolute inset-0 bg-gradient-to-t from-jay-black via-jay-black/10 to-jay-black/50" aria-hidden="true" />
+        <div className="absolute inset-0 bg-gradient-to-t from-jay-black via-jay-black/25 to-jay-black/40" aria-hidden="true" />
 
         <div className="container-jay relative">
           <div className="flex min-h-[92svh] items-center py-14 lg:min-h-[90svh] lg:py-10">
-            <div className="max-w-xl">
+            <div className="max-w-2xl">
+              {/* Logo + marca de identidad */}
               <motion.div
                 initial={{ opacity: 0, y: 18 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
+                className="flex items-center gap-4"
               >
-                <Logo className="h-14 sm:h-16 lg:h-20" />
+                <Logo className="h-16 w-auto drop-shadow-[0_0_35px_rgba(227,38,54,0.45)] sm:h-20 lg:h-24" />
+                <div className="hidden border-l border-white/15 pl-4 sm:block">
+                  <p className="font-display text-[10px] font-bold uppercase leading-tight tracking-[0.3em] text-white/60">
+                    Concesionaria<br />Multimarca
+                  </p>
+                  <p className="mt-1 font-display text-[10px] font-semibold uppercase tracking-[0.3em] text-jay-red-soft">Tucumán</p>
+                </div>
               </motion.div>
 
               <motion.p
@@ -76,39 +85,46 @@ export const Home: React.FC = () => {
                 className="mt-6 flex items-center gap-2 font-display text-[11px] font-semibold uppercase tracking-[0.35em] text-jay-red-soft"
               >
                 <BikeIcon size={14} />
-                Concesionaria multimarca · Enduro
+                Enduro · Motocross · Off-road
               </motion.p>
 
               <motion.h1
                 initial={{ opacity: 0, y: 26 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.22 }}
-                className="mt-2 font-display text-[4.2rem] font-extrabold italic uppercase leading-[0.82] text-white sm:text-7xl lg:text-[5.6rem]"
+                className="mt-2 font-display text-[3.6rem] font-extrabold italic uppercase leading-[0.85] text-white sm:text-7xl lg:text-[5.4rem]"
               >
-                FOR RIDERS,<br />
-                <span className="text-jay-red">BY RIDERS.</span>
+                Tu próxima<br />
+                <span className="text-jay-red">aventura</span><br />
+                empieza acá
               </motion.h1>
 
-              <motion.div
+              <motion.p
+                initial={{ opacity: 0, y: 18 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.3 }}
+                className="mt-4 font-display text-base font-bold uppercase tracking-[0.3em] text-white/70 sm:text-lg"
+              >
+                {BUSINESS.tagline}
+              </motion.p>
+
+              <motion.p
                 initial={{ opacity: 0, y: 22 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.32 }}
-                className="mt-5 space-y-1.5"
+                transition={{ duration: 0.7, delay: 0.38 }}
+                className="mt-3 max-w-md text-base text-gray-300"
               >
-                <p className="font-display text-lg font-bold uppercase tracking-wide text-white sm:text-xl">
-                  Motos 0 km y usadas seleccionadas.
-                </p>
-                <p className="text-base text-gray-300">Tu próxima aventura comienza acá.</p>
-              </motion.div>
+                Motos 0 km y usadas seleccionadas. Tu próxima aventura comienza acá.
+              </motion.p>
 
               <motion.div
                 initial={{ opacity: 0, y: 22 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.42 }}
+                transition={{ duration: 0.7, delay: 0.48 }}
                 className="mt-7 flex flex-col gap-3 sm:flex-row"
               >
                 <Link to="/motos" className="btn btn-red px-8 py-4 text-sm">
-                  Explorar motos
+                  Ver motos
                   <ArrowRight size={18} />
                 </Link>
                 <a href={waGeneral} target="_blank" rel="noopener noreferrer" className="btn btn-ghost px-8 py-4 text-sm">
@@ -130,22 +146,27 @@ export const Home: React.FC = () => {
               </motion.div>
 
               <p className="mt-6 max-w-[16rem] text-[9px] uppercase leading-relaxed tracking-[0.2em] text-white/35">
-                Foto ilustrativa: Tim Gotzkowsky · CC BY 3.0
+                Foto ilustrativa: Jix31 · FREENDURO 2024 · CC BY 4.0
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ============ MARCAS ============ */}
-      <section className="overflow-hidden border-b border-white/5 bg-white py-4" aria-hidden="true">
-        <div className="flex w-max animate-marquee items-center gap-12 whitespace-nowrap">
-          {[...BRANDS, ...BRANDS].map((brand, i) => (
-            <span key={i} className="font-display text-lg font-extrabold italic uppercase tracking-[0.18em] text-black/75 sm:text-xl">
-              {brand} <span className="ml-12 text-jay-red">/</span>
-            </span>
-          ))}
+      {/* ============ MARCAS REFERENTES DEL OFF-ROAD ============ */}
+      <section className="border-b border-white/5 bg-white py-3">
+        <div className="overflow-hidden" aria-hidden="true">
+          <div className="flex w-max animate-marquee items-center gap-12 whitespace-nowrap">
+            {[...BRANDS, ...BRANDS].map((brand, i) => (
+              <span key={i} className="font-display text-lg font-extrabold italic uppercase tracking-[0.18em] text-black/75 sm:text-xl">
+                {brand} <span className="ml-12 text-jay-red">/</span>
+              </span>
+            ))}
+          </div>
         </div>
+        <p className="container-jay pt-2 text-center text-[9px] font-semibold uppercase tracking-[0.25em] text-black/45">
+          Marcas referentes del mundo off-road · JAY MOTOS no declara representación oficial de ninguna marca
+        </p>
       </section>
 
       {/* ============ 0 KM / USADAS (Catálogo) ============ */}
@@ -159,7 +180,7 @@ export const Home: React.FC = () => {
             <h2 className="mt-3 font-display text-6xl font-extrabold italic leading-none text-white transition-transform duration-300 group-hover:translate-x-1 sm:text-7xl">
               0<br />KM
             </h2>
-            <p className="mt-4 max-w-[16rem] text-sm text-gray-400">Las últimas unidades de las marcas líderes.</p>
+            <p className="mt-4 max-w-[16rem] text-sm text-gray-400">Últimas unidades 0 km seleccionadas por nosotros.</p>
             <span className="mt-6 inline-flex items-center gap-2 font-display text-xs font-bold uppercase tracking-[0.2em] text-jay-red-soft">
               Ver 0 km <ArrowRight size={15} />
             </span>

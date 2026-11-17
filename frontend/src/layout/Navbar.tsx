@@ -9,9 +9,7 @@ import { useCompareStore } from '@/stores/compare';
 
 const NAV_LINKS = [
   { to: '/', label: 'Inicio' },
-  { to: '/motos', label: 'Catálogo' },
-  { to: '/motos?condition=NUEVA', label: 'Motos 0 KM' },
-  { to: '/motos?condition=USADA', label: 'Motos usadas' },
+  { to: '/motos', label: 'Motos' },
   { to: '/financiacion', label: 'Financiación' },
   { to: '/nosotros', label: 'Sobre nosotros' },
   { to: '/contacto', label: 'Contacto' },
@@ -70,7 +68,7 @@ export const Navbar: React.FC = () => {
             </Link>
 
             {/* Navegación desktop */}
-            <div className="hidden items-center gap-3 min-[1150px]:flex min-[1440px]:gap-5">
+            <div className="hidden items-center gap-5 lg:flex min-[1440px]:gap-7">
               {NAV_LINKS.map((link) => (
                 <Link
                   key={link.to}
@@ -132,11 +130,11 @@ export const Navbar: React.FC = () => {
                 className="btn btn-red hidden px-4 py-2.5 text-[11px] min-[1440px]:px-5 md:inline-flex"
               >
                 <Phone size={14} />
-                WhatsApp
+                Consultar
               </a>
               <button
                 onClick={() => setOpen(true)}
-                className="rounded-lg p-2 text-gray-200 min-[1150px]:hidden"
+                className="rounded-lg p-2 text-gray-200 lg:hidden"
                 aria-label="Abrir menú"
               >
                 <Menu size={26} />
@@ -148,7 +146,7 @@ export const Navbar: React.FC = () => {
 
       {/* Panel móvil */}
       {open && (
-        <div className="fixed inset-0 z-50 min-[1150px]:hidden">
+        <div className="fixed inset-0 z-50 lg:hidden">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setOpen(false)} aria-hidden="true" />
           <div className="absolute right-0 top-0 flex h-full w-full max-w-sm flex-col border-l border-white/10 bg-jay-black">
             <div className="flex h-16 shrink-0 items-center justify-between border-b border-white/5 px-5">
@@ -184,7 +182,7 @@ export const Navbar: React.FC = () => {
                 className="btn btn-red w-full py-4 text-sm"
               >
                 <Phone size={18} />
-                WhatsApp {BUSINESS.phoneDisplay}
+                Consultar por WhatsApp
               </a>
               <p className="mt-4 text-center text-[11px] text-gray-500">
                 {BUSINESS.address} · {BUSINESS.shippingLabel}

@@ -93,7 +93,7 @@ export const Footer: React.FC = () => (
       <div className="flex flex-col items-center justify-between gap-3 border-t border-white/5 py-6 text-[10px] leading-relaxed text-gray-600 md:flex-row">
         <p>© {new Date().getFullYear()} {BUSINESS.name} · {BUSINESS.tagline}</p>
         <p className="text-center">
-          Foto hero: Tim Gotzkowsky · CC BY 3.0 · Precios y fotos sujetos a confirmación en concesionaria
+          Foto ilustrativa hero: Jix31 · FREENDURO 2024 · CC BY 4.0 · Sección especialistas: Tim Gotzkowsky · CC BY 3.0 · Precios y fotos sujetos a confirmación en concesionaria
         </p>
       </div>
     </div>
