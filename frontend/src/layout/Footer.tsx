@@ -4,97 +4,78 @@ import { Logo } from '@/components/shared/Logo';
 import { buildWhatsAppLink, BUSINESS } from '@/lib/constants';
 import { Phone, MapPin, Truck } from 'lucide-react';
 
-const EXPLORE = [
-  { label: 'Catálogo', to: '/motos' },
+const LINKS = [
+  { label: 'Inicio', to: '/' },
+  { label: 'Motos', to: '/motos' },
   { label: 'Motos 0 KM', to: '/motos?condition=NUEVA' },
   { label: 'Motos usadas', to: '/motos?condition=USADA' },
   { label: 'Destacadas', to: '/motos?featured=true' },
   { label: 'Financiación', to: '/financiacion' },
-  { label: 'Comparador', to: '/comparador' },
-  { label: 'Favoritos', to: '/favoritos' },
-];
-
-const COMPANY = [
   { label: 'Sobre nosotros', to: '/nosotros' },
   { label: 'Contacto', to: '/contacto' },
-  { label: 'Panel administrativo', to: '/admin/login' },
+  { label: 'Comparador', to: '/comparador' },
+  { label: 'Favoritos', to: '/favoritos' },
 ];
 
 export const Footer: React.FC = () => (
   <footer className="relative border-t border-white/5 bg-black">
     <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-jay-red to-transparent opacity-70" />
 
-    <div className="container-jay">
-      <div className="grid grid-cols-2 gap-10 py-12 md:grid-cols-12 md:py-14">
-        <div className="col-span-2 space-y-5 md:col-span-4">
-          <Link to="/" aria-label="JAY MOTOS — Inicio" className="inline-block">
-            <Logo className="h-14 sm:h-16" />
+    <div className="container-jay py-8 md:py-10">
+      {/* Fila principal */}
+      <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between md:gap-10">
+        {/* Marca */}
+        <div className="flex items-center gap-4">
+          <Link to="/" aria-label="JAY MOTOS — Inicio" className="shrink-0">
+            <Logo className="h-11 sm:h-14" />
           </Link>
-          <p className="font-display text-sm font-bold uppercase tracking-[0.3em] text-jay-red-soft">
-            {BUSINESS.tagline}
+          <div className="space-y-1">
+            <p className="font-display text-[10px] font-bold uppercase leading-none tracking-[0.3em] text-jay-red-soft">
+              {BUSINESS.tagline}
+            </p>
+            <p className="max-w-[15rem] text-[11px] leading-snug text-gray-500">
+              {BUSINESS.specialty}
+            </p>
+          </div>
+        </div>
+
+        {/* Navegación */}
+        <nav className="flex flex-wrap gap-x-5 gap-y-2 text-[11px] text-gray-400" aria-label="Enlaces del sitio">
+          {LINKS.map((link) => (
+            <Link key={link.label} to={link.to} className="transition-colors hover:text-white">
+              {link.label}
+            </Link>
+          ))}
+        </nav>
+
+        {/* Contacto */}
+        <div className="space-y-1.5 text-[11px] text-gray-400">
+          <p className="flex items-start gap-2">
+            <MapPin size={13} className="mt-0.5 shrink-0 text-jay-red" />
+            <a href={BUSINESS.addressLink} target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-white">
+              {BUSINESS.address}
+            </a>
           </p>
-          <p className="max-w-xs text-sm leading-relaxed text-gray-400">
-            {BUSINESS.specialty}
+          <p className="flex items-center gap-2">
+            <Truck size={13} className="shrink-0 text-jay-red" />
+            {BUSINESS.shippingLabel}
           </p>
-        </div>
-
-        <div className="md:col-span-2">
-          <h4 className="mb-4 font-display text-xs font-bold uppercase tracking-[0.2em] text-gray-500">Explorar</h4>
-          <ul className="space-y-2.5">
-            {EXPLORE.map((item) => (
-              <li key={item.label}>
-                <Link to={item.to} className="text-sm text-gray-300 transition-colors hover:text-white">{item.label}</Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div className="md:col-span-2">
-          <h4 className="mb-4 font-display text-xs font-bold uppercase tracking-[0.2em] text-gray-500">Agencia</h4>
-          <ul className="space-y-2.5">
-            {COMPANY.map((item) => (
-              <li key={item.label}>
-                <Link to={item.to} className="text-sm text-gray-300 transition-colors hover:text-white">{item.label}</Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div className="col-span-2 md:col-span-4">
-          <h4 className="mb-4 font-display text-xs font-bold uppercase tracking-[0.2em] text-gray-500">Concesionaria</h4>
-          <ul className="space-y-3.5 text-sm text-gray-300">
-            <li className="flex items-start gap-3">
-              <MapPin size={17} className="mt-0.5 shrink-0 text-jay-red" />
-              <a href={BUSINESS.addressLink} target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-white">
-                {BUSINESS.address}
-              </a>
-            </li>
-            <li className="flex items-start gap-3">
-              <Truck size={17} className="mt-0.5 shrink-0 text-jay-red" />
-              {BUSINESS.shippingLabel}
-            </li>
-            <li className="flex items-start gap-3">
-              <Phone size={17} className="mt-0.5 shrink-0 text-jay-red" />
-              <a href={buildWhatsAppLink(BUSINESS.whatsappGeneralMessage)} target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-white">
-                {BUSINESS.phoneDisplay} (WhatsApp)
-              </a>
-            </li>
-          </ul>
+          <a
+            href={buildWhatsAppLink(BUSINESS.whatsappGeneralMessage)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 text-white transition-colors hover:text-jay-red-soft"
+          >
+            <Phone size={13} className="shrink-0 text-jay-red" />
+            {BUSINESS.phoneDisplay} (WhatsApp)
+          </a>
         </div>
       </div>
 
-      {/* Watermark */}
-      <div className="pointer-events-none select-none overflow-hidden border-t border-white/5 pt-8" aria-hidden="true">
-        <p className="whitespace-nowrap text-center font-display text-[16vw] font-extrabold italic leading-none tracking-tight text-white/[0.04] sm:text-[13vw] lg:text-[11rem]">
-          FOR RIDERS
-        </p>
-      </div>
-
-      <div className="flex flex-col items-center justify-between gap-3 border-t border-white/5 py-6 text-[10px] leading-relaxed text-gray-600 md:flex-row">
-        <p>© {new Date().getFullYear()} {BUSINESS.name} · {BUSINESS.tagline}</p>
-        <p className="text-center">
-          Foto ilustrativa hero: Jix31 · FREENDURO 2024 · CC BY 4.0 · Sección especialistas: Tim Gotzkowsky · CC BY 3.0 · Precios y fotos sujetos a confirmación en concesionaria
-        </p>
+      {/* Barra inferior */}
+      <div className="flex flex-col items-center justify-between gap-1.5 border-t border-white/5 pt-4 text-[9px] text-gray-600 sm:flex-row">
+        <p>© {new Date().getFullYear()} {BUSINESS.name}</p>
+        <p>Fotos: Jix31 (CC BY 4.0) · Tim Gotzkowsky (CC BY 3.0) · Precios y fotos sujetos a confirmación</p>
       </div>
     </div>
   </footer>

@@ -8,7 +8,6 @@ import {
   Phone,
   BadgeCheck,
   MapPin,
-  Scale,
 } from 'lucide-react';
 import { Link } from '@/components/shared/Link';
 import { Logo } from '@/components/shared/Logo';
@@ -62,20 +61,11 @@ export const Home: React.FC = () => {
         <div className="container-jay relative">
           <div className="flex min-h-[92svh] items-center py-14 lg:min-h-[90svh] lg:py-10">
             <div className="max-w-2xl">
-              {/* Logo oficial integrado */}
-              <motion.div
-                initial={{ opacity: 0, y: 18 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-              >
-                <Logo className="h-20 w-auto drop-shadow-[0_0_35px_rgba(227,38,54,0.4)] sm:h-24 lg:h-32" />
-              </motion.div>
-
               <motion.h1
                 initial={{ opacity: 0, y: 26 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.15 }}
-                className="mt-6 font-display text-4xl font-extrabold italic uppercase leading-[0.9] text-white sm:text-6xl lg:text-7xl xl:text-[4.5rem]"
+                className="font-display text-4xl font-extrabold italic uppercase leading-[0.9] text-white sm:text-6xl lg:text-7xl xl:text-[4.5rem]"
               >
                 Tu próxima<br />
                 <span className="text-jay-red">aventura</span><br />
@@ -128,25 +118,6 @@ export const Home: React.FC = () => {
                 </span>
               </motion.div>
 
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.8, delay: 0.65 }}
-                className="mt-5 flex items-center gap-4 text-[10px] font-semibold uppercase tracking-[0.25em] text-white/45"
-              >
-                <Link to="/comparador" className="flex items-center gap-1.5 transition-colors hover:text-white">
-                  <Scale size={13} />
-                  Comparar motos
-                </Link>
-                <span className="h-3 w-px bg-white/15" aria-hidden="true" />
-                <Link to="/financiacion" className="transition-colors hover:text-white">
-                  Financiación
-                </Link>
-              </motion.div>
-
-              <p className="mt-6 max-w-[16rem] text-[9px] uppercase leading-relaxed tracking-[0.2em] text-white/35">
-                Foto ilustrativa: Jix31 · FREENDURO 2024 · CC BY 4.0
-              </p>
             </div>
           </div>
         </div>

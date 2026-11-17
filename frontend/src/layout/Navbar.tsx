@@ -31,6 +31,7 @@ export const Navbar: React.FC = () => {
 
   return (
     <header className="sticky top-0 z-50 border-b border-white/5 bg-jay-black/95 backdrop-blur-md">
+      <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-jay-red to-transparent opacity-60" aria-hidden="true" />
       <div className="container-jay">
         <div className="flex h-16 items-center justify-between gap-4 lg:h-[72px]">
           {/* Logo */}
@@ -46,7 +47,7 @@ export const Navbar: React.FC = () => {
                 to={link.to}
                 className={({ isActive }) =>
                   `group relative whitespace-nowrap py-2 font-display text-[11px] font-semibold uppercase tracking-[0.14em] transition-colors min-[1440px]:text-[12px] ${
-                    isActive ? 'text-white' : 'text-gray-400 hover:text-white'
+                    isActive ? 'text-jay-red-soft' : 'text-gray-400 hover:text-white'
                   }`
                 }
               >
