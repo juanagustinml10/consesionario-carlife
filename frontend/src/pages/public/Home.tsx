@@ -48,7 +48,7 @@ export const Home: React.FC = () => {
   return (
     <div className="bg-jay-black text-jay-white">
       {/* ============ HERO ============ */}
-      <section className="relative overflow-hidden border-b border-white/5">
+      <section className="relative flex min-h-[100svh] flex-col overflow-hidden border-b border-white/5">
         {/* Fotografía real enduro (CC BY 4.0 — Jix31 · FREENDURO 2024) */}
         <img
           src={betaPhoto}
@@ -58,7 +58,7 @@ export const Home: React.FC = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-jay-black via-jay-black/80 to-jay-black/5" aria-hidden="true" />
         <div className="absolute inset-0 bg-gradient-to-t from-jay-black via-jay-black/25 to-jay-black/40" aria-hidden="true" />
 
-        <div className="container-jay relative flex min-h-[92svh] items-center lg:min-h-[90svh]">
+        <div className="container-jay relative flex flex-1 items-center py-14">
             <div className="max-w-2xl">
               <motion.h1
                 initial={{ opacity: 0, y: 26 }}
