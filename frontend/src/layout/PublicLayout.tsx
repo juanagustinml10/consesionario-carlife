@@ -9,8 +9,14 @@ import { Footer } from '@/layout/Footer';
  */
 export const PublicLayout: React.FC = () => (
   <div className="flex min-h-screen flex-col bg-jay-black">
+    <a
+      href="#main-content"
+      className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-jay-red focus:px-4 focus:py-3 focus:text-sm focus:font-bold focus:text-white"
+    >
+      Saltar al contenido principal
+    </a>
     <Navbar />
-    <main className="flex-1">
+    <main id="main-content" className="flex-1">
       <Outlet />
     </main>
     <Footer />

@@ -2,14 +2,13 @@ import * as React from 'react';
 import { Link } from '@/components/shared/Link';
 import { Logo } from '@/components/shared/Logo';
 import { buildWhatsAppLink, BUSINESS } from '@/lib/constants';
-import { Phone, MapPin, Truck } from 'lucide-react';
+import { MessageCircle, MapPin, Truck, ArrowUpRight } from 'lucide-react';
 
 const LINKS = [
   { label: 'Inicio', to: '/' },
-  { label: 'Motos', to: '/motos' },
-  { label: 'Motos 0 KM', to: '/motos?condition=NUEVA' },
+  { label: 'Catálogo', to: '/motos' },
+  { label: 'Motos 0 km', to: '/motos?condition=NUEVA' },
   { label: 'Motos usadas', to: '/motos?condition=USADA' },
-  { label: 'Destacadas', to: '/motos?featured=true' },
   { label: 'Financiación', to: '/financiacion' },
   { label: 'Sobre nosotros', to: '/nosotros' },
   { label: 'Contacto', to: '/contacto' },
@@ -17,65 +16,99 @@ const LINKS = [
   { label: 'Favoritos', to: '/favoritos' },
 ];
 
-export const Footer: React.FC = () => (
-  <footer className="relative border-t border-white/5 bg-black">
-    <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-jay-red to-transparent opacity-70" />
+const CURRENT_YEAR = new Date().getFullYear();
 
-    <div className="container-jay py-8 md:py-10">
+export const Footer: React.FC = () => (
+  <footer className="relative overflow-hidden border-t border-white/8 bg-black">
+    <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-jay-red to-transparent opacity-70" aria-hidden="true" />
+    <span className="pointer-events-none absolute -bottom-14 right-0 select-none font-display text-[18rem] font-extrabold italic leading-none text-outline sm:text-[26rem]" aria-hidden="true">
+      JAY
+    </span>
+
+    <div className="container-jay relative py-12 md:py-16">
+      {/* Cierre / WhatsApp */}
+      <div className="mb-12 flex flex-col gap-6 border-b border-white/8 pb-10 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="font-display text-[10px] font-bold uppercase tracking-[0.3em] text-jay-red">Hablemos</p>
+          <p className="mt-3 max-w-xl font-display text-4xl font-extrabold uppercase italic leading-[0.88] text-white sm:text-6xl">
+            Tu próxima moto <span className="text-jay-red">empieza acá.</span>
+          </p>
+        </div>
+        <a
+          href={buildWhatsAppLink(BUSINESS.whatsappGeneralMessage)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn btn-red w-full px-7 py-4 text-xs sm:w-auto"
+        >
+          <MessageCircle size={17} /> {BUSINESS.phoneDisplay}
+        </a>
+      </div>
+
       {/* Fila principal */}
-      <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between md:gap-10">
+      <div className="grid gap-10 md:grid-cols-12 md:gap-8">
         {/* Marca */}
-        <div className="flex items-center gap-4">
-          <Link to="/" aria-label="JAY MOTOS — Inicio" className="shrink-0">
-            <Logo className="h-11 sm:h-14" />
+        <div className="md:col-span-4">
+          <Link to="/" aria-label="JAY MOTOS — Inicio" className="inline-block">
+            <Logo className="h-11 sm:h-12" />
           </Link>
-          <div className="space-y-1">
-            <p className="font-display text-[10px] font-bold uppercase leading-none tracking-[0.3em] text-jay-red-soft">
-              {BUSINESS.tagline}
-            </p>
-            <p className="max-w-[15rem] text-[11px] leading-snug text-gray-500">
-              {BUSINESS.specialty}
-            </p>
-          </div>
+          <p className="mt-5 font-display text-[10px] font-bold uppercase leading-none tracking-[0.28em] text-jay-red-soft">
+            {BUSINESS.tagline}
+          </p>
+          <p className="mt-3 max-w-[18rem] text-[11px] leading-relaxed text-gray-500">
+            {BUSINESS.specialty}
+          </p>
+          <div className="mt-6 h-[2px] w-10 bg-jay-red" aria-hidden="true" />
         </div>
 
         {/* Navegación */}
-        <nav className="flex flex-wrap gap-x-5 gap-y-2 text-[11px] text-gray-400" aria-label="Enlaces del sitio">
-          {LINKS.map((link) => (
-            <Link key={link.label} to={link.to} className="transition-colors hover:text-white">
-              {link.label}
-            </Link>
-          ))}
+        <nav className="md:col-span-4" aria-label="Enlaces del sitio">
+          <p className="mb-4 font-display text-[10px] font-bold uppercase tracking-[0.25em] text-gray-600">Navegación</p>
+          <div className="grid grid-cols-2 gap-x-5 gap-y-3 text-[11px] text-gray-400 sm:grid-cols-3 md:grid-cols-2">
+            {LINKS.map((link) => (
+              <Link key={link.label} to={link.to} className="group inline-flex items-center gap-1.5 transition-colors hover:text-white">
+                <span className="h-1 w-1 shrink-0 bg-jay-red/60 transition-all group-hover:w-2" aria-hidden="true" />
+                {link.label}
+              </Link>
+            ))}
+          </div>
         </nav>
 
         {/* Contacto */}
-        <div className="space-y-1.5 text-[11px] text-gray-400">
-          <p className="flex items-start gap-2">
-            <MapPin size={13} className="mt-0.5 shrink-0 text-jay-red" />
-            <a href={BUSINESS.addressLink} target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-white">
-              {BUSINESS.address}
-            </a>
-          </p>
-          <p className="flex items-center gap-2">
-            <Truck size={13} className="shrink-0 text-jay-red" />
-            {BUSINESS.shippingLabel}
-          </p>
-          <a
-            href={buildWhatsAppLink(BUSINESS.whatsappGeneralMessage)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 text-white transition-colors hover:text-jay-red-soft"
-          >
-            <Phone size={13} className="shrink-0 text-jay-red" />
-            {BUSINESS.phoneDisplay} (WhatsApp)
-          </a>
+        <div className="md:col-span-4">
+          <p className="mb-4 font-display text-[10px] font-bold uppercase tracking-[0.25em] text-gray-600">Contacto</p>
+          <ul className="space-y-4 text-[11px] text-gray-400">
+            <li className="flex items-start gap-3">
+              <MapPin size={14} className="mt-0.5 shrink-0 text-jay-red" />
+              <a href={BUSINESS.addressLink} target="_blank" rel="noopener noreferrer" className="inline-flex items-start gap-1 transition-colors hover:text-white">
+                <span>{BUSINESS.address}</span>
+                <ArrowUpRight size={12} className="shrink-0" />
+              </a>
+            </li>
+            <li className="flex items-start gap-3">
+              <Truck size={14} className="mt-0.5 shrink-0 text-jay-red" />
+              {BUSINESS.shippingLabel}
+            </li>
+            <li className="flex items-start gap-3">
+              <MessageCircle size={14} className="mt-0.5 shrink-0 text-jay-red" />
+              <a
+                href={buildWhatsAppLink(BUSINESS.whatsappGeneralMessage)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-colors hover:text-white"
+              >
+                {BUSINESS.phoneDisplay} (WhatsApp)
+              </a>
+            </li>
+          </ul>
         </div>
       </div>
 
       {/* Barra inferior */}
-      <div className="flex flex-col items-center justify-between gap-1.5 border-t border-white/5 pt-4 text-[9px] text-gray-600 sm:flex-row">
-        <p>© {new Date().getFullYear()} {BUSINESS.name}</p>
-        <p>Fotos: Jix31 (CC BY 4.0) · Tim Gotzkowsky (CC BY 3.0) · Precios y fotos sujetos a confirmación</p>
+      <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-white/8 pt-6 text-[10px] leading-relaxed text-gray-600 sm:flex-row sm:text-left">
+        <p>© {CURRENT_YEAR} {BUSINESS.name} · {BUSINESS.tagline}</p>
+        <p className="max-w-2xl text-center sm:text-right">
+          Fotos: Beta RR Freenduro — Jimmy Boakes / Jix31 (CC BY 4.0) · KTM forest — Tim Gotzkowsky (CC BY 3.0). Precios y condiciones sujetos a confirmación.
+        </p>
       </div>
     </div>
   </footer>

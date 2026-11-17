@@ -1,0 +1,77 @@
+# AGENTS.md — JAY MOTOS
+
+## Stack y disposición del repo
+
+Monorepo simple **sin workspaces** (no hay `turborepo`/`nx`/workspaces de npm). Solo `package.json` en la raíz con scripts de conveniencia; las dependencias se instalan por carpeta.
+
+| Carpeta | Rol | Tooling |
+|---|---|---|
+| `frontend/` | SPA pública + panel admin | React 19, Vite 8, TypeScript ~7.0.2, Tailwind v4 (`@theme` en `src/index.css`, **no** en `tailwind.config.js`), Framer Motion, Zustand (persist `localStorage`), React Router 7, Axios |
+| `backend/` | API REST | Node ≥18 (probado Node 24), Express 4, TS 5.8 (typecheck only), Prisma 6, Zod, bcryptjs, JWT, Multer, Helmet |
+| `scripts/dev.mjs` | Levanta backend + frontend juntos | Spawn directo de los binarios `node_modules/vite/bin/vite.js` y `node_modules/tsx/dist/cli.mjs` con `process.execPath` y **`shell: false`** (el harness no puede lanzar `npm.cmd`/`cmd.exe`) |
+
+No hay CI, no hay Dockerfiles, no hay tests.
+
+## Comandos que el agente debe recordar
+
+### Levantar todo
+```bash
+npm run dev        # scripts/dev.mjs → backend (tsx watch src/index.ts :4000) + frontend (vite :5173)
+npm run dev:frontend
+npm run dev:backend
+```
+> **Windows + harness:** igual que `scripts/dev.mjs`, ejecutar si hace falta hacerlo manualmente: `node node_modules/vite/bin/vite.js` (frontend) y `node node_modules/tsx/dist/cli.mjs watch src/index.ts` (backend). `npm`/`npx` funcionan pero su shim `npm.cmd`/`cmd.exe` NO puede spawnearlo el harness (EINVAL/ENOENT).
+
+### Compilar
+```bash
+npm run build            # raíz: frontend (tsc -b && vite build) → backend (tsc --noEmit && prisma generate)
+npm --prefix frontend run build
+npm --prefix backend run build
+```
+⚠️ **Gran trampa de entorno:** `backend` build falla con `EPERM` al renombrar `node_modules/.prisma/client/query_engine-windows.dll.node` si hay un dev server/tsx watch en ejecución (el query engine está cargado y bloqueado por Windows). **Detener el backend dev server antes de `prisma generate`.**
+
+### Typecheck / lint
+```bash
+cd frontend && npx tsc --noEmit -p tsconfig.app.json   # el raíz NO resuelve tsc
+cd frontend && npm run lint                             # oxlint, warnings OK, 0 errors esperados
+cd backend && npx tsc --noEmit                          # solo typecheck; el runtime usa tsx
+```
+No existe `tsc` en el root; siempre invocarlo con `--prefix` o dentro de cada carpeta.
+
+## Estado real (verificado) — no suponer
+
+- **La DB no está operativa.** `backend/.env` local tiene `DATABASE_URL` placeholder → `prisma db execute` devuelve **P1010**; `/api/bikes` y `/api/bikes/brands` devuelven **500**. `prisma/migrations/` **no existe** → nunca se ejecutó `prisma migrate dev`. No asumas que los endpoints de datos funcionan.
+- **`/health` (200) ≠ API funcionando** — solo verifica que Express está vivo.
+- **El panel admin nunca fue probado en vivo** (sin DB, sin seed); está completo en código pero no validado end-to-end.
+- **Frontend público muestra estados vacíos** por `catch → []` cuando la API falla — por diseño, no es un bug.
+- **Procesos dev huérfanos** en puertos 4000/5173 pueden persistir entre sesiones y bloquear `prisma generate` — si `EPERM` en backend, matar el tsx watch primero.
+
+## Datos oficiales (no cambiar)
+
+Nombre: **JAY MOTOS** · Eslogan: **FOR RIDERS, BY RIDERS.** · Dirección: **Corrientes 1440, Tucumán, Argentina** · WhatsApp/Tel: **3812212048** → `wa.me/5493812212048` · Envíos a todo el país · Especialidad: multimarca, identidad enduro/off-road · 0 km y usadas seleccionadas.
+
+**No inventar años, clientes, garantías, financiación ni promociones.** Constantes centralizadas en `frontend/src/lib/constants.ts` (`BUSINESS`), no duplicar inline.
+
+## Convenciones y trampas concretas
+
+- **Alias `@` → `frontend/src`** (tsconfig.app.json + vite.config.ts). Usar `@/...` en imports, no relativos `../../`.
+- **Tailwind v4:** los tokens/estilos viven en `src/index.css` (`@import "tailwindcss"` + `@theme { --color-jay-* }`). Edit `index.css`, no `tailwind.config.js` (ese archivo es legado de v3).
+- **Logo oficial:** `logo agencia.jpeg` (raíz, intacto). El web usa `frontend/public/logo/logo-jaymotos-transparent.png` (alfa + relleno negro `#111111`). **No redibujar, no recolorear, no inventar una variante SVG.** Si se quiere nueva versión, partir del JPEG.
+- **Créditos fotográficos a conservar** en footer: Beta RR Freenduro (CC BY 4.0, Jimmy Boakes / Jix31) y KTM forest (CC BY 3.0, Tim Gotzkowsky).
+- **Rutas públicas deben quedar dentro de `<PublicLayout>`** (wrapper de `App.tsx` con Navbar + Outlet + Footer). No agregar `<Navbar>` manualmente en páginas públicas.
+- **Panel admin:** `ProtectedRoute` lee `localStorage` (`jay_motors_access_token`); sin backend real el panel no puede autenticar.
+- **`.gitignore` excluye `backend/.env`**; solo `.env.example` (valores placeholder). **Nunca commitear `backend/.env`** ni credenciales.
+- **Backend usa `tsx` en runtime** (no compila a `dist/` para ejecución); `tsc --noEmit` es solo validación de tipos. No esperes `dist/backend/serve.js`.
+- **Windows paths con espacios** — siempre con comillas cuando toque fuera de los scripts; `dev.mjs` se resuelve relativa al repo, no al CWD.
+
+## Verificación mínima antes de dar por terminado
+
+1. `npm run build` (raíz) — si backend falla con EPERM, detener dev server y reintentar.
+2. `cd frontend && npx tsc --noEmit -p tsconfig.app.json` — sin errores.
+3. `cd frontend && npm run lint` — sin errores (warnings permitido).
+4. Si tocaste backend data flow: verificar contra DB real u documentar que no fue verificado.
+5. Rutas públicas siguen mostrando datos/vacío sin romper (no asumir DB disponible).
+
+## Repositorio remoto
+
+`origin` = https://github.com/juanagustinml10/jay-motos (público). `main` 1 commit ahead de `origin/main` al momento de escribir (no pusheado automáticamente). Formato de commits: `tipo(alcance): resumen en español`.

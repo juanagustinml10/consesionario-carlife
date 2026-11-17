@@ -67,6 +67,17 @@
   a { color: inherit; text-decoration: none; }
   button, [role="button"] { cursor: pointer; }
 
+  /* Foco visible y consistente para navegación por teclado */
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  [tabindex]:focus-visible {
+    outline: 2px solid var(--color-jay-red-soft);
+    outline-offset: 3px;
+  }
+
   img { display: block; max-width: 100%; height: auto; }
 
   ::selection { background: var(--color-jay-red); color: #fff; }
@@ -79,9 +90,19 @@
 
 @layer utilities {
   .text-balance { text-wrap: balance; }
+  .scrollbar-none { scrollbar-width: none; }
+  .scrollbar-none::-webkit-scrollbar { display: none; }
   .text-outline {
     -webkit-text-stroke: 1.5px rgba(255,255,255,0.22);
     color: transparent;
+  }
+  .text-outline-light {
+    -webkit-text-stroke: 1px rgba(17,17,17,0.18);
+    color: transparent;
+  }
+  .track-lines {
+    background-image: linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px);
+    background-size: 100% 48px;
   }
   .diagonal-lines {
     background-image: repeating-linear-gradient(
@@ -155,6 +176,69 @@
     background: var(--color-jay-surface);
     border: 1px solid var(--color-jay-line);
     border-radius: 1rem;
+  }
+
+  /* Sistema visual extendido: superficies, campos y etiquetas sin esquinas redondeadas. */
+  .panel {
+    background: var(--color-jay-surface);
+    border: 1px solid var(--color-jay-line);
+  }
+  .panel-light {
+    background: #ffffff;
+    border: 1px solid rgba(17, 17, 17, 0.12);
+    color: var(--color-jay-black);
+  }
+  .field {
+    width: 100%;
+    height: 3rem;
+    padding: 0 1rem;
+    background: var(--color-jay-elevated);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+    font-size: 0.875rem;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .field::placeholder { color: #6b6b6b; }
+  .field:focus {
+    border-color: var(--color-jay-red);
+    box-shadow: 0 0 0 3px rgba(227, 38, 54, 0.14);
+  }
+  .field-label {
+    font-family: var(--font-display);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #8a8a8e;
+  }
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.6rem;
+    font-family: var(--font-display);
+    font-size: 0.625rem;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+  .section-index {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: var(--font-display);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+  }
+  .section-index::before {
+    content: "";
+    width: 2.5rem;
+    height: 2px;
+    background: var(--color-jay-red);
   }
 }
 

@@ -20,7 +20,9 @@ export const Logo: React.FC<LogoProps> = ({
   <img
     src="/logo/logo-jaymotos-transparent.png"
     alt={alt}
-    className={cn('w-auto select-none object-contain', className)}
+    width={1274}
+    height={274}
+    className={cn('h-auto w-auto select-none object-contain', className)}
     draggable={false}
   />
 );

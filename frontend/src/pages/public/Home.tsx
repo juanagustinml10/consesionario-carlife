@@ -1,17 +1,23 @@
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import {
   ArrowRight,
-  ChevronRight,
   Truck,
   Phone,
   BadgeCheck,
   MapPin,
+  ChevronLeft,
+  ChevronRight,
+  SearchX,
 } from 'lucide-react';
 import { Link } from '@/components/shared/Link';
 import { Logo } from '@/components/shared/Logo';
 import { BikeCard } from '@/components/public/BikeCard';
+import { SectionHeading } from '@/components/public/SectionHeading';
+import { EmptyState } from '@/components/shared/EmptyState';
+import { ErrorState } from '@/components/shared/ErrorState';
+import { SkeletonCard } from '@/components/shared/SkeletonCard';
 import { bikesService } from '@/services/bikes';
 import { BUSINESS, buildWhatsAppLink } from '@/lib/constants';
 import betaPhoto from '@/assets/beta-300rr-freenduro.jpg';
@@ -26,214 +32,294 @@ export const Home: React.FC = () => {
   const [featured, setFeatured] = useState<Bike[]>([]);
   const [latest, setLatest] = useState<Bike[]>([]);
   const [loading, setLoading] = useState(true);
+  const [featuredError, setFeaturedError] = useState(false);
+  const [latestError, setLatestError] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
+  const latestRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let cancelled = false;
+    // eslint-disable-next-line react/set-state-in-effect -- reinicio del estado antes de cada carga
+    setLoading(true);
+    setFeaturedError(false);
+    setLatestError(false);
     Promise.allSettled([
       bikesService.list({ featured: true, limit: 3 }),
-      bikesService.list({ limit: 6 }),
+      bikesService.list({ limit: 4 }),
     ]).then(([featuredRes, latestRes]) => {
       if (cancelled) return;
-      if (featuredRes.status === 'fulfilled') setFeatured(featuredRes.value.data);
-      if (latestRes.status === 'fulfilled') setLatest(latestRes.value.data);
+      if (featuredRes.status === 'fulfilled') {
+        setFeatured(featuredRes.value.data);
+      } else {
+        setFeatured([]);
+        setFeaturedError(true);
+      }
+      if (latestRes.status === 'fulfilled') {
+        setLatest(latestRes.value.data);
+      } else {
+        setLatest([]);
+        setLatestError(true);
+      }
       setLoading(false);
     });
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [reloadKey]);
 
+  const retry = () => setReloadKey((key) => key + 1);
   const waGeneral = buildWhatsAppLink(BUSINESS.whatsappGeneralMessage);
+  const scrollLatest = (direction: number) => {
+    latestRef.current?.scrollBy({ left: direction * 380, behavior: 'smooth' });
+  };
 
   return (
     <div className="bg-jay-black text-jay-white">
       {/* ============ HERO ============ */}
-      <section className="relative flex min-h-[88svh] flex-col overflow-hidden border-b border-white/5 lg:min-h-[calc(100svh-6rem)]">
-        {/* Fotografía real enduro (CC BY 4.0 — Jix31 · FREENDURO 2024) */}
+      <section className="relative flex min-h-[88svh] flex-col overflow-hidden border-b border-white/5 lg:min-h-[calc(100svh-4.5rem)]">
+        {/* Fotografía original del hero: se conserva sin reemplazos */}
         <img
           src={betaPhoto}
-          alt="Beta RR enduro sobre colina con camino off-road — imagen ilustrativa del mundo enduro"
+          alt="Moto Beta RR enduro sobre un camino de montaña — imagen del mundo off-road"
+          fetchPriority="high"
           className="absolute inset-0 h-full w-full object-cover object-[78%_38%] sm:object-[74%_30%] lg:object-[68%_30%]"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-jay-black via-jay-black/80 to-jay-black/5" aria-hidden="true" />
         <div className="absolute inset-0 bg-gradient-to-t from-jay-black via-jay-black/25 to-jay-black/40" aria-hidden="true" />
 
         <div className="container-jay relative flex flex-1 items-center py-14">
-            <div className="max-w-2xl">
-              <motion.h1
-                initial={{ opacity: 0, y: 26 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.15 }}
-                className="font-display text-5xl font-extrabold italic uppercase leading-[0.9] text-white sm:text-7xl lg:text-[5.5rem] xl:text-[6rem]"
-              >
-                Tu próxima<br />
-                <span className="text-jay-red">aventura</span><br />
-                empieza acá
-              </motion.h1>
+          <div className="max-w-2xl">
+            <motion.h1
+              initial={{ opacity: 0, y: 26 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.15 }}
+              className="font-display text-5xl font-extrabold italic uppercase leading-[0.9] text-white sm:text-7xl lg:text-[5.5rem] xl:text-[6rem]"
+            >
+              Tu próxima<br />
+              <span className="text-jay-red">aventura</span><br />
+              empieza acá
+            </motion.h1>
 
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.28 }}
-                className="mt-5 font-display text-base font-bold uppercase tracking-[0.35em] text-white/75 sm:text-lg"
-              >
-                {BUSINESS.tagline}
-              </motion.p>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.28 }}
+              className="mt-5 font-display text-base font-bold uppercase tracking-[0.35em] text-white/75 sm:text-lg"
+            >
+              {BUSINESS.tagline}
+            </motion.p>
 
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.36 }}
-                className="mt-2 text-base text-gray-300"
-              >
-                Motos 0 km y usadas seleccionadas.
-              </motion.p>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.36 }}
+              className="mt-2 text-base text-gray-300"
+            >
+              {BUSINESS.activity}
+            </motion.p>
 
-              <motion.div
-                initial={{ opacity: 0, y: 22 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.48 }}
-                className="mt-7 flex flex-col gap-3 sm:flex-row"
-              >
-                <Link to="/motos" className="btn btn-red px-8 py-4 text-sm">
-                  Ver motos
-                  <ArrowRight size={18} />
-                </Link>
-                <a href={waGeneral} target="_blank" rel="noopener noreferrer" className="btn btn-ghost px-8 py-4 text-sm">
-                  <Phone size={17} />
-                  Contactar por WhatsApp
-                </a>
-              </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 22 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.48 }}
+              className="mt-7 flex flex-col gap-3 sm:flex-row"
+            >
+              <Link to="/motos" className="btn btn-red px-8 py-4 text-sm">
+                Ver motos
+                <ArrowRight size={18} />
+              </Link>
+              <a href={waGeneral} target="_blank" rel="noopener noreferrer" className="btn btn-ghost px-8 py-4 text-sm">
+                <Phone size={17} />
+                Contactar por WhatsApp
+              </a>
+            </motion.div>
 
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.8, delay: 0.55 }}
-                className="mt-7 inline-flex items-center gap-2 rounded-full border border-jay-red/40 bg-black/60 px-4 py-2 backdrop-blur"
-              >
-                <Truck size={15} className="text-jay-red-soft" />
-                <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-gray-100">
-                  Envíos a todo el país
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.55 }}
+              className="mt-7 inline-flex items-center gap-2 rounded-full border border-jay-red/40 bg-black/60 px-4 py-2 backdrop-blur"
+            >
+              <Truck size={15} className="text-jay-red-soft" />
+              <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-gray-100">
+                {BUSINESS.shippingLabel}
+              </span>
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Franja multimarca a todo ancho, dentro del hero */}
+        <div className="relative z-10 border-t border-white/10 bg-white py-3">
+          <div className="overflow-hidden" aria-hidden="true">
+            <div className="flex w-max animate-marquee items-center gap-12 whitespace-nowrap">
+              {[...BRANDS, ...BRANDS].map((brand, i) => (
+                <span key={i} className="font-display text-lg font-extrabold italic uppercase tracking-[0.18em] text-black/75 sm:text-xl">
+                  {brand} <span className="ml-12 text-jay-red">/</span>
                 </span>
-              </motion.div>
-
+              ))}
             </div>
           </div>
-
-          {/* Marcas referentes del off-road — franja blanca a todo ancho, visible dentro del hero */}
-          <div className="relative z-10 border-t border-white/10 bg-white py-3">
-            <div className="overflow-hidden" aria-hidden="true">
-              <div className="flex w-max animate-marquee items-center gap-12 whitespace-nowrap">
-                {[...BRANDS, ...BRANDS].map((brand, i) => (
-                  <span key={i} className="font-display text-lg font-extrabold italic uppercase tracking-[0.18em] text-black/75 sm:text-xl">
-                    {brand} <span className="ml-12 text-jay-red">/</span>
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
+        </div>
       </section>
 
-      {/* ============ 0 KM / USADAS (Catálogo) ============ */}
-      <section className="bg-jay-black">
-        <div className="container-jay grid gap-4 py-10 sm:grid-cols-2 sm:py-14">
-          <Link
-            to="/motos?condition=NUEVA"
-            className="group relative overflow-hidden rounded-2xl border border-jay-red/25 bg-gradient-to-br from-jay-red/15 via-jay-surface to-jay-surface p-6 transition-all hover:border-jay-red/60 sm:p-8"
-          >
-            <span className="eyebrow">Catálogo 0 km</span>
-            <h2 className="mt-3 font-display text-6xl font-extrabold italic leading-none text-white transition-transform duration-300 group-hover:translate-x-1 sm:text-7xl">
-              0<br />KM
-            </h2>
-            <p className="mt-4 max-w-[16rem] text-sm text-gray-400">Últimas unidades 0 km seleccionadas por nosotros.</p>
-            <span className="mt-6 inline-flex items-center gap-2 font-display text-xs font-bold uppercase tracking-[0.2em] text-jay-red-soft">
-              Ver 0 km <ArrowRight size={15} />
-            </span>
-            <span className="pointer-events-none absolute -right-6 bottom-2 select-none font-display text-[7rem] font-extrabold italic leading-none text-white/[0.03] sm:text-[9rem]">0</span>
-          </Link>
+      {/* ============ 01 / CATEGORÍAS — BLOQUE CLARO ============ */}
+      <section className="bg-white text-jay-black">
+        <div className="container-jay py-16 sm:py-24">
+          <div className="mb-10 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <div className="flex items-center gap-3">
+                <span className="font-display text-xs font-extrabold tracking-[0.2em] text-jay-red">01</span>
+                <span className="h-px w-10 bg-jay-red" />
+                <span className="font-display text-[10px] font-bold uppercase tracking-[0.35em] text-black/50">Catálogo</span>
+              </div>
+              <h2 className="mt-3 font-display text-5xl font-extrabold uppercase italic leading-[0.88] sm:text-7xl">
+                Dos formas de <span className="text-jay-red">arrancar.</span>
+              </h2>
+            </div>
+            <p className="max-w-sm text-sm leading-relaxed text-black/60">
+              Motos 0 km y usadas seleccionadas. Elegí el camino que mejor se adapte a tu próxima aventura.
+            </p>
+          </div>
+
+          <div className="grid gap-4 lg:grid-cols-12">
+            <Link
+              to="/motos?condition=NUEVA"
+              className="group relative flex min-h-[280px] flex-col justify-between overflow-hidden bg-jay-black p-7 text-white sm:p-10 lg:col-span-7"
+              style={{ clipPath: 'polygon(0 0, 100% 0, 100% calc(100% - 32px), calc(100% - 32px) 100%, 0 100%)' }}
+            >
+              <span className="pointer-events-none absolute -right-4 -top-10 select-none font-display text-[13rem] font-extrabold italic leading-none text-outline sm:text-[17rem]" aria-hidden="true">0</span>
+              <div className="relative">
+                <span className="font-display text-[10px] font-bold uppercase tracking-[0.35em] text-jay-red-soft">Catálogo 0 km</span>
+                <h3 className="mt-4 font-display text-7xl font-extrabold italic leading-[0.82] sm:text-8xl">0 KM<span className="text-jay-red">.</span></h3>
+              </div>
+              <div className="relative mt-10 flex items-end justify-between gap-6">
+                <p className="max-w-[15rem] text-sm text-gray-300">Motos 0 km publicadas en nuestro catálogo.</p>
+                <span className="flex h-12 w-12 shrink-0 items-center justify-center bg-jay-red transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true">
+                  <ArrowRight size={22} />
+                </span>
+              </div>
+            </Link>
+
+            <Link
+              to="/motos?condition=USADA"
+              className="group relative flex min-h-[280px] flex-col justify-between overflow-hidden border border-black/15 bg-[#f3f3f3] p-7 text-jay-black transition-colors hover:border-jay-red sm:p-10 lg:col-span-5"
+            >
+              <span className="pointer-events-none absolute -bottom-10 right-0 select-none font-display text-[13rem] font-extrabold italic leading-none text-black/[0.04] sm:text-[16rem]" aria-hidden="true">U</span>
+              <div className="relative">
+                <span className="font-display text-[10px] font-bold uppercase tracking-[0.35em] text-jay-red">Usadas seleccionadas</span>
+                <h3 className="mt-4 font-display text-6xl font-extrabold italic leading-[0.85] sm:text-7xl">USA<span className="text-jay-red">DAS</span></h3>
+              </div>
+              <div className="relative mt-10 flex items-end justify-between gap-6">
+                <p className="max-w-[15rem] text-sm text-black/60">Unidades elegidas por la agencia antes de publicarse.</p>
+                <span className="flex h-12 w-12 shrink-0 items-center justify-center border border-black/20 transition-all duration-300 group-hover:border-jay-red group-hover:bg-jay-red group-hover:text-white" aria-hidden="true">
+                  <ArrowRight size={22} />
+                </span>
+              </div>
+            </Link>
+          </div>
 
           <Link
-            to="/motos?condition=USADA"
-            className="group relative overflow-hidden rounded-2xl border border-white/8 bg-gradient-to-br from-white/[0.06] via-jay-surface to-jay-surface p-6 transition-all hover:border-white/20 sm:p-8"
+            to="/motos"
+            className="mt-4 flex items-center justify-between border border-black/10 px-6 py-4 font-display text-xs font-extrabold uppercase tracking-[0.22em] text-black/70 transition-colors hover:border-jay-red hover:text-jay-red"
           >
-            <span className="eyebrow !text-gray-400">Usadas seleccionadas</span>
-            <h2 className="mt-3 font-display text-6xl font-extrabold italic leading-none text-white transition-transform duration-300 group-hover:translate-x-1 sm:text-7xl">
-              USA<span className="text-jay-red">DAS</span>
-            </h2>
-            <p className="mt-4 max-w-[16rem] text-sm text-gray-400">Selección propia: unidades elegidas y verificadas por la agencia.</p>
-            <span className="mt-6 inline-flex items-center gap-2 font-display text-xs font-bold uppercase tracking-[0.2em] text-gray-300 transition-colors group-hover:text-white">
-              Ver usadas <ArrowRight size={15} />
-            </span>
-            <span className="pointer-events-none absolute -right-6 bottom-2 select-none font-display text-[7rem] font-extrabold italic leading-none text-white/[0.03] sm:text-[9rem]">U</span>
+            Ver catálogo completo <ArrowRight size={17} />
           </Link>
         </div>
       </section>
 
-      {/* ============ DESTACADAS ============ */}
-      <section className="border-t border-white/5 bg-jay-panel">
-        <div className="container-jay py-14 sm:py-20">
-          <div className="mb-8 flex items-end justify-between gap-4 sm:mb-10">
-            <div>
-              <span className="eyebrow">Selección JAY MOTOS</span>
-              <h2 className="mt-2 font-display text-4xl font-extrabold uppercase italic leading-[0.9] text-white sm:text-6xl">
-                Destacadas<span className="text-jay-red">.</span>
-              </h2>
-            </div>
-            <Link to="/motos?featured=true" className="hidden items-center gap-2 font-display text-xs font-bold uppercase tracking-[0.2em] text-gray-400 transition-colors hover:text-white sm:inline-flex">
-              Ver todas <ChevronRight size={16} />
-            </Link>
-          </div>
-
+      {/* ============ 02 / DESTACADAS ============ */}
+      <section className="bg-jay-black">
+        <div className="container-jay py-16 sm:py-24">
+          <SectionHeading
+            index="02"
+            eyebrow="Selección JAY MOTOS"
+            title={<>Destacadas<span className="text-jay-red">.</span></>}
+            actionLabel="Ver todas"
+            actionTo="/motos?featured=true"
+          />
           {loading ? (
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {[0, 1, 2].map((i) => (
-                <div key={i} className="h-96 animate-pulse rounded-2xl bg-jay-surface" />
-              ))}
+            <div className="grid gap-4 lg:grid-cols-2">
+              {[0, 1, 2].map((i) => <SkeletonCard key={i} className={i === 0 ? 'lg:col-span-2' : ''} />)}
             </div>
+          ) : featuredError ? (
+            <ErrorState compact onRetry={retry} />
           ) : featured.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-white/10 p-12 text-center text-gray-500">
-              Aún no hay motos destacadas. Volvé pronto.
-            </div>
+            <EmptyState
+              icon={<BadgeCheck size={30} />}
+              code="00"
+              title={<>Sin destacadas<span className="text-jay-red">.</span></>}
+              description="Todavía no hay motos destacadas publicadas."
+            />
           ) : (
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {featured.map((bike) => (
-                <BikeCard key={bike.id} bike={bike} />
+            <div className="grid gap-4 lg:grid-cols-2">
+              {featured.map((bike, index) => (
+                <BikeCard
+                  key={bike.id}
+                  bike={bike}
+                  feature={index === 0}
+                  className={index === 0 ? 'lg:col-span-2' : ''}
+                />
               ))}
             </div>
           )}
         </div>
       </section>
 
-      {/* ============ ÚLTIMOS INGRESOS ============ */}
-      <section className="border-t border-white/5 bg-jay-black">
-        <div className="container-jay py-14 sm:py-20">
-          <div className="mb-8 flex items-end justify-between gap-4">
+      {/* ============ 03 / ÚLTIMOS INGRESOS — BLOQUE CLARO ============ */}
+      <section className="bg-[#f3f3f3] text-jay-black">
+        <div className="container-jay py-16 sm:py-24">
+          <div className="mb-8 flex flex-col gap-5 border-t border-jay-red/60 pt-5 sm:flex-row sm:items-end sm:justify-between sm:mb-12">
             <div>
-              <span className="eyebrow">Recién publicadas</span>
-              <h2 className="mt-2 font-display text-4xl font-extrabold uppercase italic leading-[0.9] text-white sm:text-6xl">
+              <div className="flex items-center gap-3">
+                <span className="font-display text-xs font-extrabold tracking-[0.2em] text-jay-red">03</span>
+                <span className="h-px w-10 bg-jay-red" />
+                <span className="font-display text-[10px] font-bold uppercase tracking-[0.35em] text-black/50">Recién publicadas</span>
+              </div>
+              <h2 className="mt-2 font-display text-4xl font-extrabold uppercase italic leading-[0.88] sm:text-6xl">
                 Últimos ingresos<span className="text-jay-red">.</span>
               </h2>
             </div>
-            <Link to="/motos" className="hidden items-center gap-2 font-display text-xs font-bold uppercase tracking-[0.2em] text-gray-400 transition-colors hover:text-white sm:inline-flex">
-              Ver catálogo <ChevronRight size={16} />
-            </Link>
+            {!loading && !latestError && latest.length > 0 && (
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => scrollLatest(-1)}
+                  aria-label="Ver ingresos anteriores"
+                  className="flex h-11 w-11 items-center justify-center border border-black/15 transition-colors hover:border-jay-red hover:text-jay-red"
+                >
+                  <ChevronLeft size={20} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => scrollLatest(1)}
+                  aria-label="Ver más ingresos"
+                  className="flex h-11 w-11 items-center justify-center border border-black/15 transition-colors hover:border-jay-red hover:text-jay-red"
+                >
+                  <ChevronRight size={20} />
+                </button>
+              </div>
+            )}
           </div>
 
           {loading ? (
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-              {[0, 1, 2, 3].map((i) => (
-                <div key={i} className="h-96 animate-pulse rounded-2xl bg-jay-surface" />
-              ))}
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {[0, 1, 2, 3].map((i) => <SkeletonCard key={i} tone="light" />)}
             </div>
+          ) : latestError ? (
+            <ErrorState compact onRetry={retry} />
           ) : latest.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-white/10 p-12 text-center text-gray-500">
-              Todavía no hay motos publicadas. Volvé pronto.
-            </div>
+            <EmptyState
+              tone="light"
+              icon={<SearchX size={30} />}
+              code="00"
+              title={<>Catálogo vacío<span className="text-jay-red">.</span></>}
+              description="Todavía no hay motos publicadas en el catálogo."
+            />
           ) : (
-            <div className="-mx-5 flex snap-x snap-mandatory gap-5 overflow-x-auto px-5 pb-2 sm:mx-0 sm:px-0 lg:grid lg:grid-cols-4 lg:overflow-visible">
+            <div ref={latestRef} className="scrollbar-none -mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-3 sm:mx-0 sm:px-0">
               {latest.slice(0, 4).map((bike) => (
-                <div key={bike.id} className="w-[78vw] max-w-xs shrink-0 snap-start sm:w-80 lg:w-auto lg:max-w-none">
-                  <BikeCard bike={bike} />
+                <div key={bike.id} className="w-[82vw] max-w-sm shrink-0 snap-start sm:w-[350px]">
+                  <BikeCard bike={bike} tone="light" />
                 </div>
               ))}
             </div>
@@ -241,31 +327,71 @@ export const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* ============ ESPECIALISTAS EN MOTOS ============ */}
-      <section className="relative overflow-hidden border-t border-white/5 bg-jay-panel">
-        <img
-          src={ktmPhoto}
-          alt=""
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 h-full w-full object-cover object-[70%_20%] opacity-25"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-jay-panel via-jay-panel/85 to-jay-panel/30" aria-hidden="true" />
-        <div className="container-jay relative grid gap-10 py-16 sm:py-20 lg:grid-cols-12 lg:items-center">
-          <div className="lg:col-span-7">
-            <span className="eyebrow">Especialistas en motos</span>
-            <h2 className="mt-3 font-display text-5xl font-extrabold uppercase leading-[0.88] text-white sm:text-7xl">
-              En el enduro<br /><span className="text-jay-red">nos sentimos<br />en casa.</span>
+      {/* ============ 04 / COMPARADOR ============ */}
+      <section className="relative overflow-hidden border-y border-white/5 bg-jay-panel">
+        <span className="pointer-events-none absolute -right-6 -top-20 select-none font-display text-[15rem] font-extrabold italic leading-none text-outline sm:text-[24rem]" aria-hidden="true">VS</span>
+        <div className="container-jay relative grid gap-8 py-14 sm:py-20 lg:grid-cols-12 lg:items-center">
+          <div className="lg:col-span-5">
+            <div className="flex items-center gap-3">
+              <span className="font-display text-xs font-extrabold tracking-[0.2em] text-jay-red">04</span>
+              <span className="h-px w-10 bg-jay-red" />
+              <span className="font-display text-[10px] font-bold uppercase tracking-[0.35em] text-gray-500">Decisión informada</span>
+            </div>
+            <h2 className="mt-3 font-display text-7xl font-extrabold italic leading-[0.8] text-white sm:text-9xl">
+              VS<span className="text-jay-red">.</span>
             </h2>
-            <p className="mt-6 max-w-lg text-lg leading-relaxed text-gray-300">
+          </div>
+          <div className="lg:col-span-5 lg:col-start-8">
+            <p className="font-display text-2xl font-extrabold uppercase leading-none text-white sm:text-3xl">
+              Compará antes de decidir
+            </p>
+            <p className="mt-3 max-w-md text-sm leading-relaxed text-gray-400">
+              Guardá hasta dos motos del catálogo y mirá sus datos lado a lado: año, cilindrada, kilometraje y precio.
+            </p>
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+              <Link to="/comparador" className="btn btn-red px-7 py-4 text-xs">
+                Ir al comparador <ArrowRight size={16} />
+              </Link>
+              <Link to="/favoritos" className="btn btn-ghost px-7 py-4 text-xs">
+                Ver favoritos
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ============ 05 / ESPECIALIDAD — FOTOGRAFÍA PROTAGONISTA ============ */}
+      <section className="bg-black">
+        <div className="container-jay grid gap-0 py-16 sm:py-24 lg:grid-cols-12 lg:items-stretch">
+          <div className="relative lg:col-span-7">
+            <img
+              src={ktmPhoto}
+              alt="Moto de enduro en un camino de montaña"
+              loading="lazy"
+              className="h-full min-h-[300px] w-full object-cover object-[70%_20%] sm:min-h-[460px]"
+            />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" aria-hidden="true" />
+            <span className="pointer-events-none absolute bottom-4 left-5 select-none font-display text-6xl font-extrabold italic leading-none text-outline sm:text-8xl" aria-hidden="true">RIDE</span>
+          </div>
+          <div className="relative bg-jay-black p-7 sm:p-10 lg:col-span-5 lg:col-start-8 lg:self-center lg:border-l-2 lg:border-jay-red lg:py-14">
+            <div className="flex items-center gap-3">
+              <span className="font-display text-xs font-extrabold tracking-[0.2em] text-jay-red">05</span>
+              <span className="h-px w-10 bg-jay-red" />
+              <span className="font-display text-[10px] font-bold uppercase tracking-[0.35em] text-gray-500">Especialidad</span>
+            </div>
+            <h2 className="mt-3 font-display text-5xl font-extrabold uppercase leading-[0.88] text-white sm:text-6xl">
+              Enduro<br /><span className="text-jay-red">& off-road.</span>
+            </h2>
+            <p className="mt-5 text-base leading-relaxed text-gray-300">
               JAY MOTOS es una concesionaria multimarca con especial identidad en las motos enduro y off-road:
               las motos que amamos, las que conocemos y las que recomendamos. No somos una tienda generalista.
             </p>
-            <ul className="mt-7 space-y-3">
+            <ul className="mt-6 space-y-3">
               {[
                 'Concesionaria multimarca',
                 'Especialidad en enduro y off-road',
                 'Motos 0 km y usadas seleccionadas',
-                'Envíos a todo el país',
+                BUSINESS.shippingLabel,
               ].map((item) => (
                 <li key={item} className="flex items-center gap-3 text-sm font-semibold text-gray-200">
                   <BadgeCheck size={18} className="shrink-0 text-jay-red" />
@@ -273,55 +399,56 @@ export const Home: React.FC = () => {
                 </li>
               ))}
             </ul>
-            <Link to="/nosotros" className="btn btn-ghost mt-8 px-6 py-3.5 text-xs">
-              Sobre la agencia <ChevronRight size={16} />
+            <Link to="/nosotros" className="mt-8 inline-flex items-center gap-2 border-b border-white/20 pb-1 font-display text-xs font-extrabold uppercase tracking-[0.22em] text-white transition-colors hover:border-jay-red hover:text-jay-red">
+              Sobre la agencia <ArrowRight size={16} />
             </Link>
           </div>
-          <div className="lg:col-span-5">
-            <div className="rounded-2xl border border-jay-red/25 bg-black/70 p-8 backdrop-blur">
-              <p className="font-display text-[10px] font-bold uppercase tracking-[0.35em] text-jay-red-soft">
-                El eslogan es un compromiso
+        </div>
+      </section>
+
+      {/* ============ 06 / FINANCIACIÓN — BLOQUE CLARO ============ */}
+      <section className="bg-white text-jay-black">
+        <div className="container-jay relative py-16 sm:py-24">
+          <span className="absolute -left-4 top-10 h-2 w-32 -rotate-6 bg-jay-red" aria-hidden="true" />
+          <div className="grid gap-10 lg:grid-cols-12 lg:items-end">
+            <div className="lg:col-span-8">
+              <div className="flex items-center gap-3">
+                <span className="font-display text-xs font-extrabold tracking-[0.2em] text-jay-red">06</span>
+                <span className="h-px w-10 bg-jay-red" />
+                <span className="font-display text-[10px] font-bold uppercase tracking-[0.35em] text-black/50">JAY MOTOS · Comercial</span>
+              </div>
+              <h2 className="mt-3 font-display text-5xl font-extrabold uppercase leading-[0.85] sm:text-8xl">
+                FINAN<span className="text-jay-red">CIA</span>CIÓN
+              </h2>
+            </div>
+            <div className="lg:col-span-4">
+              <p className="text-base leading-relaxed text-black/65">
+                Las opciones de financiación se consultan directamente con nosotros. Escribinos y conversamos
+                sobre cada operación: las condiciones se definen caso por caso.
               </p>
-              <p className="mt-3 font-display text-5xl font-extrabold italic uppercase leading-[0.9] text-white sm:text-6xl">
-                FOR<br />RIDERS,<br /><span className="text-jay-red">BY<br />RIDERS.</span>
-              </p>
+              <div className="mt-6 flex flex-col gap-3">
+                <a
+                  href={buildWhatsAppLink('Hola! Quisiera consultar por las opciones de financiación disponibles en JAY MOTOS.')}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-red px-7 py-4 text-xs"
+                >
+                  <Phone size={17} /> Consultar por WhatsApp
+                </a>
+                <Link to="/financiacion" className="inline-flex items-center justify-center gap-2 border border-black/20 px-7 py-4 font-display text-xs font-extrabold uppercase tracking-[0.2em] transition-colors hover:border-jay-red hover:text-jay-red">
+                  Ver detalles <ArrowRight size={16} />
+                </Link>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ============ FINANCIACIÓN ============ */}
-      <section className="border-t border-white/5 bg-jay-black">
-        <div className="container-jay flex flex-col items-start justify-between gap-8 py-14 sm:py-16 lg:flex-row lg:items-center">
-          <div className="max-w-2xl">
-            <span className="eyebrow">JAY MOTOS · Comercial</span>
-            <h2 className="mt-2 font-display text-6xl font-extrabold uppercase leading-[0.85] text-white sm:text-8xl">
-              FINAN<span className="text-jay-red">CIA</span>CIÓN
-            </h2>
-            <p className="mt-4 max-w-md text-base leading-relaxed text-gray-300">
-              Las opciones de financiación se consultan directamente con nosotros.
-              Escribinos y armamos un esquema a medida de cada operación — sin vueltas.
-            </p>
-          </div>
-          <div className="flex w-full flex-col items-stretch gap-3 lg:w-auto">
-            <a href={buildWhatsAppLink('Hola! Quisiera consultar por las opciones de financiación disponibles en JAY MOTOS.')} target="_blank" rel="noopener noreferrer" className="btn btn-red px-8 py-4 text-sm">
-              <Phone size={18} />
-              Consultar por WhatsApp
-            </a>
-            <Link to="/financiacion" className="btn btn-ghost px-8 py-4 text-sm">
-              Ver cómo funciona
-              <ChevronRight size={17} />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ============ ENVÍOS A TODO EL PAÍS ============ */}
-      <section className="relative overflow-hidden border-t border-white/5 bg-black">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_120%_at_50%_50%,rgba(227,38,54,0.16),transparent)]" aria-hidden="true" />
-        <div className="container-jay relative flex flex-col items-center gap-6 py-12 text-center sm:py-16 lg:flex-row lg:justify-between lg:text-left">
+      {/* ============ ENVÍOS ============ */}
+      <section className="diagonal-lines border-y border-white/5 bg-jay-black">
+        <div className="container-jay flex flex-col gap-6 py-16 sm:flex-row sm:items-center sm:justify-between sm:py-20">
           <div className="flex items-center gap-5">
-            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-jay-red text-white sm:h-20 sm:w-20">
+            <div className="flex h-16 w-16 shrink-0 items-center justify-center bg-jay-red text-white sm:h-20 sm:w-20">
               <Truck size={34} />
             </div>
             <div>
@@ -333,100 +460,81 @@ export const Home: React.FC = () => {
               </p>
             </div>
           </div>
-          <a href={buildWhatsAppLink('Hola! Quisiera coordinar el envío de una moto a mi localidad.')} target="_blank" rel="noopener noreferrer" className="btn btn-ghost shrink-0 px-7 py-4 text-xs">
-            Coordinar mi envío
-            <ChevronRight size={16} />
+          <a
+            href={buildWhatsAppLink('Hola! Quisiera coordinar el envío de una moto a mi localidad.')}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn btn-ghost shrink-0 px-7 py-4 text-xs"
+          >
+            Coordinar mi envío <ArrowRight size={16} />
           </a>
         </div>
       </section>
 
-      {/* ============ SOBRE NOSOTROS ============ */}
-      <section className="border-t border-white/5 bg-jay-panel">
-        <div className="container-jay grid gap-10 py-14 sm:py-20 lg:grid-cols-12">
-          <div className="lg:col-span-7">
-            <span className="eyebrow">Sobre nosotros</span>
-            <h2 className="mt-3 font-display text-4xl font-extrabold uppercase leading-[0.95] text-white sm:text-6xl">
-              En JAY MOTOS compartimos<br /><span className="text-jay-red">la misma pasión<br />que vos.</span>
-            </h2>
-          </div>
-          <div className="flex flex-col justify-center lg:col-span-5">
-            <p className="text-lg leading-relaxed text-gray-300">
-              En JAY MOTOS compartimos la misma pasión que nuestros clientes. Somos una concesionaria
-              multimarca dedicada a la venta de motocicletas 0 km y usadas seleccionadas.
-              Creemos que cada moto representa una nueva aventura.
-            </p>
-            <p className="mt-5 font-display text-2xl font-extrabold italic uppercase leading-none text-white">
-              FOR RIDERS,<br /><span className="text-jay-red">BY RIDERS.</span>
-            </p>
-            <Link to="/nosotros" className="mt-6 inline-flex items-center gap-1.5 font-display text-xs font-bold uppercase tracking-[0.25em] text-gray-500 transition-colors hover:text-white">
-              Conocé la agencia <ChevronRight size={14} />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ============ UBICACIÓN Y CONTACTO ============ */}
-      <section className="border-t border-white/5 bg-jay-black">
-        <div className="container-jay grid gap-8 py-14 sm:py-20 lg:grid-cols-12 lg:items-center">
-          <div className="lg:col-span-7">
-            <span className="eyebrow">Ubicación y contacto</span>
-            <h2 className="mt-3 font-display text-4xl font-extrabold uppercase leading-[0.9] text-white sm:text-6xl">
+      {/* ============ 07 / UBICACIÓN Y CONTACTO — BLOQUE CLARO ============ */}
+      <section className="bg-[#f3f3f3] text-jay-black">
+        <div className="container-jay grid gap-10 py-16 sm:py-24 lg:grid-cols-12 lg:items-center">
+          <div className="lg:col-span-6">
+            <div className="flex items-center gap-3">
+              <span className="font-display text-xs font-extrabold tracking-[0.2em] text-jay-red">07</span>
+              <span className="h-px w-10 bg-jay-red" />
+              <span className="font-display text-[10px] font-bold uppercase tracking-[0.35em] text-black/50">Ubicación y contacto</span>
+            </div>
+            <h2 className="mt-3 font-display text-5xl font-extrabold uppercase italic leading-[0.88] sm:text-7xl">
               Vení a<br /><span className="text-jay-red">Corrientes 1440.</span>
             </h2>
-            <ul className="mt-8 space-y-4 text-base text-gray-300">
-              <li className="flex items-start gap-3">
-                <MapPin size={20} className="mt-0.5 shrink-0 text-jay-red" />
-                <span className="font-semibold text-white">{BUSINESS.address}</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <Truck size={20} className="mt-0.5 shrink-0 text-jay-red" />
-                <span>{BUSINESS.shippingLabel}</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <Phone size={20} className="mt-0.5 shrink-0 text-jay-red" />
-                <a href={waGeneral} target="_blank" rel="noopener noreferrer" className="font-semibold text-white transition-colors hover:text-jay-red-soft">
-                  {BUSINESS.phoneDisplay} <span className="text-gray-500">(WhatsApp)</span>
+
+            <div className="mt-8 bg-jay-black p-7 text-white sm:p-8">
+              <ul className="space-y-4 text-sm">
+                <li className="flex items-start gap-3">
+                  <MapPin size={20} className="mt-0.5 shrink-0 text-jay-red" />
+                  <span className="font-semibold">{BUSINESS.address}</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <Truck size={20} className="mt-0.5 shrink-0 text-jay-red" />
+                  <span>{BUSINESS.shippingLabel}</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <Phone size={20} className="mt-0.5 shrink-0 text-jay-red" />
+                  <a href={waGeneral} target="_blank" rel="noopener noreferrer" className="font-semibold transition-colors hover:text-jay-red-soft">
+                    {BUSINESS.phoneDisplay} <span className="text-gray-500">(WhatsApp)</span>
+                  </a>
+                </li>
+              </ul>
+              <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+                <a href={BUSINESS.addressLink} target="_blank" rel="noopener noreferrer" className="btn btn-red px-6 py-4 text-xs">
+                  <MapPin size={17} /> Abrir en Google Maps
                 </a>
-              </li>
-            </ul>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <a href={BUSINESS.addressLink} target="_blank" rel="noopener noreferrer" className="btn btn-red px-7 py-4 text-xs">
-                <MapPin size={17} />
-                Abrir en Google Maps
-              </a>
-              <a href={waGeneral} target="_blank" rel="noopener noreferrer" className="btn btn-ghost px-7 py-4 text-xs">
-                <Phone size={17} />
-                Escribinos ahora
-              </a>
+                <a href={waGeneral} target="_blank" rel="noopener noreferrer" className="btn btn-ghost px-6 py-4 text-xs">
+                  <Phone size={17} /> Escribinos ahora
+                </a>
+              </div>
             </div>
           </div>
-          <div className="lg:col-span-5">
-            <div className="overflow-hidden rounded-2xl border border-white/10 shadow-card">
-              {/* Mapa interactivo de Google Maps — Corrientes 1440, Tucumán, Argentina */}
+
+          <div className="lg:col-span-6">
+            <div className="relative border-4 border-white shadow-[0_24px_60px_-30px_rgba(0,0,0,0.5)]">
               <iframe
                 title="JAY MOTOS — Corrientes 1440, Tucumán, Argentina"
                 src="https://www.google.com/maps?q=Corrientes+1440+Tucuman+Argentina&output=embed"
                 width="100%"
                 height="420"
-                className="block h-[280px] w-full sm:h-[360px] lg:h-[440px]"
+                className="block h-[300px] w-full sm:h-[420px] lg:h-[480px]"
                 style={{ border: 0 }}
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
                 allowFullScreen
               />
-              {/* Franja de identidad de marca */}
-              <div className="flex flex-wrap items-center justify-between gap-4 border-t border-white/10 bg-jay-surface px-5 py-4 sm:px-6">
-                <Logo className="h-9 sm:h-11" />
-                <p className="font-display text-[10px] font-bold uppercase tracking-[0.35em] text-jay-red-soft sm:text-xs">
+              <div className="absolute -bottom-4 left-4 flex items-center gap-4 bg-jay-black px-5 py-3 text-white">
+                <Logo className="h-8" />
+                <span className="hidden font-display text-[10px] font-bold uppercase tracking-[0.3em] text-jay-red-soft sm:inline">
                   For riders, by riders.
-                </p>
+                </span>
               </div>
             </div>
           </div>
         </div>
       </section>
-
-      {/* ============ Footer (cierre de la página) ============ */}
     </div>
   );
 };

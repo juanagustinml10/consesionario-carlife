@@ -1,9 +1,13 @@
 import * as React from 'react';
 import { useCallback } from 'react';
-import { ChevronRight, X, Scale, ShieldCheck, Truck } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, Scale, MessageCircle } from 'lucide-react';
 import { Link } from '@/components/shared/Link';
+import { PageIntro } from '@/components/public/PageIntro';
+import { EmptyState } from '@/components/shared/EmptyState';
 import { ImagePlaceholder } from '@/components/shared/ImagePlaceholder';
-import { BUSINESS } from '@/lib/constants';
+import { ConditionTag } from '@/components/public/BikeBadges';
+import { buildWhatsAppLink } from '@/lib/constants';
+import { conditionLabel, formatDisplacement, formatMileage, formatPrice, statusLabel } from '@/lib/format';
 import { useCompareStore } from '@/stores/compare';
 import type { Bike } from '@/types';
 import { cn } from '@/lib/utils';
@@ -14,7 +18,7 @@ const ATTRS: Array<{ key: AttrKey; label: string }> = [
   { key: 'brand', label: 'Marca' },
   { key: 'model', label: 'Modelo' },
   { key: 'year', label: 'Año' },
-  { key: 'condition', label: 'Condición' },
+  { key: 'condition', label: 'Categoría' },
   { key: 'displacementCc', label: 'Cilindrada' },
   { key: 'mileageKm', label: 'Kilometraje' },
   { key: 'price', label: 'Precio' },
@@ -23,20 +27,13 @@ const ATTRS: Array<{ key: AttrKey; label: string }> = [
 
 const renderValue = (bike: Bike, key: AttrKey): string => {
   switch (key) {
-    case 'price':
-      return `$${bike.price.toLocaleString('es-AR')} ${bike.currency}`;
-    case 'condition':
-      return bike.condition === 'NUEVA' ? '0 km' : 'Usada';
-    case 'brand':
-      return bike.brand?.name ?? '—';
-    case 'displacementCc':
-      return bike.displacementCc ? `${bike.displacementCc} cc` : '—';
-    case 'mileageKm':
-      return bike.mileageKm != null ? `${bike.mileageKm.toLocaleString('es-AR')} km` : '0 km';
-    case 'status':
-      return bike.status === 'DISPONIBLE' ? 'Disponible' : bike.status === 'RESERVADA' ? 'Reservada' : 'Vendida';
-    default:
-      return String(bike[key] ?? '—');
+    case 'price': return formatPrice(bike.price, bike.currency);
+    case 'condition': return conditionLabel(bike.condition);
+    case 'brand': return bike.brand?.name ?? '—';
+    case 'displacementCc': return formatDisplacement(bike.displacementCc);
+    case 'mileageKm': return formatMileage(bike.mileageKm);
+    case 'status': return statusLabel(bike.status);
+    default: return String(bike[key] ?? '—');
   }
 };
 
@@ -45,75 +42,90 @@ export const Compare: React.FC = () => {
   const remove = useCompareStore((state) => state.remove);
   const clear = useCompareStore((state) => state.clear);
 
-  const handleWhatsApp = useCallback(() => {
-    const phones = BUSINESS.whatsappNumber;
-    const text = bikes
-      .map((b) => `${b.title} (${b.year}) - $${b.price.toLocaleString('es-AR')} ${b.currency}`)
-      .join('%0A');
-    window.open(`https://wa.me/${phones}?text=Hola%20JAY%20MOTOS,%20me%20interesan%20estas%20motos:%0A${text}`, '_blank');
+  const whatsappLink = useCallback(() => {
+    const detalle = bikes
+      .map((bike) => `${bike.title} (${bike.year}) — ${formatPrice(bike.price, bike.currency)}`)
+      .join('\n');
+    return buildWhatsAppLink(`Hola JAY MOTOS! Me interesan estas motos:\n${detalle}`);
   }, [bikes]);
 
   if (bikes.length === 0) {
     return (
-      <div className="flex min-h-[75vh] flex-col items-center justify-center bg-jay-black px-6 text-center">
-        <div className="flex h-20 w-20 items-center justify-center rounded-2xl border border-jay-red/30 bg-jay-red/10">
-          <Scale size={34} className="text-jay-red" />
-        </div>
-        <h1 className="mt-6 font-display text-4xl font-extrabold uppercase leading-[0.9] text-white sm:text-5xl">
-          Comparador<br /><span className="text-jay-red">vacío.</span>
-        </h1>
-        <p className="mt-3 max-w-md text-sm leading-relaxed text-gray-400">
-          Agregá dos motos desde el catálogo y compará año, cilindrada, kilometraje y precio lado a lado.
-        </p>
-        <Link to="/motos" className="btn btn-red mt-8 px-7 py-4 text-xs">
-          Ir al catálogo <ChevronRight size={16} />
-        </Link>
+      <div className="container-jay flex min-h-[75vh] items-center py-12 sm:py-16">
+        <EmptyState
+          icon={<Scale size={30} />}
+          code="00"
+          title={<>Comparador <span className="text-jay-red">vacío.</span></>}
+          description="Agregá hasta dos motos desde el catálogo y compará año, cilindrada, kilometraje y precio lado a lado."
+          actions={
+            <Link to="/motos" className="btn btn-red px-7 py-4 text-xs">
+              Ir al catálogo <ChevronRight size={16} />
+            </Link>
+          }
+          className="w-full"
+        />
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-jay-black pb-16 text-jay-white">
-      {/* Header */}
-      <section className="border-b border-white/5 bg-jay-panel">
-        <div className="container-jay flex flex-col gap-4 py-8 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <span className="eyebrow">Decisión informada</span>
-            <h1 className="mt-1 font-display text-4xl font-extrabold uppercase leading-[0.9] text-white sm:text-5xl">
-              Comparador<span className="text-jay-red">.</span>
-            </h1>
-            <p className="mt-2 text-xs font-semibold uppercase tracking-widest text-gray-500">
-              {bikes.length} de 2 motos seleccionadas
-            </p>
-          </div>
-          <button
-            onClick={clear}
-            className="btn btn-ghost px-5 py-3 text-xs"
-          >
-            <X size={15} />
-            Limpiar selección
+      {/* 01 / Encabezado */}
+      <PageIntro
+        index="01"
+        eyebrow="Decisión informada"
+        title={<>Comparador<span className="text-jay-red">.</span></>}
+        outline="VS"
+        description={
+          <p>
+            {bikes.length} de 2 motos seleccionadas. Compará sus datos principales lado a lado y consultanos
+            por la unidad que te interese.
+          </p>
+        }
+        actions={
+          <button type="button" onClick={clear} className="btn btn-ghost w-full px-5 py-3 text-xs sm:w-auto">
+            <X size={15} /> Limpiar selección
           </button>
-        </div>
-      </section>
+        }
+      />
 
-      {/* Tabla comparativa */}
-      <section className="container-jay py-8">
-        <div className="overflow-x-auto rounded-2xl border border-white/8 bg-jay-surface">
+      {/* 02 / Tabla comparativa */}
+      <section className="container-jay py-12 sm:py-16">
+        <div className="mb-5 flex items-center gap-3">
+          <span className="font-display text-xs font-extrabold tracking-[0.2em] text-jay-red">02</span>
+          <span className="h-px w-10 bg-jay-red" />
+          <span className="font-display text-[10px] font-bold uppercase tracking-[0.35em] text-gray-500">Ficha comparativa</span>
+        </div>
+
+        <div className="panel relative overflow-x-auto">
+          <div className="absolute inset-x-0 top-0 h-[3px] bg-jay-red" aria-hidden="true" />
           <table className="w-full min-w-[640px] border-collapse text-left">
             <thead>
-              <tr className="border-b border-white/8">
-                <th className="px-5 py-4 text-[10px] font-bold uppercase tracking-[0.25em] text-gray-500">Característica</th>
+              <tr className="border-b border-white/10">
+                <th scope="col" className="sticky left-0 z-10 bg-jay-surface px-5 py-4 text-[10px] font-bold uppercase tracking-[0.25em] text-gray-500">
+                  Característica
+                </th>
                 {bikes.map((bike) => (
-                  <th key={bike.id} className="px-5 py-4">
+                  <th key={bike.id} scope="col" className="min-w-[220px] px-5 py-4">
                     <div className="flex items-center justify-between gap-3">
-                      <div className="min-w-0">
-                        <p className="truncate font-display text-base font-bold uppercase leading-tight text-white">{bike.title}</p>
-                        <p className="text-[10px] font-semibold uppercase tracking-wider text-jay-red-soft">{bike.brand?.name ?? ''}</p>
+                      <div className="flex min-w-0 items-center gap-3">
+                        <div className="h-14 w-20 shrink-0 overflow-hidden border border-white/10 bg-black">
+                          {bike.images[0] ? (
+                            <img src={bike.images[0].url} alt="" className="h-full w-full object-cover" loading="lazy" />
+                          ) : (
+                            <ImagePlaceholder width={160} height={112} className="h-full w-full" />
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="truncate font-display text-base font-bold uppercase leading-tight text-white">{bike.title}</p>
+                          <p className="text-[10px] font-semibold uppercase tracking-wider text-jay-red-soft">{bike.brand?.name ?? ''}</p>
+                        </div>
                       </div>
                       <button
+                        type="button"
                         onClick={() => remove(bike.id)}
-                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/10 text-gray-400 transition-colors hover:border-jay-red hover:text-white"
-                        aria-label="Quitar del comparador"
+                        className="flex h-8 w-8 shrink-0 items-center justify-center border border-white/10 text-gray-400 transition-colors hover:border-jay-red hover:bg-jay-red/10 hover:text-white"
+                        aria-label={`Quitar ${bike.title} del comparador`}
                       >
                         <X size={15} />
                       </button>
@@ -123,22 +135,19 @@ export const Compare: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {ATTRS.map((attr, i) => {
-                const values = bikes.map((b) => renderValue(b, attr.key));
-                const allEqual = values.every((v) => v === values[0]);
+              {ATTRS.map((attr, index) => {
+                const values = bikes.map((bike) => renderValue(bike, attr.key));
+                const allEqual = values.every((value) => value === values[0]);
                 return (
-                  <tr key={attr.label} className={cn('border-b border-white/5 last:border-0', i % 2 === 1 && 'bg-white/[0.02]')}>
-                    <td className="px-5 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500">
+                  <tr key={attr.label} className={cn('border-b border-white/5 last:border-0', index % 2 === 1 && 'bg-white/[0.02]')}>
+                    <th scope="row" className="sticky left-0 z-10 bg-jay-surface px-5 py-4 text-left text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500">
                       {attr.label}
-                    </td>
-                    {values.map((value, i2) => (
-                      <td key={i2} className="px-5 py-4">
-                        <div className="flex items-center gap-2">
-                          <span className={cn('font-display text-base font-bold uppercase leading-tight text-white', allEqual && 'text-gray-400')}>
-                            {value}
-                          </span>
-                          {allEqual && i2 === 0 && <ShieldCheck size={13} className="text-green-400" />}
-                        </div>
+                    </th>
+                    {values.map((value, valueIndex) => (
+                      <td key={valueIndex} className="px-5 py-4">
+                        <span className={cn('font-display text-base font-bold uppercase leading-tight text-white', allEqual && 'text-gray-400')}>
+                          {value}
+                        </span>
                       </td>
                     ))}
                   </tr>
@@ -147,45 +156,55 @@ export const Compare: React.FC = () => {
             </tbody>
           </table>
         </div>
+        <p className="mt-2 text-[10px] uppercase tracking-[0.2em] text-gray-600">Deslizá horizontalmente para ver todas las columnas en pantallas chicas.</p>
 
         {/* Tarjetas grandes */}
-        <div className="mt-8 grid gap-5 sm:grid-cols-2">
+        <div className="mt-10 grid gap-5 sm:grid-cols-2">
           {bikes.map((bike) => (
-            <div key={bike.id} className="card-surface overflow-hidden">
-              <div className="aspect-[16/10] bg-black">
+            <article key={bike.id} className="panel group overflow-hidden">
+              <div className="relative aspect-[16/10] bg-black">
                 {bike.images[0] ? (
-                  <img src={bike.images[0].url} alt={bike.title} className="h-full w-full object-cover" />
+                  <img src={bike.images[0].url} alt={bike.title} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" loading="lazy" />
                 ) : (
-                  <ImagePlaceholder width={640} height={400} label="Foto de prueba de la moto" className="h-full w-full" />
+                  <ImagePlaceholder width={640} height={400} label="Foto no disponible" className="h-full w-full" />
                 )}
+                <div className="absolute left-4 top-4">
+                  <ConditionTag condition={bike.condition} overlay />
+                </div>
               </div>
-              <div className="p-5">
+              <div className="border-t border-white/8 p-5">
                 <p className="font-display text-[10px] font-semibold uppercase tracking-[0.25em] text-jay-red-soft">{bike.brand?.name}</p>
                 <h3 className="mt-1 font-display text-2xl font-bold uppercase leading-tight text-white">{bike.title}</h3>
-                <p className="mt-2 font-display text-xl font-extrabold text-white">
-                  ${bike.price.toLocaleString('es-AR')} <span className="text-xs text-gray-500">{bike.currency}</span>
-                </p>
-                <Link to={`/motos/${bike.slug}`} className="mt-4 inline-flex items-center gap-1.5 font-display text-xs font-bold uppercase tracking-[0.2em] text-jay-red-soft hover:text-white">
+                <p className="mt-2 font-display text-xl font-extrabold text-white">{formatPrice(bike.price, bike.currency)}</p>
+                <Link to={`/motos/${bike.slug}`} className="mt-4 inline-flex items-center gap-1.5 border-b border-white/20 pb-1 font-display text-xs font-bold uppercase tracking-[0.2em] text-gray-300 transition-colors hover:border-jay-red hover:text-white">
                   Ver ficha completa <ChevronRight size={14} />
                 </Link>
               </div>
-            </div>
+            </article>
           ))}
         </div>
       </section>
 
-      {/* CTA */}
+      {/* 03 / Cierre */}
       <section className="container-jay">
-        <div className="flex flex-col items-center justify-between gap-5 rounded-2xl border border-jay-red/25 bg-gradient-to-r from-jay-red/15 via-jay-surface to-jay-surface p-6 sm:flex-row sm:p-8">
-          <div className="text-center sm:text-left">
-            <p className="font-display text-2xl font-extrabold uppercase leading-none text-white sm:text-3xl">¿Ya te decidiste?</p>
-            <p className="mt-1.5 text-sm text-gray-400">Consultanos disponibilidad de estas motos por WhatsApp.</p>
+        <div className="relative overflow-hidden border border-jay-red/25 bg-jay-surface p-6 sm:p-9">
+          <div className="pointer-events-none absolute -right-4 -top-10 select-none font-display text-[10rem] font-extrabold italic leading-none text-outline sm:text-[14rem]" aria-hidden="true">JAY</div>
+          <div className="relative flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-center">
+            <div>
+              <span className="section-index">Siguiente paso</span>
+              <p className="mt-4 font-display text-3xl font-extrabold uppercase italic leading-[0.9] text-white sm:text-5xl">
+                ¿Ya te <span className="text-jay-red">decidiste?</span>
+              </p>
+              <p className="mt-2 text-sm text-gray-400">Consultanos disponibilidad de estas motos por WhatsApp.</p>
+            </div>
+            <a href={whatsappLink()} target="_blank" rel="noopener noreferrer" className="btn btn-red w-full px-7 py-4 text-sm lg:w-auto">
+              <MessageCircle size={18} /> Consultar por estas motos
+            </a>
           </div>
-          <button onClick={handleWhatsApp} className="btn btn-red w-full px-7 py-4 text-sm sm:w-auto">
-            <Truck size={18} />
-            Consultar por estas motos
-          </button>
         </div>
+        <Link to="/motos" className="mt-8 inline-flex items-center gap-2 font-display text-xs font-bold uppercase tracking-[0.2em] text-gray-400 transition-colors hover:text-white">
+          <ChevronLeft size={15} /> Volver al catálogo
+        </Link>
       </section>
     </div>
   );

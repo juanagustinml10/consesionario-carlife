@@ -1,146 +1,151 @@
 import * as React from 'react';
-import { Heart, ChevronRight, Scale, Phone } from 'lucide-react';
+import { Heart, ArrowUpRight, Scale, MessageCircle } from 'lucide-react';
 import { Link } from '@/components/shared/Link';
 import { ImagePlaceholder } from '@/components/shared/ImagePlaceholder';
 import { useFavoritesStore } from '@/stores/favorites';
 import { useCompareStore } from '@/stores/compare';
 import { cn } from '@/lib/utils';
-import { buildWhatsAppLink } from '@/lib/constants';
+import { buildBikeWhatsAppLink } from '@/lib/constants';
+import { formatDisplacement, formatMileage, formatPrice } from '@/lib/format';
+import { ConditionTag, FeaturedTag, StatusTag } from '@/components/public/BikeBadges';
 import type { Bike } from '@/types';
 
 interface BikeCardProps {
   bike: Bike;
   className?: string;
+  /** Las secciones claras de la home usan la variante light. */
+  tone?: 'dark' | 'light';
+  /** Tarjeta protagonista: imagen más ample y tipografía mayor. */
+  feature?: boolean;
 }
 
-export const BikeCard: React.FC<BikeCardProps> = ({ bike, className }) => {
+export const BikeCard: React.FC<BikeCardProps> = ({ bike, className, tone = 'dark', feature = false }) => {
   const isFavorite = useFavoritesStore((state) => state.isFavorite(bike.id));
   const toggleFavorite = useFavoritesStore((state) => state.toggle);
   const addToCompare = useCompareStore((state) => state.add);
   const inCompare = useCompareStore((state) => state.isInCompare(bike.id));
   const canCompare = useCompareStore((state) => state.canAdd());
   const primaryImage = bike.images.find((img) => img.isPrimary) ?? bike.images[0];
-
-  const whatsappMessage = `Hola! Estoy interesado en la ${bike.brand?.name ?? ''} ${bike.title} que vi publicada en JAY MOTOS. ¿Me podrían brindar más información?`;
+  const whatsappLink = buildBikeWhatsAppLink(bike);
+  const light = tone === 'light';
 
   return (
     <article
       className={cn(
-        'group relative flex flex-col overflow-hidden rounded-2xl border border-white/5 bg-jay-surface transition-all duration-300 hover:-translate-y-1 hover:border-jay-red/40 hover:shadow-red',
+        'group relative flex h-full flex-col overflow-hidden border transition-all duration-500',
+        light
+          ? 'border-black/10 bg-white text-jay-black hover:border-jay-red/60 hover:shadow-[0_24px_60px_-30px_rgba(0,0,0,0.45)]'
+          : 'border-white/8 bg-jay-surface text-white hover:border-jay-red/50 hover:shadow-red',
+        'hover:-translate-y-1',
         className
       )}
     >
-      {/* Imagen */}
-      <div className="relative aspect-[4/3] overflow-hidden bg-black">
+      {/* Fotografía protagonista */}
+      <div className={cn('relative overflow-hidden bg-black', feature ? 'aspect-[16/10] sm:aspect-[16/9]' : 'aspect-[4/3]')}>
         {primaryImage ? (
           <img
             src={primaryImage.url}
-            alt={bike.title}
+            alt={`${bike.brand?.name ?? ''} ${bike.model || bike.title}`}
             loading="lazy"
-            className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+            decoding="async"
+            className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
           />
         ) : (
-          <ImagePlaceholder width={600} height={450} label="Foto de prueba de la moto" className="h-full w-full" />
+          <ImagePlaceholder width={800} height={600} label="Foto no disponible" className="h-full w-full" />
         )}
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-jay-surface via-jay-surface/20 to-transparent" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/30" aria-hidden="true" />
+        <span className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-jay-red/70" aria-hidden="true" />
 
-        {/* Chips superiores */}
-        <div className="absolute left-3 top-3 flex flex-wrap items-center gap-2">
-          <span className={cn(
-            'rounded-md px-2.5 py-1 font-display text-[10px] font-bold uppercase tracking-[0.2em]',
-            bike.condition === 'NUEVA' ? 'bg-jay-red text-white' : 'bg-white/90 text-black'
-          )}>
-            {bike.condition === 'NUEVA' ? '0 km' : 'Usada'}
-          </span>
-          {bike.featured && (
-            <span className="rounded-md border border-jay-red/40 bg-black/70 px-2 py-1 font-display text-[9px] font-bold uppercase tracking-[0.25em] text-jay-red-soft backdrop-blur">
-              Destacada
-            </span>
-          )}
+        {/* Etiquetas */}
+        <div className="absolute left-4 top-4 flex flex-wrap items-center gap-2">
+          <ConditionTag condition={bike.condition} overlay />
+          {bike.featured && <FeaturedTag overlay />}
         </div>
 
-        {/* Favorito */}
         <button
+          type="button"
           onClick={() => toggleFavorite(bike.id)}
           aria-label={isFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos'}
-          className="absolute right-3 top-3 flex h-11 w-11 items-center justify-center rounded-full bg-black/60 backdrop-blur transition-all hover:scale-110 hover:bg-black/80"
+          className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center border border-white/20 bg-black/60 text-white backdrop-blur transition-colors hover:border-jay-red hover:bg-jay-red"
         >
-          <Heart
-            size={19}
-            className={isFavorite ? 'fill-jay-red stroke-jay-red' : 'stroke-white'}
-            strokeWidth={2}
-          />
+          <Heart size={18} className={isFavorite ? 'fill-white stroke-white' : ''} strokeWidth={2} />
         </button>
 
-        {/* Estado */}
-        <div className="absolute bottom-3 left-3">
-          <span className="flex items-center gap-1.5 rounded-md bg-black/70 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-gray-200 backdrop-blur">
-            <span className={cn(
-              'h-1.5 w-1.5 rounded-full',
-              bike.status === 'DISPONIBLE' ? 'bg-green-400 animate-pulse' : bike.status === 'RESERVADA' ? 'bg-amber-400' : 'bg-jay-red'
-            )} />
-            {bike.status === 'DISPONIBLE' ? 'Disponible' : bike.status === 'RESERVADA' ? 'Reservada' : 'Vendida'}
-          </span>
+        <div className="absolute bottom-4 left-4">
+          <StatusTag status={bike.status} overlay />
         </div>
       </div>
 
-      {/* Cuerpo */}
-      <div className="flex flex-1 flex-col p-4 sm:p-5">
-        <p className="font-display text-[11px] font-semibold uppercase tracking-[0.25em] text-jay-red-soft">
+      {/* Contenido */}
+      <div className={cn('flex flex-1 flex-col p-5', feature && 'sm:p-7')}>
+        <p className="font-display text-[10px] font-extrabold uppercase tracking-[0.3em] text-jay-red">
           {bike.brand?.name ?? 'JAY MOTOS'}
         </p>
-        <Link to={`/motos/${bike.slug}`} className="mt-1 block">
-          <h3 className="font-display text-xl font-bold uppercase leading-tight tracking-wide text-white transition-colors group-hover:text-white line-clamp-2 min-h-[2.4rem]">
+        <Link to={`/motos/${bike.slug}`} className="mt-1.5 block">
+          <h3 className={cn(
+            'font-display font-extrabold uppercase italic leading-[0.95] line-clamp-2 transition-colors group-hover:text-jay-red',
+            feature ? 'text-3xl sm:text-4xl' : 'text-2xl'
+          )}>
             {bike.model || bike.title}
           </h3>
         </Link>
-        <p className="mt-1.5 text-xs text-gray-400">
-          {bike.year} · {bike.displacementCc ? `${bike.displacementCc} cc` : 'Cilindrada a confirmar'}{bike.mileageKm != null ? ` · ${bike.mileageKm.toLocaleString('es-AR')} km` : ''}
+        <p className={cn('mt-2 text-xs', light ? 'text-black/55' : 'text-gray-400')}>
+          {bike.year} · {formatDisplacement(bike.displacementCc)} · {formatMileage(bike.mileageKm)}
         </p>
 
-        {/* Precio + acciones */}
-        <div className="mt-4 flex items-end justify-between gap-3 border-t border-white/5 pt-4">
+        <div className={cn('mt-auto flex items-end justify-between gap-3 border-t pt-4', light ? 'border-black/10' : 'border-white/8')}>
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-gray-500">Precio</p>
-            <p className="font-display text-2xl font-extrabold leading-none text-white">
-              {bike.price.toLocaleString('es-AR')}
-              <span className="ml-1 text-xs font-bold text-gray-400">{bike.currency}</span>
+            <p className={cn('text-[9px] font-bold uppercase tracking-[0.25em]', light ? 'text-black/45' : 'text-gray-500')}>
+              Precio publicado
+            </p>
+            <p className="mt-0.5 font-display text-2xl font-extrabold leading-none text-jay-red sm:text-3xl">
+              {formatPrice(bike.price, bike.currency)}
             </p>
           </div>
-          <div className="flex items-center gap-1.5">
+          <div className="flex shrink-0 items-center gap-1.5">
             <button
+              type="button"
               onClick={() => addToCompare(bike)}
               disabled={inCompare || !canCompare}
               title={inCompare ? 'Ya está en el comparador' : 'Agregar al comparador'}
               aria-label={inCompare ? 'Ya está en el comparador' : 'Agregar al comparador'}
               className={cn(
-                'flex h-10 w-10 items-center justify-center rounded-lg border transition-all',
+                'flex h-9 w-9 items-center justify-center border transition-colors',
                 inCompare
                   ? 'border-jay-red bg-jay-red text-white'
-                  : 'border-white/10 text-gray-300 hover:border-jay-red hover:text-white disabled:opacity-30'
+                  : light
+                    ? 'border-black/15 text-black/60 hover:border-jay-red hover:text-jay-red disabled:opacity-30'
+                    : 'border-white/12 text-gray-300 hover:border-jay-red hover:text-white disabled:opacity-30'
               )}
             >
-              <Scale size={17} />
+              <Scale size={16} />
             </button>
             <a
-              href={buildWhatsAppLink(whatsappMessage)}
+              href={whatsappLink}
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Consultar por WhatsApp"
-              className="flex h-10 w-10 items-center justify-center rounded-lg border border-white/10 text-gray-300 transition-all hover:border-jay-red hover:text-white"
+              className={cn(
+                'flex h-9 w-9 items-center justify-center border transition-colors',
+                light
+                  ? 'border-black/15 text-black/60 hover:border-jay-red hover:text-jay-red'
+                  : 'border-white/12 text-gray-300 hover:border-jay-red hover:text-white'
+              )}
             >
-              <Phone size={17} />
+              <MessageCircle size={16} />
             </a>
           </div>
         </div>
 
         <Link
           to={`/motos/${bike.slug}`}
-          className="mt-4 inline-flex items-center gap-1.5 font-display text-xs font-bold uppercase tracking-[0.2em] text-jay-red-soft transition-colors hover:text-white"
+          className="mt-4 inline-flex items-center gap-1.5 font-display text-xs font-extrabold uppercase tracking-[0.2em] text-jay-red transition-colors hover:gap-2.5"
         >
-          Ver ficha <ChevronRight size={15} />
+          Ver ficha <ArrowUpRight size={15} />
         </Link>
       </div>
+
+      <span className="pointer-events-none absolute bottom-0 left-0 h-[3px] w-0 bg-jay-red transition-all duration-500 group-hover:w-full" aria-hidden="true" />
     </article>
   );
 };
