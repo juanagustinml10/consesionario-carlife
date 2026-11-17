@@ -58,14 +58,14 @@ export const Home: React.FC = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-jay-black via-jay-black/80 to-jay-black/5" aria-hidden="true" />
         <div className="absolute inset-0 bg-gradient-to-t from-jay-black via-jay-black/25 to-jay-black/40" aria-hidden="true" />
 
-        <div className="container-jay relative">
-          <div className="flex min-h-[92svh] items-center py-14 lg:min-h-[90svh] lg:py-10">
+        <div className="container-jay relative flex min-h-[92svh] flex-col lg:min-h-[90svh]">
+          <div className="flex flex-1 items-center py-12 lg:py-8">
             <div className="max-w-2xl">
               <motion.h1
                 initial={{ opacity: 0, y: 26 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.15 }}
-                className="font-display text-4xl font-extrabold italic uppercase leading-[0.9] text-white sm:text-6xl lg:text-7xl xl:text-[4.5rem]"
+                className="font-display text-5xl font-extrabold italic uppercase leading-[0.9] text-white sm:text-7xl lg:text-[5.5rem] xl:text-[6rem]"
               >
                 Tu próxima<br />
                 <span className="text-jay-red">aventura</span><br />
@@ -120,23 +120,23 @@ export const Home: React.FC = () => {
 
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* ============ MARCAS REFERENTES DEL OFF-ROAD ============ */}
-      <section className="border-b border-white/5 bg-white py-3">
-        <div className="overflow-hidden" aria-hidden="true">
-          <div className="flex w-max animate-marquee items-center gap-12 whitespace-nowrap">
-            {[...BRANDS, ...BRANDS].map((brand, i) => (
-              <span key={i} className="font-display text-lg font-extrabold italic uppercase tracking-[0.18em] text-black/75 sm:text-xl">
-                {brand} <span className="ml-12 text-jay-red">/</span>
-              </span>
-            ))}
+          {/* Marcas referentes — integrado al hero */}
+          <div className="relative z-10 -mx-4 border-t border-white/10 bg-black/55 py-3 backdrop-blur-sm sm:-mx-6 lg:-mx-8">
+            <div className="overflow-hidden" aria-hidden="true">
+              <div className="flex w-max animate-marquee items-center gap-12 whitespace-nowrap">
+                {[...BRANDS, ...BRANDS].map((brand, i) => (
+                  <span key={i} className="font-display text-xs font-bold uppercase tracking-[0.2em] text-white/70 sm:text-sm">
+                    {brand} <span className="ml-10 text-jay-red">/</span>
+                  </span>
+                ))}
+              </div>
+            </div>
+            <p className="container-jay pt-1.5 text-center text-[7px] font-semibold uppercase leading-relaxed tracking-[0.22em] text-white/35">
+              Marcas referentes del mundo off-road · JAY MOTOS no declara representación oficial de ninguna marca
+            </p>
           </div>
         </div>
-        <p className="container-jay pt-2 text-center text-[9px] font-semibold uppercase tracking-[0.25em] text-black/45">
-          Marcas referentes del mundo off-road · JAY MOTOS no declara representación oficial de ninguna marca
-        </p>
       </section>
 
       {/* ============ 0 KM / USADAS (Catálogo) ============ */}
