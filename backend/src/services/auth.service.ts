@@ -24,13 +24,11 @@ export const comparePassword = async (password: string, hash: string) =>
 export const signAccessToken = (payload: JwtPayload) =>
   jwt.sign(payload, env.JWT_ACCESS_SECRET, {
     expiresIn: Number(env.JWT_ACCESS_TTL),
-    subject: payload.sub,
   });
 
 export const signRefreshToken = (payload: JwtPayload) =>
   jwt.sign(payload, env.JWT_REFRESH_SECRET, {
     expiresIn: Number(env.JWT_REFRESH_TTL),
-    subject: payload.sub,
   });
 
 /**
