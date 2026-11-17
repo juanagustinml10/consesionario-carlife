@@ -1,8 +1,7 @@
 import * as React from 'react';
-import { ChevronRight, BadgeCheck, Truck, Bike, Handshake } from 'lucide-react';
+import { ChevronRight, BadgeCheck, Truck, Bike } from 'lucide-react';
 import { Link } from '@/components/shared/Link';
 import { HeroBike } from '@/components/public/HeroBike';
-import { BUSINESS, buildWhatsAppLink } from '@/lib/constants';
 
 const PILLARS = [
   { icon: <Bike size={22} />, title: 'Multimarca', text: 'No nos casamos con una sola marca: elegimos las mejores unidades de cada casa.' },
@@ -59,28 +58,6 @@ export const About: React.FC = () => (
             <p className="mt-2 text-sm leading-relaxed text-gray-400">{p.text}</p>
           </div>
         ))}
-      </div>
-    </section>
-
-    {/* Especialidad enduro */}
-    <section className="border-t border-white/5 bg-black">
-      <div className="container-jay flex flex-col items-center gap-6 py-14 text-center sm:py-20">
-        <span className="eyebrow">Nuestra especialidad</span>
-        <p className="max-w-3xl font-display text-4xl font-extrabold uppercase leading-[0.9] text-white sm:text-6xl">
-          Enduro y off-road,<br /><span className="text-jay-red">de verdad.</span>
-        </p>
-        <p className="max-w-lg text-base leading-relaxed text-gray-400">
-          JAY MOTOS se especializa en el mundo enduro: las motos, los rutas y la cultura que nos define.
-        </p>
-        <a
-          href={buildWhatsAppLink(BUSINESS.whatsappGeneralMessage)}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="btn btn-red mt-2 px-8 py-4 text-xs"
-        >
-          <Handshake size={18} />
-          Hablar con un rider
-        </a>
       </div>
     </section>
 
