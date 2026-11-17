@@ -48,7 +48,7 @@ export const Home: React.FC = () => {
   return (
     <div className="bg-jay-black text-jay-white">
       {/* ============ HERO ============ */}
-      <section className="relative flex min-h-[78svh] flex-col overflow-hidden border-b border-white/5 lg:min-h-[calc(100svh-9rem)]">
+      <section className="relative flex min-h-[88svh] flex-col overflow-hidden border-b border-white/5 lg:min-h-[calc(100svh-6rem)]">
         {/* Fotografía real enduro (CC BY 4.0 — Jix31 · FREENDURO 2024) */}
         <img
           src={betaPhoto}
