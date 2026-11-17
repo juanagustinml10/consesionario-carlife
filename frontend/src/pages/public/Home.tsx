@@ -74,7 +74,7 @@ export const Home: React.FC = () => {
                 initial={{ opacity: 0, y: 26 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.15 }}
-                className="mt-6 font-display text-5xl font-extrabold italic uppercase leading-[0.9] text-white sm:text-7xl lg:text-[5.2rem]"
+                className="mt-6 font-display text-3xl font-extrabold italic uppercase leading-[0.9] text-white sm:text-4xl lg:text-5xl xl:text-6xl"
               >
                 Tu próxima<br />
                 <span className="text-jay-red">aventura</span><br />
