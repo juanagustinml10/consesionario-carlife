@@ -2,7 +2,7 @@ import { spawn } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const root = path.dirname(fileURLToPath(import.meta.url));
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const node = process.execPath;
 
 const processes = [];
@@ -17,7 +17,9 @@ function run(label, args, cwd) {
   child.on('error', (err) => {
     console.error(`[${label}] no pudo iniciar: ${err.message}`);
     for (const p of processes) {
-      if (p !== child && !p.killed) p.kill();
+      if (p !== child) {
+        try { p.kill(); } catch { /* ignorar */ }
+      }
     }
     process.exit(1);
   });
@@ -27,7 +29,9 @@ function run(label, args, cwd) {
     if (c !== 0) {
       console.error(`[${label}] terminó con código ${c}`);
       for (const p of processes) {
-        if (p !== child && !p.killed) p.kill();
+        if (p !== child) {
+          try { p.kill(); } catch { /* ignorar */ }
+        }
       }
       process.exit(c);
     }
