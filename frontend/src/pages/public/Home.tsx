@@ -48,7 +48,7 @@ export const Home: React.FC = () => {
   return (
     <div className="bg-jay-black text-jay-white">
       {/* ============ HERO ============ */}
-      <section className="relative flex min-h-[100svh] flex-col overflow-hidden border-b border-white/5">
+      <section className="relative flex min-h-[calc(100svh-4rem)] flex-col overflow-hidden border-b border-white/5 lg:min-h-[calc(100svh-4.5rem)]">
         {/* Fotografía real enduro (CC BY 4.0 — Jix31 · FREENDURO 2024) */}
         <img
           src={betaPhoto}
@@ -131,9 +131,6 @@ export const Home: React.FC = () => {
                 ))}
               </div>
             </div>
-            <p className="container-jay pt-2 text-center text-[9px] font-semibold uppercase tracking-[0.25em] text-black/45">
-              Marcas referentes del mundo off-road · JAY MOTOS no declara representación oficial de ninguna marca
-            </p>
           </div>
       </section>
 
