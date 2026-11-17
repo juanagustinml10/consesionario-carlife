@@ -1,0 +1,119 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum BikeCondition {
+  NUEVA
+  USADA
+}
+
+enum BikeStatus {
+  DISPONIBLE
+  RESERVADA
+  VENDIDA
+}
+
+model Brand {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique
+  logoUrl   String?
+  createdAt DateTime @default(now())
+  bikes     Bike[]
+
+  @@index([slug])
+}
+
+model Bike {
+  id            String      @id @default(cuid())
+  slug          String      @unique
+  title         String
+  brandId       String
+  brand         Brand       @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  model         String
+  year          Int
+  condition     BikeCondition
+  displacementCc Int?
+  price         Float
+  currency      String      @default("ARS")
+  description   String?
+  status        BikeStatus  @default(DISPONIBLE)
+  featured      Boolean     @default(false)
+  views         Int         @default(0)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  images        BikeImage[]
+  features      BikeFeature[]
+  visits        BikeVisit[]
+
+  @@index([brandId])
+  @@index([slug])
+  @@index([status])
+  @@index([featured])
+  @@index([createdAt])
+}
+
+model BikeImage {
+  id        String   @id @default(cuid())
+  bikeId    String
+  bike      Bike     @relation(fields: [bikeId], references: [id], onDelete: Cascade)
+  url       String
+  isPrimary Boolean  @default(false)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([bikeId])
+  @@index([bikeId, isPrimary])
+}
+
+model BikeFeature {
+  id        String   @id @default(cuid())
+  bikeId    String
+  bike      Bike     @relation(fields: [bikeId], references: [id], onDelete: Cascade)
+  key       String
+  value     String
+
+  @@index([bikeId])
+}
+
+model BikeVisit {
+  id        String   @id @default(cuid())
+  bikeId    String
+  bike      Bike     @relation(fields: [bikeId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  ip        String?
+  userAgent String?
+
+  @@index([bikeId])
+  @@index([createdAt])
+}
+
+model AdminUser {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  passwordHash  String
+  role          String   @default("ADMIN")
+  createdAt     DateTime @default(now())
+  lastLoginAt   DateTime?
+  sessions      Session[]
+
+  @@index([email])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  user      AdminUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([token])
+  @@index([expiresAt])
+}
