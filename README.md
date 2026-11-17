@@ -52,16 +52,29 @@ consesionaria motos/
 
 ## Puesta en marcha
 
-### 1. Backend
+```bash
+# Levantar backend + frontend juntos (recomendado)
+npm install
+npm run dev   # backend en http://localhost:4000 y frontend en http://localhost:5173
+```
+
+Si preferís hacerlo por separado:
 
 ```bash
+# Backend
 cd backend
-npm install
 cp .env.example .env
-# Editá .env con los valores reales (DATABASE_URL, secretos JWT, CORS_ORIGIN…)
-npx prisma migrate dev --name init   # crea las tablas
+# Editá .env con los datos reales de tu PostgreSQL y secretos propios
+npm install
+npx prisma migrate dev --name init   # crea las tablas en la base de datos
 npm run prisma:seed                  # crea el administrador inicial (usa SEED_ADMIN_*)
 npm run dev                          # http://localhost:4000
+
+# Frontend
+cd ../frontend
+cp .env.example .env
+npm install
+npm run dev                        # http://localhost:5173
 ```
 
 Endpoints principales:
