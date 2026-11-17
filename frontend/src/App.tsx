@@ -15,29 +15,30 @@ import { Bikes } from '@/pages/admin/Bikes';
 import { BikeForm } from '@/pages/admin/BikeForm';
 import { AdminLayout } from '@/layout/admin/AdminLayout';
 import { ProtectedRoute } from '@/components/admin/ProtectedRoute';
+import { PublicLayout } from '@/layout/PublicLayout';
 
 export const App = () => (
   <Routes>
-    {/* Página pública */}
-    <Route path="/" element={<Home />} />
-    <Route path="/motos" element={<Catalog />} />
-    <Route path="/motos/:slug" element={<BikeDetail />} />
-    <Route path="/comparador" element={<Compare />} />
-    <Route path="/favoritos" element={<Favorites />} />
-    <Route path="/financiacion" element={<Financiacion />} />
-    <Route path="/nosotros" element={<About />} />
-    <Route path="/contacto" element={<Contact />} />
+    {/* Página pública — todas heredan Navbar + Footer */}
+    <Route element={<PublicLayout />}>
+      <Route path="/" element={<Home />} />
+      <Route path="/motos" element={<Catalog />} />
+      <Route path="/motos/:slug" element={<BikeDetail />} />
+      <Route path="/comparador" element={<Compare />} />
+      <Route path="/favoritos" element={<Favorites />} />
+      <Route path="/financiacion" element={<Financiacion />} />
+      <Route path="/nosotros" element={<About />} />
+      <Route path="/contacto" element={<Contact />} />
+    </Route>
 
     {/* Panel administrativo */}
     <Route path="/admin/login" element={<Login />} />
     <Route
       path="/admin"
       element={
-        <>
-          <ProtectedRoute>
-            <AdminLayout />
-          </ProtectedRoute>
-        </>
+        <ProtectedRoute>
+          <AdminLayout />
+        </ProtectedRoute>
       }
     >
       <Route index element={<Navigate to="/admin/dashboard" replace />} />

@@ -7,7 +7,7 @@ export const BUSINESS = {
   name: 'JAY MOTOS',
   tagline: 'FOR RIDERS, BY RIDERS.',
   activity: 'Venta de motocicletas 0 km y usadas seleccionadas.',
-  specialty: 'Concesionaria multimarca con especial identidad en el mundo enduro.',
+  specialty: 'Concesionaria multimarca · Motos 0 km y usadas seleccionadas.',
   address: 'Corrientes 1440, Tucumán, Argentina',
   addressLink: 'https://maps.google.com/?q=Corrientes+1440+Tucuman+Argentina',
   phoneDisplay: '381 221-2048',

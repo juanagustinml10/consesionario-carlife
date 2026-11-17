@@ -8,6 +8,7 @@ import {
   Phone,
   BadgeCheck,
   MapPin,
+  Scale,
 } from 'lucide-react';
 import { Link } from '@/components/shared/Link';
 import { Logo } from '@/components/shared/Logo';
@@ -125,6 +126,22 @@ export const Home: React.FC = () => {
                 <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-gray-100">
                   Envíos a todo el país
                 </span>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.8, delay: 0.65 }}
+                className="mt-5 flex items-center gap-4 text-[10px] font-semibold uppercase tracking-[0.25em] text-white/45"
+              >
+                <Link to="/comparador" className="flex items-center gap-1.5 transition-colors hover:text-white">
+                  <Scale size={13} />
+                  Comparar motos
+                </Link>
+                <span className="h-3 w-px bg-white/15" aria-hidden="true" />
+                <Link to="/financiacion" className="transition-colors hover:text-white">
+                  Financiación
+                </Link>
               </motion.div>
 
               <p className="mt-6 max-w-[16rem] text-[9px] uppercase leading-relaxed tracking-[0.2em] text-white/35">
@@ -418,33 +435,32 @@ export const Home: React.FC = () => {
             </div>
           </div>
           <div className="lg:col-span-5">
-            <div className="rounded-2xl border border-white/8 bg-jay-surface p-8">
-              <p className="font-display text-[10px] font-bold uppercase tracking-[0.35em] text-jay-red-soft">JAY MOTOS</p>
-              <p className="mt-4 font-display text-6xl font-extrabold italic uppercase leading-[0.85] text-white sm:text-7xl">
-                FOR<br />RIDERS,<br /><span className="text-jay-red">BY RIDERS.</span>
-              </p>
-              <p className="mt-5 text-xs uppercase tracking-[0.25em] text-gray-500">Concesionaria multimarca · Enduro</p>
+            <div className="overflow-hidden rounded-2xl border border-white/10 shadow-card">
+              {/* Mapa interactivo de Google Maps — Corrientes 1440, Tucumán, Argentina */}
+              <iframe
+                title="JAY MOTOS — Corrientes 1440, Tucumán, Argentina"
+                src="https://www.google.com/maps?q=Corrientes+1440+Tucuman+Argentina&output=embed"
+                width="100%"
+                height="420"
+                className="block h-[280px] w-full sm:h-[360px] lg:h-[440px]"
+                style={{ border: 0 }}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                allowFullScreen
+              />
+              {/* Franja de identidad de marca */}
+              <div className="flex flex-wrap items-center justify-between gap-4 border-t border-white/10 bg-jay-surface px-5 py-4 sm:px-6">
+                <Logo className="h-9 sm:h-11" />
+                <p className="font-display text-[10px] font-bold uppercase tracking-[0.35em] text-jay-red-soft sm:text-xs">
+                  For riders, by riders.
+                </p>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ============ CTA comparador ============ */}
-      <section className="relative overflow-hidden border-t border-white/5 bg-jay-red">
-        <div className="absolute inset-0 diagonal-lines opacity-60" aria-hidden="true" />
-        <div className="container-jay relative py-14 text-center sm:py-20">
-          <span className="font-display text-xs font-bold uppercase tracking-[0.3em] text-white/80">Comparador inteligente</span>
-          <h2 className="mx-auto mt-3 max-w-4xl font-display text-5xl font-extrabold italic uppercase leading-[0.88] text-white sm:text-7xl">
-            Compará, elegí<br />y llevate tu moto
-          </h2>
-          <p className="mx-auto mt-5 max-w-xl text-base text-white/85">
-            Seleccioná hasta dos motos, compará sus especificaciones lado a lado y consultanos directo por WhatsApp.
-          </p>
-          <Link to="/comparador" className="btn mt-8 inline-flex items-center gap-2 rounded-xl bg-black px-8 py-4 font-display text-sm font-bold uppercase tracking-[0.15em] text-white transition-transform hover:scale-105">
-            Abrir comparador <ArrowRight size={18} />
-          </Link>
-        </div>
-      </section>
+      {/* ============ Footer (cierre de la página) ============ */}
     </div>
   );
 };
