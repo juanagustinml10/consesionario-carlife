@@ -268,8 +268,9 @@ export const Catalog: React.FC = () => {
       <PageIntro
         index="01"
         eyebrow="Inventario JAY MOTOS"
-        title={<>Encontrá<br />tu <span className="text-jay-red">próxima moto.</span></>}
+        title={<>Encontrá tu <span className="text-jay-red">próxima moto.</span></>}
         outline="MOTOS"
+        size="compact"
         description={
           <p aria-live="polite">
             {loading
@@ -281,16 +282,16 @@ export const Catalog: React.FC = () => {
         }
       >
         {/* Buscador */}
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+        <div className="mt-5 flex flex-col gap-3 sm:flex-row">
           <div className="relative flex-1">
-            <Search size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-jay-red" aria-hidden="true" />
+            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-jay-red" aria-hidden="true" />
             <input
               type="search"
               placeholder="Marca, modelo, año, cilindrada..."
               aria-label="Buscar motocicletas"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              className="field h-14 pl-12 text-base"
+              className="field h-12 pl-11 text-sm"
             />
           </div>
           <button
@@ -298,7 +299,7 @@ export const Catalog: React.FC = () => {
             onClick={() => setOpenFilters(!openFilters)}
             aria-expanded={openFilters}
             aria-controls="filtros-catalogo"
-            className="btn btn-ghost h-14 px-6 text-xs md:hidden"
+            className="btn btn-ghost h-12 px-5 text-[11px] md:hidden"
           >
             <SlidersHorizontal size={18} />
             {openFilters ? 'Ocultar' : 'Filtros'}
@@ -307,7 +308,7 @@ export const Catalog: React.FC = () => {
         </div>
 
         {/* Panel de filtros */}
-        <div id="filtros-catalogo" className="mt-4">
+        <div id="filtros-catalogo" className="mt-3">
           <div className="hidden md:block">{renderFilterPanel('desktop')}</div>
           <motion.div
             initial={false}
@@ -321,8 +322,8 @@ export const Catalog: React.FC = () => {
 
       {/* Resultados */}
       <section id="resultados" className="scroll-mt-24 bg-[#f3f3f3] text-jay-black">
-        <div className="container-jay py-12 sm:py-16">
-          <div className="mb-8 flex flex-col gap-5 border-t border-jay-red/60 pt-5 sm:flex-row sm:items-end sm:justify-between">
+        <div className="container-jay py-8 sm:py-10">
+          <div className="mb-6 flex flex-col gap-5 border-t border-jay-red/60 pt-5 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <span className="section-index">Resultados</span>
               <p className="mt-3 font-display text-3xl font-extrabold uppercase italic leading-none sm:text-4xl">
@@ -350,7 +351,10 @@ export const Catalog: React.FC = () => {
             </div>
           ) : error ? (
             <ErrorState
+              compact
               tone="light"
+              title="No se pudo cargar el catálogo"
+              className="mx-auto max-w-2xl"
               onRetry={() => setReloadKey((key) => key + 1)}
             />
           ) : bikes.length === 0 ? (
