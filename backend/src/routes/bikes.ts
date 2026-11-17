@@ -48,6 +48,7 @@ const createBikeSchema = z.object({
   year: z.coerce.number().int().min(1900).max(2100, 'Año inválido'),
   condition: z.enum(['NUEVA', 'USADA']),
   displacementCc: z.coerce.number().int().positive().optional().nullable(),
+  mileageKm: z.coerce.number().int().nonnegative().optional().nullable(),
   price: z.coerce.number().positive('El precio debe ser mayor a 0'),
   currency: z.string().length(3, 'Moneda inválida').default('ARS'),
   description: z.string().optional().nullable(),

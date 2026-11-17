@@ -26,6 +26,7 @@ export interface CreateBikeInput {
   year: number;
   condition: 'NUEVA' | 'USADA';
   displacementCc?: number | null;
+  mileageKm?: number | null;
   price: number;
   currency: string;
   description?: string | null;
@@ -137,6 +138,7 @@ export const createBike = async (input: CreateBikeInput) => {
       year: input.year,
       condition: input.condition,
       displacementCc: input.displacementCc ?? null,
+      mileageKm: input.mileageKm ?? null,
       price: input.price,
       currency: input.currency,
       description: input.description ?? null,
@@ -176,6 +178,7 @@ export const updateBike = async (id: string, input: UpdateBikeInput) => {
   if (input.year !== undefined) data.year = input.year;
   if (input.condition !== undefined) data.condition = input.condition;
   if (input.displacementCc !== undefined) data.displacementCc = input.displacementCc;
+  if (input.mileageKm !== undefined) data.mileageKm = input.mileageKm;
   if (input.price !== undefined) data.price = input.price;
   if (input.currency !== undefined) data.currency = input.currency;
   if (input.description !== undefined) data.description = input.description;

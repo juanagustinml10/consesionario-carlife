@@ -39,6 +39,7 @@ model Bike {
   year          Int
   condition     BikeCondition
   displacementCc Int?
+  mileageKm     Int?
   price         Float
   currency      String      @default("ARS")
   description   String?

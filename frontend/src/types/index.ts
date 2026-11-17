@@ -41,6 +41,7 @@ export interface Bike {
   year: number;
   condition: BikeCondition;
   displacementCc: number | null;
+  mileageKm: number | null;
   price: number;
   currency: string;
   description: string | null;

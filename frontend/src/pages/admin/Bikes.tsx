@@ -77,12 +77,12 @@ export const Bikes: React.FC = () => {
   });
 
   return (
-    <div className="bg-jay-black/5">
+    <div className="bg-transparent">
       <div className="container-jay">
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="font-display text-2xl font-bold">Motocicletas</h1>
-            <p className="text-sm text-jay-black/60">
+            <p className="text-sm text-gray-400">
               Administración de publicaciones del catálogo.
             </p>
           </div>
@@ -94,23 +94,23 @@ export const Bikes: React.FC = () => {
           </Link>
         </div>
 
-        <div className="rounded-xl border border-jay-black/10 bg-jay-white shadow-sm overflow-hidden">
-          <div className="border-b border-jay-black/5 bg-jay-black/5 p-5">
+        <div className="rounded-2xl border border-white/8 bg-jay-surface shadow-card overflow-hidden">
+          <div className="border-b border-white/5 bg-transparent p-5">
             <div className="flex flex-col md:flex-row md:items-center gap-4 mb-5">
               <div className="relative flex-1">
-                <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-jay-black/40" />
+                <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
                 <input
                   type="search"
                   placeholder="Buscar por marca, modelo o título..."
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 rounded-lg border border-jay-black/20 bg-jay-white focus:outline-none focus:ring-2 focus:ring-jay-red/50 transition-colors"
+                  className="w-full pl-10 pr-4 py-3 rounded-lg border border-white/10 bg-jay-elevated text-white focus:outline-none focus:ring-2 focus:ring-jay-red/40 transition-colors"
                 />
               </div>
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value as BikeStatus | 'TODOS')}
-                className="py-3 rounded-lg border border-jay-black/20 bg-jay-white text-sm focus:outline-none focus:ring-2 focus:ring-jay-red/50"
+                className="py-3 rounded-lg border border-white/10 bg-jay-elevated text-white text-sm focus:outline-none focus:ring-2 focus:ring-jay-red/40"
               >
                 <option value="TODOS">Todos los estados</option>
                 <option value="DISPONIBLE">Disponibles</option>
@@ -118,20 +118,20 @@ export const Bikes: React.FC = () => {
                 <option value="VENDIDA">Vendidas</option>
               </select>
             </div>
-            <div className="flex items-center gap-2 text-xs text-jay-black/50">
+            <div className="flex items-center gap-2 text-xs text-gray-500">
               <Motorbike size={14} />
               <span>{filtered.length} publicación{filtered.length !== 1 ? 'es' : ''}</span>
             </div>
           </div>
 
           {/* Vista móvil: tarjetas */}
-          <div className="divide-y divide-jay-black/5 md:hidden">
+          <div className="divide-y divide-white/5 md:hidden">
             {loading ? (
-              <div className="h-40 flex items-center justify-center text-sm text-jay-black/40">
+              <div className="h-40 flex items-center justify-center text-sm text-gray-500">
                 Cargando publicaciones...
               </div>
             ) : filtered.length === 0 ? (
-              <div className="h-40 flex items-center justify-center text-sm text-jay-black/40">
+              <div className="h-40 flex items-center justify-center text-sm text-gray-500">
                 No se encontraron publicaciones.
               </div>
             ) : (
@@ -139,12 +139,12 @@ export const Bikes: React.FC = () => {
                 <div key={bike.id} className="p-5">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex min-w-0 items-center gap-3">
-                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-jay-black/5">
-                        <Motorbike size={18} className="text-jay-black/40" />
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-transparent">
+                        <Motorbike size={18} className="text-gray-500" />
                       </div>
                       <div className="min-w-0">
-                        <p className="truncate font-medium text-jay-black">{bike.title}</p>
-                        <p className="truncate text-xs text-jay-black/50">
+                        <p className="truncate font-medium text-white">{bike.title}</p>
+                        <p className="truncate text-xs text-gray-500">
                           {bike.brand?.name ?? ''} {bike.model} · {bike.year}
                         </p>
                       </div>
@@ -162,13 +162,13 @@ export const Bikes: React.FC = () => {
                     </span>
                   </div>
                   <div className="mt-4 flex items-center justify-between gap-3">
-                    <span className="font-bold text-jay-black">
+                    <span className="font-bold text-white">
                       {bike.price.toLocaleString('es-AR')} {bike.currency}
                     </span>
                     <div className="flex items-center gap-2">
                       <Link
                         to={`/admin/motos/${bike.id}/editar`}
-                        className="rounded-lg p-2.5 text-jay-black/60 transition-colors hover:bg-jay-black/5 hover:text-jay-red"
+                        className="rounded-lg p-2.5 text-gray-400 transition-colors hover:bg-transparent hover:text-jay-red"
                         title="Editar"
                         aria-label="Editar publicación"
                       >
@@ -176,7 +176,7 @@ export const Bikes: React.FC = () => {
                       </Link>
                       <button
                         onClick={() => handleDelete(bike)}
-                        className="rounded-lg p-2.5 text-jay-black/60 transition-colors hover:bg-jay-red hover:text-white"
+                        className="rounded-lg p-2.5 text-gray-400 transition-colors hover:bg-jay-red hover:text-white"
                         title="Eliminar"
                         aria-label="Eliminar publicación"
                       >
@@ -193,46 +193,46 @@ export const Bikes: React.FC = () => {
           <div className="hidden overflow-x-auto md:block">
             <table className="w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-jay-black/5 bg-jay-black/3">
-                  <th className="py-4 px-6 font-medium text-jay-black/60">Moto</th>
-                  <th className="py-4 px-6 font-medium text-jay-black/60">Año</th>
-                  <th className="py-4 px-6 font-medium text-jay-black/60">Precio</th>
-                  <th className="py-4 px-6 font-medium text-jay-black/60">Estado</th>
-                  <th className="py-4 px-6 font-medium text-jay-black/60 text-center">Acciones</th>
+                <tr className="border-b border-white/5 bg-white/[0.02]">
+                  <th className="py-4 px-6 font-medium text-gray-400">Moto</th>
+                  <th className="py-4 px-6 font-medium text-gray-400">Año</th>
+                  <th className="py-4 px-6 font-medium text-gray-400">Precio</th>
+                  <th className="py-4 px-6 font-medium text-gray-400">Estado</th>
+                  <th className="py-4 px-6 font-medium text-gray-400 text-center">Acciones</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-jay-black/5">
+              <tbody className="divide-y divide-white/5">
                 {loading ? (
                   <tr>
-                    <td colSpan={5} className="h-40 text-center text-jay-black/40">
+                    <td colSpan={5} className="h-40 text-center text-gray-500">
                       Cargando publicaciones...
                     </td>
                   </tr>
                 ) : filtered.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="h-40 text-center text-jay-black/40">
+                    <td colSpan={5} className="h-40 text-center text-gray-500">
                       No se encontraron publicaciones.
                     </td>
                   </tr>
                 ) : (
                   filtered.map((bike) => (
-                    <tr key={bike.id} className="hover:bg-jay-black/3 transition-colors">
+                    <tr key={bike.id} className="hover:bg-white/[0.02] transition-colors">
                       <td className="py-5 px-6">
                         <div className="flex items-center gap-4">
-                          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-jay-black/5">
-                            <Motorbike size={18} className="text-jay-black/40" />
+                          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-transparent">
+                            <Motorbike size={18} className="text-gray-500" />
                           </div>
                           <div>
-                            <p className="font-medium text-jay-black">{bike.title}</p>
-                            <p className="text-xs text-jay-black/50">
+                            <p className="font-medium text-white">{bike.title}</p>
+                            <p className="text-xs text-gray-500">
                               {bike.brand?.name ?? ''} {bike.model} · {bike.year}
                             </p>
                           </div>
                         </div>
                       </td>
-                      <td className="py-5 px-6 text-jay-black/60">{bike.year}</td>
+                      <td className="py-5 px-6 text-gray-400">{bike.year}</td>
                       <td className="py-5 px-6">
-                        <span className="font-medium text-jay-black">
+                        <span className="font-medium text-white">
                           {bike.price.toLocaleString('es-AR')} {bike.currency}
                         </span>
                       </td>
@@ -253,14 +253,14 @@ export const Bikes: React.FC = () => {
                         <div className="flex items-center justify-center gap-2">
                           <Link
                             to={`/admin/motos/${bike.id}/editar`}
-                            className="p-2 rounded-lg text-jay-black/60 hover:bg-jay-black/5 hover:text-jay-red transition-colors"
+                            className="p-2 rounded-lg text-gray-400 hover:bg-transparent hover:text-jay-red transition-colors"
                             title="Editar"
                           >
                             <Edit2 size={18} />
                           </Link>
                           <button
                             onClick={() => handleDelete(bike)}
-                            className="p-2 rounded-lg text-jay-black/60 hover:bg-jay-red hover:text-white transition-colors"
+                            className="p-2 rounded-lg text-gray-400 hover:bg-jay-red hover:text-white transition-colors"
                             title="Eliminar"
                           >
                             <Trash2 size={18} />
@@ -282,13 +282,13 @@ export const Bikes: React.FC = () => {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="relative w-full max-w-md rounded-xl border border-jay-black/10 bg-jay-white p-6 shadow-2xl"
+            className="relative w-full max-w-md rounded-2xl border border-white/10 bg-jay-surface p-6 shadow-2xl"
           >
             <div className="mb-4">
               <Motorbike size={24} className="text-jay-red" />
               <h3 className="ml-3 font-display text-xl font-bold">Eliminar publicación</h3>
             </div>
-            <p className="text-sm text-jay-black/60 mb-6">
+            <p className="text-sm text-gray-400 mb-6">
               ¿Estás seguro de que querés eliminar <strong>"{bikeToDelete.title}"</strong>? Esta acción no se puede deshacer.
             </p>
             <div className="flex justify-end gap-3">

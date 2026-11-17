@@ -1,13 +1,22 @@
 import * as React from 'react';
 import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
-import { ChevronLeft, ChevronRight as ChevronRightIcon, Link as LinkIcon } from 'lucide-react';
+import {
+  ChevronRight,
+  Phone,
+  Share2,
+  Heart,
+  Scale,
+  Fuel,
+  Gauge,
+  Calendar,
+  Tag,
+  ShieldCheck,
+  Clock,
+} from 'lucide-react';
 import { Link } from '@/components/shared/Link';
-import Button from '@/components/ui/button';
-
-import { WhatsAppButton } from '@/components/shared/WhatsAppButton';
-import { ImagePlaceholder } from '@/components/shared/ImagePlaceholder';
 import { BikeCard } from '@/components/public/BikeCard';
+import { ImagePlaceholder } from '@/components/shared/ImagePlaceholder';
 import { useFavoritesStore } from '@/stores/favorites';
 import { useCompareStore } from '@/stores/compare';
 import { bikesService } from '@/services/bikes';
@@ -20,6 +29,7 @@ export const BikeDetail: React.FC = () => {
   const [related, setRelated] = useState<Bike[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeImage, setActiveImage] = useState(0);
+  const [copied, setCopied] = useState(false);
 
   const bikeId = bike?.id ?? slug ?? '';
   const isFavorite = useFavoritesStore((state) => state.isFavorite(bikeId));
@@ -33,12 +43,12 @@ export const BikeDetail: React.FC = () => {
     setLoading(true);
     try {
       const data = await bikesService.getBySlug(slug);
-      await bikesService.trackVisit(data.id);
+      bikesService.trackVisit(data.id).catch(() => {});
       setBike(data);
       setActiveImage(0);
 
-      const all = await bikesService.list({ limit: 20 });
-      setRelated(all.data.filter((b) => b.id !== data.id).slice(0, 3));
+      const all = await bikesService.list({ limit: 8 });
+      setRelated(all.data.filter((b) => b.id !== data.id).slice(0, 4));
     } catch {
       setBike(null);
     } finally {
@@ -52,281 +62,266 @@ export const BikeDetail: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="container-jay py-20">
-        <p className="text-jay-black/40">Cargando ficha de la moto...</p>
+      <div className="flex min-h-[60vh] items-center justify-center bg-jay-black text-gray-500">
+        <div className="text-center">
+          <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-white/10 border-t-jay-red" />
+          <p className="mt-4 text-sm uppercase tracking-widest">Cargando ficha...</p>
+        </div>
       </div>
     );
   }
+
   if (!bike) {
     return (
-      <div className="container-jay py-20 text-center">
-        <h2 className="text-2xl font-bold">Moto no encontrada</h2>
-        <p className="mt-2 text-jay-black/50">
-          La publicación buscada no existe o ya no está disponible.
-        </p>
-        <Link
-          to="/motos"
-          className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-jay-red hover:text-jay-black"
-        >
-          <ChevronLeft size={16} /> Volver al catálogo
+      <div className="flex min-h-[70vh] flex-col items-center justify-center bg-jay-black text-center">
+        <p className="font-display text-6xl font-extrabold uppercase text-white/10">404</p>
+        <h1 className="mt-2 font-display text-3xl font-bold uppercase text-white">Moto no encontrada</h1>
+        <p className="mt-2 max-w-sm text-sm text-gray-500">La publicación buscada no existe o ya no está disponible.</p>
+        <Link to="/motos" className="btn btn-red mt-6 px-6 py-3 text-xs">
+          Volver al catálogo
         </Link>
       </div>
     );
   }
 
-  const primaryImage = bike.images.find((img) => img.isPrimary) ?? bike.images[0];
-  const whatsappMessage = `Hola JAY MOTOS, me interesa la moto "${bike.title}" (${bike.year}, ${bike.condition === 'NUEVA' ? '0 km' : 'usada'}). ¿Podrían darme más información y confirmar disponibilidad?`;
+  const images = bike.images.length > 0 ? bike.images : [];
+  const currentImage = images[activeImage] ?? images[0];
+  const whatsappMessage = `Hola JAY MOTOS, me interesa la moto ${bike.title} (${bike.year}${bike.condition === 'NUEVA' ? ', 0 km' : ', usada'}). ¿Podrían darme más información y confirmar disponibilidad?`;
+  const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
+
+  const handleShare = async () => {
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: bike.title, text: whatsappMessage, url: shareUrl });
+      } else {
+        await navigator.clipboard.writeText(shareUrl);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      }
+    } catch {
+      // compartir cancelado
+    }
+  };
 
   return (
-    <div className="bg-jay-white">
-      <section className="border-b border-jay-black/5">
-        <div className="container-jay py-6">
-          <nav className="flex items-center gap-1 text-xs text-jay-black/50">
-            <Link to="/motos" className="hover:text-jay-red transition-colors">Catálogo</Link>
-            <span>/</span>
-            <span className="text-jay-black">{bike.title}</span>
-          </nav>
+    <div className="min-h-screen bg-jay-black pb-16 text-jay-white">
+      {/* Breadcrumb */}
+      <div className="border-b border-white/5">
+        <div className="container-jay flex h-12 items-center gap-2 overflow-x-auto text-[11px] font-semibold uppercase tracking-widest text-gray-500">
+          <Link to="/motos" className="shrink-0 transition-colors hover:text-white">Catálogo</Link>
+          <span className="text-gray-700">/</span>
+          <span className="shrink-0 text-gray-300">{bike.brand?.name ?? 'Moto'}</span>
+          <span className="text-gray-700">/</span>
+          <span className="truncate text-white">{bike.title}</span>
         </div>
-      </section>
+      </div>
 
-      <section className="py-12 lg:py-20">
-        <div className="container-jay">
-          <div className="grid lg:grid-cols-12 gap-8 lg:gap-12">
-            {/* Galería */}
-            <div className="lg:col-span-7 space-y-6">
-              <div className="aspect-video relative bg-jay-black/5 rounded-2xl overflow-hidden shadow-lg">
-                {primaryImage ? (
-                  <img
-                    src={primaryImage.url}
-                    alt={bike.title}
-                    className="h-full w-full object-cover transition-opacity duration-300"
-                  />
-                ) : (
-                  <ImagePlaceholder width={900} height={600} label={`Foto de prueba: ${bike.title}`} />
-                )}
-                <button
-                  onClick={() => setActiveImage((i) => (i + 1) % bike.images.length)}
-                  className="absolute top-4 right-4 p-2 rounded-full bg-white/80 backdrop-blur text-jay-black hover:bg-white transition-colors"
-                  aria-label="Siguiente imagen"
-                >
-                  <ChevronRightIcon size={20} />
-                </button>
-                <div className="absolute bottom-4 left-4 z-10 flex gap-1.5">
-                  {bike.images.map((_img, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => setActiveImage(idx)}
-                      className={`h-8 w-8 rounded-full border-2 transition-all ${
-                        activeImage === idx
-                          ? 'border-jay-red bg-jay-red'
-                          : 'border-white/60 bg-white/80 hover:border-jay-black/30'
-                      }`}
-                      aria-label={`Imagen ${idx + 1}`}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-4 gap-2">
-                {bike.images.slice(0, 4).map((_img, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setActiveImage(idx)}
-                    className={`aspect-square rounded-xl overflow-hidden border-2 transition-all ${
-                      activeImage === idx
-                        ? 'border-jay-red'
-                        : 'border-transparent hover:border-jay-black/30'
-                    }`}
-                  >
-                    {bike.images[idx].url ? (
-                      <img src={bike.images[idx].url} alt="" className="h-full w-full object-cover" />
-                    ) : (
-                      <ImagePlaceholder width={200} height={200} label="" />
-                    )}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Ficha */}
-            <div className="lg:col-span-5 space-y-6">
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  {bike.condition === 'NUEVA' ? (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-green-500/10 text-green-600 text-[10px] font-bold uppercase">
-                      0 km
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-700 text-[10px] font-bold uppercase">
-                      Usada
-                    </span>
-                  )}
-                  {bike.featured && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-jay-red text-jay-white text-[10px] font-bold uppercase border border-jay-red/30">
-                      Destacada
-                    </span>
-                  )}
-                </div>
-                <span
-                  className={[
-                    'inline-flex items-center gap-1 px-3 py-1 rounded-md text-[11px] font-bold uppercase tracking-wider',
-                    bike.status === 'DISPONIBLE'
-                      ? 'bg-green-500/10 text-green-700 border border-green-500/30'
-                      : bike.status === 'RESERVADA'
-                        ? 'bg-amber-500/10 text-amber-700 border border-amber-500/30'
-                        : 'bg-jay-red/10 text-jay-red border border-jay-red/30',
-                  ].join(' ')}
-                >
-                  {bike.status === 'DISPONIBLE' ? 'Disponible' : bike.status === 'RESERVADA' ? 'Reservada' : 'Vendida'}
-                </span>
-                <h1 className="mt-2 font-display text-3xl md:text-4xl font-bold leading-tight">
-                  {bike.title}
-                </h1>
-                <p className="mt-1 text-lg text-jay-black/60">
-                  {bike.brand?.name ?? ''} {bike.model} · {bike.year}{bike.displacementCc ? ` · ${bike.displacementCc} cc` : ''}
-                </p>
-              </div>
-
-              <div className="bg-jay-black/5 p-6 rounded-xl border border-jay-black/10">
-                <div className="flex items-baseline gap-2 mb-2">
-                  <span className="font-display text-3xl font-bold">
-                    {bike.price.toLocaleString('es-AR')}
-                  </span>
-                  <span className="text-sm font-medium text-jay-black/60">{bike.currency}</span>
-                </div>
-                <p className="text-sm text-jay-black/50">
-                  Precio lista publicado por JAY MOTOS. Consultar por financiación directamente en concesionaria.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <WhatsAppButton
-                  phone={import.meta.env.VITE_WHATSAPP_PHONE ?? ''}
-                  message={whatsappMessage}
-                  label="Consultar por WhatsApp"
-                  className="w-full flex items-center justify-center gap-2 bg-jay-red text-white hover:bg-black"
+      <div className="container-jay grid gap-8 py-8 lg:grid-cols-12 lg:gap-10 lg:py-12">
+        {/* ===== Galería ===== */}
+        <div className="lg:col-span-7">
+          <div className="relative overflow-hidden rounded-2xl border border-white/8 bg-black">
+            <div className="aspect-[4/3] sm:aspect-[16/11]">
+              {currentImage ? (
+                <img
+                  src={currentImage.url}
+                  alt={bike.title}
+                  className="h-full w-full object-contain"
                 />
-                <Button
-                  variant="outline"
-                  onClick={handleCopy}
-                  className="w-full flex items-center justify-center gap-2"
-                >
-                  <LinkIcon size={20} /> Compartir
-                </Button>
-              </div>
+              ) : (
+                <ImagePlaceholder width={1200} height={900} label="Foto de prueba de la moto" className="h-full w-full" />
+              )}
+            </div>
+            <button
+              onClick={() => setActiveImage((i) => (i + 1) % images.length)}
+              className="absolute right-3 top-3 flex h-11 w-11 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur transition-colors hover:bg-jay-red"
+              aria-label="Siguiente fotografía"
+            >
+              <ChevronRight size={22} />
+            </button>
+            <span className="absolute left-3 top-3 rounded-md bg-black/70 px-2.5 py-1.5 font-display text-[10px] font-bold uppercase tracking-[0.2em] text-white backdrop-blur">
+              {activeImage + 1} / {images.length || 1}
+            </span>
+          </div>
 
-              <div className="flex items-center gap-2">
+          {/* Miniaturas */}
+          {images.length > 1 && (
+            <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
+              {images.map((img, i) => (
                 <button
-                  onClick={() => toggleFavorite(bike.id)}
-                  className="flex items-center gap-2 rounded-lg border border-jay-black/20 px-4 py-3 text-sm font-medium transition-colors hover:bg-jay-black/5"
-                >
-                  <Heart filled={isFavorite} />{' '}
-                  {isFavorite ? 'En favoritos' : 'Agregar a favoritos'}
-                </button>
-                <button
-                  onClick={() => addToCompare(bike)}
-                  disabled={inCompare || !canCompare}
+                  key={img.id}
+                  onClick={() => setActiveImage(i)}
+                  aria-label={`Fotografía ${i + 1}`}
+                  aria-current={i === activeImage ? 'true' : undefined}
                   className={cn(
-                    'flex items-center gap-2 rounded-lg border px-4 py-3 text-sm font-medium transition-colors disabled:opacity-50 disabled:pointer-events-none',
-                    inCompare
-                      ? 'bg-jay-red border-jay-red text-white'
-                      : 'border-jay-black/20 text-jay-black/70 hover:bg-jay-black/5'
+                    'h-20 w-28 shrink-0 overflow-hidden rounded-xl border transition-all',
+                    i === activeImage ? 'border-jay-red opacity-100' : 'border-white/10 opacity-50 hover:opacity-80'
                   )}
                 >
-                  <CompareIcon /> {inCompare ? 'En comparador' : 'Comparar'}
+                  <img src={img.url} alt="" className="h-full w-full object-cover" loading="lazy" />
                 </button>
-              </div>
-
-              {bike.description && (
-                <div>
-                  <h3 className="text-sm font-semibold uppercase tracking-wider text-jay-black/40 mb-3">
-                    Detalles
-                  </h3>
-                  <p className="text-sm text-jay-black/60 leading-relaxed whitespace-pre-line">
-                    {bike.description}
-                  </p>
-                </div>
-              )}
-
-              <div>
-                <h3 className="text-sm font-semibold uppercase tracking-wider text-jay-black/40 mb-3">
-                  Características
-                </h3>
-                <ul className="grid grid-cols-2 gap-3 text-sm text-jay-black/60">
-                  {(bike.features ?? []).map((f) => (
-                    <li key={f.id} className="flex justify-between border-b border-jay-black/5 pb-1.5 last:border-0">
-                      <span>{f.key}</span>
-                      <span className="font-medium text-jay-black">{f.value}</span>
-                    </li>
-                  ))}
-                  <li className="flex justify-between border-b border-jay-black/5 pb-1.5 last:border-0">
-                    <span>Año</span>
-                    <span className="font-medium text-jay-black">{bike.year}</span>
-                  </li>
-                  <li className="flex justify-between border-b border-jay-black/5 pb-1.5 last:border-0">
-                    <span>Condición</span>
-                    <span className="font-medium text-jay-black">
-                      {bike.condition === 'NUEVA' ? '0 km' : 'Usada'}
-                    </span>
-                  </li>
-                </ul>
-              </div>
+              ))}
             </div>
+          )}
+
+          {/* Acciones secundarias */}
+          <div className="mt-4 flex flex-wrap gap-2">
+            <button
+              onClick={() => toggleFavorite(bike.id)}
+              className={cn(
+                'flex items-center gap-2 rounded-xl border px-4 py-3 text-xs font-bold uppercase tracking-wider transition-all',
+                isFavorite ? 'border-jay-red bg-jay-red/15 text-jay-red-soft' : 'border-white/10 text-gray-300 hover:border-white/25 hover:text-white'
+              )}
+            >
+              <Heart size={16} className={isFavorite ? 'fill-jay-red text-jay-red' : ''} />
+              {isFavorite ? 'En favoritos' : 'Guardar'}
+            </button>
+            <button
+              onClick={() => addToCompare(bike)}
+              disabled={inCompare || !canCompare}
+              className={cn(
+                'flex items-center gap-2 rounded-xl border px-4 py-3 text-xs font-bold uppercase tracking-wider transition-all disabled:opacity-40',
+                inCompare ? 'border-jay-red bg-jay-red text-white' : 'border-white/10 text-gray-300 hover:border-white/25 hover:text-white'
+              )}
+            >
+              <Scale size={16} />
+              {inCompare ? 'En comparador' : 'Comparar'}
+            </button>
+            <button
+              onClick={handleShare}
+              className="flex items-center gap-2 rounded-xl border border-white/10 px-4 py-3 text-xs font-bold uppercase tracking-wider text-gray-300 transition-all hover:border-white/25 hover:text-white"
+            >
+              <Share2 size={16} />
+              {copied ? '¡Copiado!' : 'Compartir'}
+            </button>
           </div>
         </div>
-      </section>
+
+        {/* ===== Ficha ===== */}
+        <div className="lg:col-span-5">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className={cn(
+              'rounded-md px-3 py-1.5 font-display text-[10px] font-bold uppercase tracking-[0.25em]',
+              bike.condition === 'NUEVA' ? 'bg-jay-red text-white' : 'bg-white/90 text-black'
+            )}>
+              {bike.condition === 'NUEVA' ? '0 km' : 'Usada'}
+            </span>
+            <span className="flex items-center gap-1.5 rounded-md border border-white/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.25em] text-gray-300">
+              <span className={cn(
+                'h-1.5 w-1.5 rounded-full',
+                bike.status === 'DISPONIBLE' ? 'bg-green-400 animate-pulse' : bike.status === 'RESERVADA' ? 'bg-amber-400' : 'bg-jay-red'
+              )} />
+              {bike.status === 'DISPONIBLE' ? 'Disponible' : bike.status === 'RESERVADA' ? 'Reservada' : 'Vendida'}
+            </span>
+            {bike.featured && (
+              <span className="rounded-md border border-jay-red/40 bg-jay-red/10 px-3 py-1.5 font-display text-[10px] font-bold uppercase tracking-[0.25em] text-jay-red-soft">
+                Destacada
+              </span>
+            )}
+          </div>
+
+          <p className="mt-5 font-display text-xs font-bold uppercase tracking-[0.3em] text-jay-red-soft">
+            {bike.brand?.name ?? 'JAY MOTOS'}
+          </p>
+          <h1 className="mt-1 font-display text-5xl font-extrabold uppercase leading-[0.9] text-white sm:text-6xl">
+            {bike.model || bike.title}
+          </h1>
+          <p className="mt-3 text-sm text-gray-400">
+            {bike.title}
+          </p>
+
+          {/* Precio */}
+          <div className="mt-6 border-y border-white/8 py-5">
+            <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-500">Precio final</p>
+            <div className="mt-1 flex flex-wrap items-baseline gap-3">
+              <span className="font-display text-6xl font-extrabold leading-none text-white">
+                {bike.price.toLocaleString('es-AR')}
+              </span>
+              <span className="font-display text-xl font-bold text-jay-red-soft">{bike.currency}</span>
+            </div>
+            <p className="mt-2 text-[11px] text-gray-500">Precio de lista en concesionaria. Financiación disponible — consultanos.</p>
+          </div>
+
+          {/* Consulta WhatsApp */}
+          <a
+            href={`https://wa.me/5491112345678?text=${encodeURIComponent(whatsappMessage)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn btn-red mt-6 flex w-full items-center justify-center gap-2 py-4 text-sm"
+          >
+            <Phone size={20} />
+            Consultar disponibilidad
+          </a>
+          <p className="mt-2 text-center text-[11px] text-gray-500">Respondemos en el día · Lun–Sáb 9–19 h</p>
+
+          {/* Especificaciones */}
+          <div className="mt-7">
+            <h2 className="font-display text-xs font-bold uppercase tracking-[0.3em] text-gray-500">Especificaciones</h2>
+            <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+              {[
+                { icon: <Calendar size={17} />, label: 'Año', value: String(bike.year) },
+                { icon: <Gauge size={17} />, label: 'Cilindrada', value: bike.displacementCc ? `${bike.displacementCc} cc` : '—' },
+                { icon: <Fuel size={17} />, label: 'Kilómetros', value: bike.mileageKm != null ? `${bike.mileageKm.toLocaleString('es-AR')} km` : '0 km' },
+                { icon: <Tag size={17} />, label: 'Condición', value: bike.condition === 'NUEVA' ? 'Nueva' : 'Usada' },
+              ].map((spec) => (
+                <div key={spec.label} className="rounded-xl border border-white/8 bg-jay-surface p-3">
+                  <div className="text-jay-red-soft">{spec.icon}</div>
+                  <p className="mt-2 text-[9px] font-bold uppercase tracking-[0.2em] text-gray-500">{spec.label}</p>
+                  <p className="mt-0.5 font-display text-base font-bold text-white">{spec.value}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Descripción */}
+          {bike.description && (
+            <div className="mt-7">
+              <h2 className="font-display text-xs font-bold uppercase tracking-[0.3em] text-gray-500">Descripción</h2>
+              <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-gray-300">{bike.description}</p>
+            </div>
+          )}
+
+          {/* Garantía */}
+          <div className="mt-6 flex items-start gap-3 rounded-xl border border-jay-red/20 bg-jay-red/5 p-4">
+            <ShieldCheck size={20} className="mt-0.5 shrink-0 text-jay-red" />
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wider text-white">Compra con respaldo</p>
+              <p className="mt-1 text-xs leading-relaxed text-gray-400">
+                Documentación verificada, revisión técnica certificada y garantía según condición de la unidad.
+              </p>
+            </div>
+          </div>
+
+          <p className="mt-4 flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-gray-600">
+            <Clock size={12} /> Publicada el {new Date(bike.createdAt).toLocaleDateString('es-AR')}
+          </p>
+        </div>
+      </div>
 
       {/* Relacionadas */}
-      <section className="py-20 border-t border-jay-black/5">
-        <div className="container-jay">
-          <div className="flex items-center justify-between mb-10">
-            <h2 className="font-display text-2xl font-bold">Te puede interesar</h2>
-            <Link to="/motos" className="text-sm font-medium text-jay-red hover:text-jay-black">
-              Ver todo el catálogo
-            </Link>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {related.map((b) => (
-              <div key={b.id}>
-                <BikeCard bike={b} />
+      {related.length > 0 && (
+        <div className="border-t border-white/5">
+          <div className="container-jay py-12">
+            <div className="mb-6 flex items-end justify-between gap-4">
+              <div>
+                <span className="eyebrow">También te puede interesar</span>
+                <h2 className="mt-1 font-display text-3xl font-extrabold uppercase italic text-white sm:text-4xl">
+                  Similares<span className="text-jay-red">.</span>
+                </h2>
               </div>
-            ))}
+              <Link to="/motos" className="hidden items-center gap-1 font-display text-xs font-bold uppercase tracking-[0.2em] text-gray-400 hover:text-white sm:inline-flex">
+                Ver catálogo <ChevronRight size={14} />
+              </Link>
+            </div>
+            <div className="-mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-2 sm:mx-0 sm:px-0 lg:grid lg:grid-cols-4 lg:overflow-visible">
+              {related.map((b) => (
+                <div key={b.id} className="w-[78vw] max-w-xs shrink-0 snap-start sm:w-72 lg:w-auto lg:max-w-none">
+                  <BikeCard bike={b} />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-      </section>
+      )}
     </div>
   );
 };
-
-function handleCopy() {
-  navigator.clipboard.writeText(window.location.href);
-  alert('Enlace copiado al portapapeles');
-}
-
-function Heart({ filled }: { filled: boolean }) {
-  return (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill={filled ? 'currentColor' : 'none'}
-      stroke={filled ? 'none' : 'currentColor'}
-      strokeWidth={2.5}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="transition-colors"
-    >
-      <path d="M19 14c1.49-1.46 3-3.21 3-5.5 0-5.5-4.5-9.5-7-9.5-2.5 0-7 4-7 9.5 0 2.3 1.5 4.04 3 5.5" />
-    </svg>
-  );
-}
-
-function CompareIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M15 3h4v12h-4z" />
-      <path d="M3 16h4v4H3z" />
-      <path d="M9 3h6v16H9z" />
-    </svg>
-  );
-}

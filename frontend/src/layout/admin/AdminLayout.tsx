@@ -2,6 +2,7 @@ import * as React from 'react';
 import { useState } from 'react';
 import { useNavigate, Outlet } from 'react-router-dom';
 import { Link } from '@/components/shared/Link';
+import { Logo } from '@/components/shared/Logo';
 import {
   LayoutDashboard,
   Motorbike,
@@ -45,13 +46,8 @@ export const AdminLayout: React.FC = () => {
         }`}
       >
         <div className="flex h-16 shrink-0 items-center justify-between border-b border-white/10 px-6">
-          <Link to="/admin/dashboard" className="flex items-center gap-2">
-            <span className="flex h-6 w-6 items-center justify-center rounded bg-jay-red text-[10px] font-black uppercase tracking-tighter text-white">
-              JM
-            </span>
-            <span className="font-display text-xl font-bold tracking-tighter">
-              JAY<span className="text-jay-red">MOTOS</span>
-            </span>
+          <Link to="/admin/dashboard" className="flex items-center gap-2" aria-label="JAY MOTOS — Panel">
+            <Logo className="h-8 sm:h-9" />
           </Link>
           <button
             onClick={() => setSidebarOpen(false)}

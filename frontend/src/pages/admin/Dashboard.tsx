@@ -104,16 +104,16 @@ export const Dashboard: React.FC = () => {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.05 * idx }}
-        className="rounded-xl border border-jay-black/10 bg-jay-white shadow-sm"
+        className="rounded-2xl border border-white/8 bg-jay-surface shadow-card"
       >
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium text-jay-black/60">{stat.label}</CardTitle>
-          <div className="w-8 h-8 rounded-lg bg-black/5 flex items-center justify-center text-jay-black/60">
+          <CardTitle className="text-sm font-medium text-gray-400">{stat.label}</CardTitle>
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/5 text-gray-400">
             {stat.icon}
           </div>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-jay-black">
+          <div className="text-2xl font-bold text-white">
             {loading ? '--' : values[idx] ?? '--'}
           </div>
         </CardContent>
@@ -122,12 +122,12 @@ export const Dashboard: React.FC = () => {
   };
 
   return (
-    <div className="bg-jay-black/5">
+    <div className="bg-transparent">
       <div className="container-jay">
         <div className="flex items-center justify-between mb-10">
           <div>
             <h1 className="font-display text-2xl font-bold">Dashboard</h1>
-            <p className="text-sm text-jay-black/60">
+            <p className="text-sm text-gray-400">
               Resumen del estado de las publicaciones de JAY MOTOS.
             </p>
           </div>
@@ -138,7 +138,7 @@ export const Dashboard: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="rounded-xl border border-jay-black/10 bg-jay-white shadow-sm">
+          <div className="rounded-2xl border border-white/8 bg-jay-surface shadow-card">
             <CardHeader>
               <CardTitle>Publicaciones recientes</CardTitle>
               <CardDescription>
@@ -148,23 +148,23 @@ export const Dashboard: React.FC = () => {
             <CardContent>
               <div className="space-y-4">
                 {loading || recent.length === 0 ? (
-                  <div className="h-32 flex items-center justify-center text-jay-black/40 text-sm">
+                  <div className="h-32 flex items-center justify-center text-gray-500 text-sm">
                     {loading ? 'Cargando...' : 'No hay publicaciones recientes.'}
                   </div>
                 ) : (
                   recent.map((bike) => (
-                    <div key={bike.id} className="flex items-center justify-between border-b border-jay-black/5 pb-4 last:border-0 last:pb-0">
+                    <div key={bike.id} className="flex items-center justify-between border-b border-white/5 pb-4 last:border-0 last:pb-0">
                       <div className="flex items-center gap-4">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-black/5">
-                          <Motorbike size={18} className="text-jay-black/40" />
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/5">
+                          <Motorbike size={18} className="text-gray-500" />
 
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-jay-black">{bike.title}</p>
-                          <p className="text-xs text-jay-black/50">{new Date(bike.createdAt).toLocaleDateString('es-AR')}</p>
+                          <p className="text-sm font-medium text-white">{bike.title}</p>
+                          <p className="text-xs text-gray-500">{new Date(bike.createdAt).toLocaleDateString('es-AR')}</p>
                         </div>
                       </div>
-                      <span className="text-xs font-medium text-jay-black/50">{bike.views} visitas</span>
+                      <span className="text-xs font-medium text-gray-500">{bike.views} visitas</span>
                     </div>
                   ))
                 )}
@@ -173,28 +173,28 @@ export const Dashboard: React.FC = () => {
             <CardFooter>
               <Link
                 to="/admin/motos"
-                className="text-xs font-medium text-jay-red hover:text-jay-black transition-colors"
+                className="text-xs font-medium text-jay-red hover:text-white transition-colors"
               >
                 Ver todas las publicaciones
               </Link>
             </CardFooter>
           </div>
 
-          <div className="rounded-xl border border-jay-black/10 bg-jay-white shadow-sm p-6">
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-jay-black/40 mb-6">
+          <div className="rounded-2xl border border-white/8 bg-jay-surface shadow-card p-6">
+            <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-500 mb-6">
               Accesos rápidos
             </h3>
             <div className="space-y-3">
               <Link
                 to="/admin/motos/nuevo"
-                className="flex items-center gap-3 px-4 py-3 rounded-lg border border-jay-black/10 hover:bg-jay-black/5 transition-colors text-jay-black/70"
+                className="flex items-center gap-3 px-4 py-3 rounded-lg border border-white/8 hover:bg-transparent transition-colors text-gray-300"
               >
                 <Motorbike size={18} className="text-jay-red" />
                 <span>Publicar nueva motocicleta</span>
               </Link>
               <Link
                 to="/admin/motos"
-                className="flex items-center gap-3 px-4 py-3 rounded-lg border border-jay-black/10 hover:bg-jay-black/5 transition-colors text-jay-black/70"
+                className="flex items-center gap-3 px-4 py-3 rounded-lg border border-white/8 hover:bg-transparent transition-colors text-gray-300"
               >
                 <List size={18} />
                 <span>Gestionar publicaciones existentes</span>
