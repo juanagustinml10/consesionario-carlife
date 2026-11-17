@@ -14,9 +14,17 @@ import { bikesService } from '@/services/bikes';
 import type { Bike, BikeStatus } from '@/types';
 
 const STATUS_LABELS: Record<BikeStatus, string> = {
+  BORRADOR: 'Borrador',
   DISPONIBLE: 'Disponible',
   RESERVADA: 'Reservada',
   VENDIDA: 'Vendida',
+};
+
+const statusBadgeClass = (status: BikeStatus) => {
+  if (status === 'BORRADOR') return 'bg-white/5 text-gray-400 border-white/15';
+  if (status === 'DISPONIBLE') return 'bg-green-500/10 text-green-700 border-green-500/30';
+  if (status === 'RESERVADA') return 'bg-amber-500/10 text-amber-700 border-amber-500/30';
+  return 'bg-jay-red/10 text-jay-red border-jay-red/30';
 };
 
 export const Bikes: React.FC = () => {
@@ -31,7 +39,7 @@ export const Bikes: React.FC = () => {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await bikesService.list({
+      const response = await bikesService.listAdmin({
         limit: 100,
         status: statusFilter === 'TODOS' ? undefined : statusFilter,
       });
@@ -113,6 +121,7 @@ export const Bikes: React.FC = () => {
                 className="py-3 rounded-lg border border-white/10 bg-jay-elevated text-white text-sm focus:outline-none focus:ring-2 focus:ring-jay-red/40"
               >
                 <option value="TODOS">Todos los estados</option>
+                <option value="BORRADOR">Borradores</option>
                 <option value="DISPONIBLE">Disponibles</option>
                 <option value="RESERVADA">Reservadas</option>
                 <option value="VENDIDA">Vendidas</option>
@@ -150,13 +159,7 @@ export const Bikes: React.FC = () => {
                       </div>
                     </div>
                     <span
-                      className={`inline-flex shrink-0 items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border ${
-                        bike.status === 'DISPONIBLE'
-                          ? 'bg-green-500/10 text-green-700 border-green-500/30'
-                          : bike.status === 'RESERVADA'
-                            ? 'bg-amber-500/10 text-amber-700 border-amber-500/30'
-                            : 'bg-jay-red/10 text-jay-red border-jay-red/30'
-                      }`}
+                      className={`inline-flex shrink-0 items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border ${statusBadgeClass(bike.status)}`}
                     >
                       {STATUS_LABELS[bike.status]}
                     </span>
@@ -238,13 +241,7 @@ export const Bikes: React.FC = () => {
                       </td>
                       <td className="py-5 px-6">
                         <span
-                          className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border ${
-                            bike.status === 'DISPONIBLE'
-                              ? 'bg-green-500/10 text-green-700 border-green-500/30'
-                              : bike.status === 'RESERVADA'
-                                ? 'bg-amber-500/10 text-amber-700 border-amber-500/30'
-                                : 'bg-jay-red/10 text-jay-red border-jay-red/30'
-                          }`}
+                          className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border ${statusBadgeClass(bike.status)}`}
                         >
                           {STATUS_LABELS[bike.status]}
                         </span>

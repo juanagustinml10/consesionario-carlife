@@ -7,7 +7,7 @@
 export type BikeCondition = 'NUEVA' | 'USADA';
 
 /** Estado de disponibilidad de la publicación */
-export type BikeStatus = 'DISPONIBLE' | 'RESERVADA' | 'VENDIDA';
+export type BikeStatus = 'BORRADOR' | 'DISPONIBLE' | 'RESERVADA' | 'VENDIDA';
 
 export interface Brand {
   id: string;
@@ -42,6 +42,8 @@ export interface Bike {
   condition: BikeCondition;
   displacementCc: number | null;
   mileageKm: number | null;
+  /** Horas de uso declaradas en motos usadas; null/0 significa "sin dato". */
+  usageHours: number | null;
   price: number;
   currency: string;
   description: string | null;

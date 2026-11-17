@@ -27,7 +27,14 @@ export const ConditionTag: React.FC<BadgeProps & { condition: BikeCondition }> =
 };
 
 export const StatusTag: React.FC<BadgeProps & { status: BikeStatus }> = ({ status, overlay = false, tone = 'dark' }) => {
-  const dot = status === 'DISPONIBLE' ? 'bg-green-400' : status === 'RESERVADA' ? 'bg-amber-400' : 'bg-jay-red';
+  const dot =
+    status === 'DISPONIBLE'
+      ? 'bg-green-400'
+      : status === 'RESERVADA'
+        ? 'bg-amber-400'
+        : status === 'BORRADOR'
+          ? 'bg-gray-400'
+          : 'bg-jay-red';
   return (
     <span
       className={cn(

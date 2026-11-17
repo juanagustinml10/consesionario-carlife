@@ -1,8 +1,11 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import { Prisma } from '@prisma/client';
 import prisma from '../lib/prisma';
 import { env } from '../config/env';
+
+type BikeStatusValue = 'BORRADOR' | 'DISPONIBLE' | 'RESERVADA' | 'VENDIDA';
 
 export interface ListBikesFilters {
   q?: string;
@@ -12,7 +15,7 @@ export interface ListBikesFilters {
   condition?: 'NUEVA' | 'USADA';
   priceMin?: number;
   priceMax?: number;
-  status?: 'DISPONIBLE' | 'RESERVADA' | 'VENDIDA';
+  status?: BikeStatusValue;
   featured?: boolean;
   page: number;
   limit: number;
@@ -27,16 +30,24 @@ export interface CreateBikeInput {
   condition: 'NUEVA' | 'USADA';
   displacementCc?: number | null;
   mileageKm?: number | null;
+  /** Horas de uso: opcional, decimal y solo relevante en motos usadas. */
+  usageHours?: number | null;
   price: number;
   currency: string;
   description?: string | null;
-  status: 'DISPONIBLE' | 'RESERVADA' | 'VENDIDA';
+  status: BikeStatusValue;
   featured?: boolean;
   images?: Array<{ url: string; isPrimary: boolean; order: number }>;
   features?: Array<{ key: string; value: string }>;
 }
 
 export interface UpdateBikeInput extends Partial<Omit<CreateBikeInput, 'slug'>> {}
+
+const bikeInclude: Prisma.BikeInclude = {
+  brand: true,
+  images: { orderBy: [{ isPrimary: 'desc' }, { order: 'asc' }] },
+  features: { orderBy: { key: 'asc' } },
+};
 
 const slugify = (text: string) =>
   text
@@ -52,7 +63,11 @@ export const generateSlug = (title: string) => {
   return `${base}-${suffix}`;
 };
 
-export const listBikes = async (filters: ListBikesFilters) => {
+/**
+ * Catálogo público. Los borradores nunca se exponen, incluso si alguien
+ * intenta filtrar por `status=BORRADOR` en la query.
+ */
+export const listBikes = async (filters: ListBikesFilters, includeDrafts = false) => {
   const { q, brand, model, year, condition, priceMin, priceMax, status, featured, page, limit } = filters;
   const skip = (page - 1) * limit;
 
@@ -69,7 +84,6 @@ export const listBikes = async (filters: ListBikesFilters) => {
   if (model) where.model = { contains: model, mode: 'insensitive' };
   if (year) where.year = year;
   if (condition) where.condition = condition;
-  if (status) where.status = status;
   if (featured === true) where.featured = true;
   if (priceMin !== undefined || priceMax !== undefined) {
     const price: Record<string, number> = {};
@@ -78,17 +92,22 @@ export const listBikes = async (filters: ListBikesFilters) => {
     where.price = price;
   }
 
+  if (includeDrafts) {
+    if (status) where.status = status;
+  } else {
+    where.status =
+      status && status !== 'BORRADOR'
+        ? { equals: status, not: 'BORRADOR' }
+        : { not: 'BORRADOR' };
+  }
+
   const [data, total] = await Promise.all([
     prisma.bike.findMany({
       where,
       skip,
       take: limit,
       orderBy: [{ featured: 'desc' }, { createdAt: 'desc' }],
-      include: {
-        brand: true,
-        images: { orderBy: [{ isPrimary: 'desc' }, { order: 'asc' }] },
-        features: { orderBy: { key: 'asc' } },
-      },
+      include: bikeInclude,
     }),
     prisma.bike.count({ where }),
   ]);
@@ -99,25 +118,21 @@ export const listBikes = async (filters: ListBikesFilters) => {
   };
 };
 
+/** Listado del panel: incluye borradores para poder editarlos. */
+export const listAdminBikes = async (filters: ListBikesFilters) =>
+  listBikes(filters, true);
+
 export const getBikeBySlug = async (slug: string) => {
-  return prisma.bike.findUnique({
-    where: { slug },
-    include: {
-      brand: true,
-      images: { orderBy: [{ isPrimary: 'desc' }, { order: 'asc' }] },
-      features: { orderBy: { key: 'asc' } },
-    },
+  return prisma.bike.findFirst({
+    where: { slug, status: { not: 'BORRADOR' } },
+    include: bikeInclude,
   });
 };
 
 export const getBikeById = async (id: string) => {
   return prisma.bike.findUnique({
     where: { id },
-    include: {
-      brand: true,
-      images: { orderBy: [{ isPrimary: 'desc' }, { order: 'asc' }] },
-      features: { orderBy: { key: 'asc' } },
-    },
+    include: bikeInclude,
   });
 };
 
@@ -139,6 +154,8 @@ export const createBike = async (input: CreateBikeInput) => {
       condition: input.condition,
       displacementCc: input.displacementCc ?? null,
       mileageKm: input.mileageKm ?? null,
+      // Una moto 0 km no declara horas de uso: se normaliza a null.
+      usageHours: input.condition === 'NUEVA' ? null : (input.usageHours ?? null),
       price: input.price,
       currency: input.currency,
       description: input.description ?? null,
@@ -161,11 +178,7 @@ export const createBike = async (input: CreateBikeInput) => {
             }
           : undefined,
     },
-    include: {
-      brand: true,
-      images: { orderBy: [{ isPrimary: 'desc' }, { order: 'asc' }] },
-      features: { orderBy: { key: 'asc' } },
-    },
+    include: bikeInclude,
   });
 };
 
@@ -179,26 +192,54 @@ export const updateBike = async (id: string, input: UpdateBikeInput) => {
   if (input.condition !== undefined) data.condition = input.condition;
   if (input.displacementCc !== undefined) data.displacementCc = input.displacementCc;
   if (input.mileageKm !== undefined) data.mileageKm = input.mileageKm;
+  if (input.usageHours !== undefined) data.usageHours = input.usageHours;
   if (input.price !== undefined) data.price = input.price;
   if (input.currency !== undefined) data.currency = input.currency;
   if (input.description !== undefined) data.description = input.description;
   if (input.status !== undefined) data.status = input.status;
   if (input.featured !== undefined) data.featured = input.featured;
 
-  if (Object.keys(data).length === 0) {
+  // Si la moto pasa a 0 km (o ya lo era), las horas no tienen sentido.
+  const current = await prisma.bike.findUnique({
+    where: { id },
+    select: { condition: true },
+  });
+  if (!current) {
+    const err: any = new Error('Moto no encontrada');
+    err.statusCode = 404;
+    throw err;
+  }
+  const finalCondition = input.condition ?? current.condition;
+  if (finalCondition === 'NUEVA') data.usageHours = null;
+
+  const hasScalarChanges = Object.keys(data).length > 0;
+  if (!hasScalarChanges && input.features === undefined) {
     const err: any = new Error('No hay campos para actualizar');
     err.statusCode = 400;
     throw err;
   }
 
+  if (input.features !== undefined) {
+    // Se reemplaza el conjunto completo para conservar el orden y evitar duplicados.
+    return prisma.$transaction(async (tx) => {
+      await tx.bikeFeature.deleteMany({ where: { bikeId: id } });
+      if (input.features?.length) {
+        await tx.bikeFeature.createMany({
+          data: input.features.map((f) => ({ bikeId: id, key: f.key, value: f.value })),
+        });
+      }
+      return tx.bike.update({
+        where: { id },
+        data: hasScalarChanges ? data : {},
+        include: bikeInclude,
+      });
+    });
+  }
+
   return prisma.bike.update({
     where: { id },
     data,
-    include: {
-      brand: true,
-      images: { orderBy: [{ isPrimary: 'desc' }, { order: 'asc' }] },
-      features: { orderBy: { key: 'asc' } },
-    },
+    include: bikeInclude,
   });
 };
 
@@ -267,6 +308,28 @@ export const removeBikeImage = async (bikeId: string, imageId: string) => {
   }
 
   await prisma.bikeImage.delete({ where: { id: imageId } });
+};
+
+/** Reordena las fotos existentes. Exige el listado completo de IDs de la moto. */
+export const reorderBikeImages = async (bikeId: string, ids: string[]) => {
+  const images = await prisma.bikeImage.findMany({
+    where: { bikeId },
+    select: { id: true },
+  });
+  const owned = new Set(images.map((image) => image.id));
+  if (ids.length !== owned.size || ids.some((id) => !owned.has(id))) {
+    const err: any = new Error('El orden debe incluir todas las fotografías de la moto');
+    err.statusCode = 400;
+    throw err;
+  }
+
+  await prisma.$transaction(
+    ids.map((id, order) =>
+      prisma.bikeImage.update({ where: { id }, data: { order } }),
+    ),
+  );
+
+  return getBikeById(bikeId);
 };
 
 export const trackBikeVisit = async (bikeId: string, ip?: string, userAgent?: string) => {

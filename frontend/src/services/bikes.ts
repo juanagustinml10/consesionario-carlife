@@ -1,5 +1,11 @@
 import api from '@/lib/api';
-import type { Bike, PaginatedResponse, BikeCondition, BikeStatus } from '@/types';
+import type {
+  Bike,
+  BikeImage,
+  PaginatedResponse,
+  BikeCondition,
+  BikeStatus,
+} from '@/types';
 
 export interface BikeFilters {
   q?: string;
@@ -25,9 +31,12 @@ export interface CreateBikeInput {
   condition: BikeCondition;
   displacementCc?: number | null;
   mileageKm?: number | null;
+  /** Decimal opcional; se envía null para motos 0 km o cuando no hay dato. */
+  usageHours?: number | null;
   price: number;
   currency?: string;
   description?: string | null;
+  features?: Array<{ key: string; value: string }>;
   status: BikeStatus;
   featured?: boolean;
 }
@@ -40,6 +49,12 @@ export const bikesService = {
   /** Catálogo público con filtros y paginación */
   list: async (filters: BikeFilters = {}) => {
     const { data } = await api.get<PaginatedResponse<Bike>>(BASE, { params: filters });
+    return data;
+  },
+
+  /** Listado del panel: incluye borradores (el catálogo público los oculta) */
+  listAdmin: async (filters: BikeFilters = {}) => {
+    const { data } = await api.get<PaginatedResponse<Bike>>(`${BASE}/admin`, { params: filters });
     return data;
   },
 
@@ -78,7 +93,7 @@ export const bikesService = {
     const formData = new FormData();
     const fileArray = Array.isArray(files) ? files : Array.from(files);
     fileArray.forEach((file) => formData.append('images', file));
-    const { data } = await api.post<{ images: Array<{ id: string; url: string }> }>(
+    const { data } = await api.post<{ images: BikeImage[] }>(
       `${BASE}/${bikeId}/images`,
       formData,
       { headers: { 'Content-Type': 'multipart/form-data' } }
@@ -88,8 +103,17 @@ export const bikesService = {
 
   /** Establecer imagen principal */
   setPrimaryImage: async (bikeId: string, imageId: string) => {
-    const { data } = await api.patch<Bike>(
+    const { data } = await api.patch<{ images: BikeImage[] }>(
       `${BASE}/${bikeId}/images/${imageId}/primary`
+    );
+    return data;
+  },
+
+  /** Reordenar las fotografías existentes (se envía el listado completo de IDs) */
+  reorderImages: async (bikeId: string, ids: string[]) => {
+    const { data } = await api.patch<{ images: BikeImage[] }>(
+      `${BASE}/${bikeId}/images/order`,
+      { ids }
     );
     return data;
   },

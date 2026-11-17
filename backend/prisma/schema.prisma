@@ -13,6 +13,7 @@ enum BikeCondition {
 }
 
 enum BikeStatus {
+  BORRADOR
   DISPONIBLE
   RESERVADA
   VENDIDA
@@ -40,6 +41,8 @@ model Bike {
   condition     BikeCondition
   displacementCc Int?
   mileageKm     Int?
+  /// Horas de uso declaradas para motocicletas usadas (opcional, decimal).
+  usageHours    Float?
   price         Float
   currency      String      @default("ARS")
   description   String?

@@ -11,11 +11,27 @@ export const formatMileage = (km: number | null | undefined) =>
 export const formatDisplacement = (cc: number | null | undefined) =>
   cc ? `${cc} cc` : 'A confirmar';
 
+/**
+ * Horas de uso: null/undefined/0 se consideran "sin dato" y devuelven null
+ * para que la ficha pública no muestre valores vacíos ni inventados.
+ */
+export const formatUsageHours = (hours: number | null | undefined) => {
+  if (hours == null || hours <= 0) return null;
+  const value = hours.toLocaleString('es-AR', { maximumFractionDigits: 2 });
+  return `${value} ${hours === 1 ? 'hora' : 'horas'}`;
+};
+
 export const conditionLabel = (condition: BikeCondition) =>
   condition === 'NUEVA' ? '0 km' : 'Usada';
 
 export const statusLabel = (status: BikeStatus) =>
-  status === 'DISPONIBLE' ? 'Disponible' : status === 'RESERVADA' ? 'Reservada' : 'Vendida';
+  status === 'BORRADOR'
+    ? 'Borrador'
+    : status === 'DISPONIBLE'
+      ? 'Disponible'
+      : status === 'RESERVADA'
+        ? 'Reservada'
+        : 'Vendida';
 
 /** Convierte claves técnicas (ej. "front_suspension") en etiquetas legibles. */
 export const featureLabel = (key: string) =>

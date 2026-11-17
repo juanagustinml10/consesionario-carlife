@@ -13,6 +13,8 @@ import {
   trackBikeVisit,
   updateBike,
   addBikeImages,
+  listAdminBikes,
+  reorderBikeImages,
 } from '../services/bikes.service';
 import { asyncHandler } from '../middleware/asyncHandler';
 import type { AuthenticatedRequest } from '../types/express';
@@ -24,6 +26,12 @@ type ValidatedRequest = AuthenticatedRequest & { validated?: unknown };
 
 export const list = asyncHandler(async (req: Request, res: Response) => {
   const result = await listBikes((req as ValidatedRequest).validated as any);
+  res.json(result);
+});
+
+/** Listado del panel: incluye los borradores, que el catálogo público oculta. */
+export const listAdmin = asyncHandler(async (req: Request, res: Response) => {
+  const result = await listAdminBikes((req as ValidatedRequest).validated as any);
   res.json(result);
 });
 
@@ -131,6 +139,18 @@ export const deleteImage = asyncHandler(async (req: AuthenticatedRequest, res: R
 
   await removeBikeImage(id, imageId);
   res.json({ ok: true });
+});
+
+export const reorderImages = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const { id } = req.params as { id: string };
+  const { ids } = (req as ValidatedRequest).validated as { ids: string[] };
+  const bike = await reorderBikeImages(id, ids);
+  if (!bike) {
+    const err: any = new Error('Moto no encontrada');
+    err.statusCode = 404;
+    throw err;
+  }
+  res.json({ images: bike.images });
 });
 
 export const brands = asyncHandler(async (_req: Request, res: Response) => {

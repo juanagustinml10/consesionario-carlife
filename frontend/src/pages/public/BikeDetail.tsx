@@ -14,6 +14,7 @@ import {
   Tag,
   MessageCircle,
   Clock,
+  Timer,
   Bike as BikeIcon,
 } from 'lucide-react';
 import { Link } from '@/components/shared/Link';
@@ -28,7 +29,13 @@ import { useCompareStore } from '@/stores/compare';
 import { bikesService } from '@/services/bikes';
 import type { Bike } from '@/types';
 import { buildBikeWhatsAppLink, BUSINESS } from '@/lib/constants';
-import { featureLabel, formatDisplacement, formatMileage, formatPrice } from '@/lib/format';
+import {
+  featureLabel,
+  formatDisplacement,
+  formatMileage,
+  formatPrice,
+  formatUsageHours,
+} from '@/lib/format';
 import { cn } from '@/lib/utils';
 
 export const BikeDetail: React.FC = () => {
@@ -146,10 +153,13 @@ export const BikeDetail: React.FC = () => {
     }
   };
 
+  // null, 0 y motos 0 km nunca se muestran como si tuvieran horas cargadas.
+  const usageHours = bike.condition === 'USADA' ? formatUsageHours(bike.usageHours) : null;
   const specs = [
     { icon: <Calendar size={18} />, label: 'Año', value: String(bike.year) },
     { icon: <Gauge size={18} />, label: 'Cilindrada', value: formatDisplacement(bike.displacementCc) },
     { icon: <Fuel size={18} />, label: 'Kilómetros', value: formatMileage(bike.mileageKm) },
+    ...(usageHours ? [{ icon: <Timer size={18} />, label: 'Horas de uso', value: usageHours }] : []),
     { icon: <Tag size={18} />, label: 'Categoría', value: bike.condition === 'NUEVA' ? '0 km' : 'Usada' },
   ];
 
@@ -318,7 +328,10 @@ export const BikeDetail: React.FC = () => {
                 <span className="h-px w-10 bg-jay-red" />
                 <span className="font-display text-[10px] font-bold uppercase tracking-[0.35em] text-gray-500">Datos principales</span>
               </div>
-              <div className="grid grid-cols-2 gap-px border border-white/8 bg-white/8 sm:grid-cols-4">
+              <div className={cn(
+                'grid grid-cols-2 gap-px border border-white/8 bg-white/8',
+                usageHours ? 'sm:grid-cols-5' : 'sm:grid-cols-4'
+              )}>
                 {specs.map((spec) => (
                   <div key={spec.label} className="bg-jay-surface p-4">
                     <div className="text-jay-red-soft">{spec.icon}</div>

@@ -14,6 +14,8 @@ import {
   setPrimary,
   deleteImage,
   brands,
+  listAdmin,
+  reorderImages,
 } from '../controllers/bikes.controller';
 import { authenticateAccess } from '../middleware/auth';
 import { env } from '../config/env';
@@ -28,7 +30,7 @@ const bikeQuerySchema = z.object({
   condition: z.enum(['NUEVA', 'USADA']).optional(),
   priceMin: z.coerce.number().nonnegative().optional(),
   priceMax: z.coerce.number().nonnegative().optional(),
-  status: z.enum(['DISPONIBLE', 'RESERVADA', 'VENDIDA']).optional(),
+  status: z.enum(['BORRADOR', 'DISPONIBLE', 'RESERVADA', 'VENDIDA']).optional(),
   featured: z.coerce.boolean().optional(),
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(12),
@@ -40,6 +42,9 @@ const imageSchema = z.object({
   id: z.string().cuid('ID de moto inválido'),
   imageId: z.string().cuid('ID de imagen inválido'),
 });
+const reorderSchema = z.object({
+  ids: z.array(z.string().cuid('ID de imagen inválido')).min(1),
+});
 
 const createBikeSchema = z.object({
   title: z.string().min(2, 'El título es requerido').max(140),
@@ -49,10 +54,19 @@ const createBikeSchema = z.object({
   condition: z.enum(['NUEVA', 'USADA']),
   displacementCc: z.coerce.number().int().positive().optional().nullable(),
   mileageKm: z.coerce.number().int().nonnegative().optional().nullable(),
+  // Opcional y decimal. Solo se muestra en fichas de motos usadas con valor > 0.
+  usageHours: z.coerce.number().nonnegative('Las horas de uso no pueden ser negativas').optional().nullable(),
   price: z.coerce.number().positive('El precio debe ser mayor a 0'),
   currency: z.string().length(3, 'Moneda inválida').default('ARS'),
   description: z.string().optional().nullable(),
-  status: z.enum(['DISPONIBLE', 'RESERVADA', 'VENDIDA']).default('DISPONIBLE'),
+  features: z
+    .array(z.object({
+      key: z.string().min(1, 'La característica necesita un nombre').max(80),
+      value: z.string().min(1, 'La característica necesita un valor').max(200),
+    }))
+    .max(30)
+    .optional(),
+  status: z.enum(['BORRADOR', 'DISPONIBLE', 'RESERVADA', 'VENDIDA']).default('DISPONIBLE'),
   featured: z.coerce.boolean().default(false),
 });
 
@@ -74,7 +88,12 @@ const upload = multer({
 router.get('/', validate(bikeQuerySchema, 'query'), list);
 router.get('/brands', brands);
 router.get('/slug/:slug', validate(slugSchema, 'params'), getBySlug);
-router.get('/:id', validate(bikeIdSchema, 'params'), getById);
+
+// Privado (panel administrativo). Va antes de /:id para no colisionar con el parámetro.
+router.get('/admin', authenticateAccess, validate(bikeQuerySchema, 'query'), listAdmin);
+
+// El detalle por ID solo lo usa el panel: evita exponer borradores por su ID.
+router.get('/:id', authenticateAccess, validate(bikeIdSchema, 'params'), getById);
 router.post('/:id/visits', validate(bikeIdSchema, 'params'), trackVisit);
 
 // Privado (panel administrativo)
@@ -102,6 +121,13 @@ router.post(
   authenticateAccess,
   upload.array('images', 10),
   uploadImages,
+);
+router.patch(
+  '/:id/images/order',
+  authenticateAccess,
+  validate(bikeIdSchema, 'params'),
+  validate(reorderSchema),
+  reorderImages,
 );
 router.patch(
   '/:id/images/:imageId/primary',
