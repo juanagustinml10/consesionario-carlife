@@ -5,6 +5,7 @@ import { ImagePlaceholder } from '@/components/shared/ImagePlaceholder';
 import { useFavoritesStore } from '@/stores/favorites';
 import { useCompareStore } from '@/stores/compare';
 import { cn } from '@/lib/utils';
+import { buildWhatsAppLink } from '@/lib/constants';
 import type { Bike } from '@/types';
 
 interface BikeCardProps {
@@ -20,7 +21,7 @@ export const BikeCard: React.FC<BikeCardProps> = ({ bike, className }) => {
   const canCompare = useCompareStore((state) => state.canAdd());
   const primaryImage = bike.images.find((img) => img.isPrimary) ?? bike.images[0];
 
-  const whatsappMessage = `Hola JAY MOTOS, me interesa la moto ${bike.title} (${bike.year}). ¿Podrían darme más información?`;
+  const whatsappMessage = `Hola! Estoy interesado en la ${bike.brand?.name ?? ''} ${bike.title} que vi publicada en JAY MOTOS. ¿Me podrían brindar más información?`;
 
   return (
     <article
@@ -122,7 +123,7 @@ export const BikeCard: React.FC<BikeCardProps> = ({ bike, className }) => {
               <Scale size={17} />
             </button>
             <a
-              href={`https://wa.me/5491112345678?text=${encodeURIComponent(whatsappMessage)}`}
+              href={buildWhatsAppLink(whatsappMessage)}
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Consultar por WhatsApp"

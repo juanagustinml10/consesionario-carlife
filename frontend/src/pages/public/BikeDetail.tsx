@@ -21,6 +21,7 @@ import { useFavoritesStore } from '@/stores/favorites';
 import { useCompareStore } from '@/stores/compare';
 import { bikesService } from '@/services/bikes';
 import type { Bike } from '@/types';
+import { buildWhatsAppLink, BUSINESS } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 
 export const BikeDetail: React.FC = () => {
@@ -86,7 +87,7 @@ export const BikeDetail: React.FC = () => {
 
   const images = bike.images.length > 0 ? bike.images : [];
   const currentImage = images[activeImage] ?? images[0];
-  const whatsappMessage = `Hola JAY MOTOS, me interesa la moto ${bike.title} (${bike.year}${bike.condition === 'NUEVA' ? ', 0 km' : ', usada'}). ¿Podrían darme más información y confirmar disponibilidad?`;
+  const whatsappMessage = `Hola! Estoy interesado en la ${bike.brand?.name ?? ''} ${bike.title} que vi publicada en JAY MOTOS. ¿Me podrían brindar más información?`;
   const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
 
   const handleShare = async () => {
@@ -238,12 +239,12 @@ export const BikeDetail: React.FC = () => {
               </span>
               <span className="font-display text-xl font-bold text-jay-red-soft">{bike.currency}</span>
             </div>
-            <p className="mt-2 text-[11px] text-gray-500">Precio de lista en concesionaria. Financiación disponible — consultanos.</p>
+            <p className="mt-2 text-[11px] text-gray-500">Precio de lista publicado por la concesionaria. Consultá por las opciones de financiación disponibles.</p>
           </div>
 
           {/* Consulta WhatsApp */}
           <a
-            href={`https://wa.me/5491112345678?text=${encodeURIComponent(whatsappMessage)}`}
+            href={buildWhatsAppLink(whatsappMessage)}
             target="_blank"
             rel="noopener noreferrer"
             className="btn btn-red mt-6 flex w-full items-center justify-center gap-2 py-4 text-sm"
@@ -251,7 +252,7 @@ export const BikeDetail: React.FC = () => {
             <Phone size={20} />
             Consultar disponibilidad
           </a>
-          <p className="mt-2 text-center text-[11px] text-gray-500">Respondemos en el día · Lun–Sáb 9–19 h</p>
+          <p className="mt-2 text-center text-[11px] text-gray-500">Te esperamos en {BUSINESS.address}</p>
 
           {/* Especificaciones */}
           <div className="mt-7">
@@ -286,7 +287,7 @@ export const BikeDetail: React.FC = () => {
             <div>
               <p className="text-xs font-bold uppercase tracking-wider text-white">Compra con respaldo</p>
               <p className="mt-1 text-xs leading-relaxed text-gray-400">
-                Documentación verificada, revisión técnica certificada y garantía según condición de la unidad.
+                Motos 0 km y usadas seleccionadas por la concesionaria. Compra con respaldo directo de JAY MOTOS.
               </p>
             </div>
           </div>

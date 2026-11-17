@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useState } from 'react';
-import { Phone, Mail, MapPin, Clock, CheckCircle, Send } from 'lucide-react';
-import { WhatsAppButton } from '@/components/shared/WhatsAppButton';
+import { Phone, MapPin, Truck, CheckCircle, Send } from 'lucide-react';
+import { BUSINESS, buildWhatsAppLink } from '@/lib/constants';
 
 export const Contact: React.FC = () => {
   const [sent, setSent] = useState(false);
@@ -10,6 +10,8 @@ export const Contact: React.FC = () => {
     e.preventDefault();
     setSent(true);
   };
+
+  const waGeneral = buildWhatsAppLink(BUSINESS.whatsappGeneralMessage);
 
   return (
     <div className="bg-jay-black text-jay-white">
@@ -21,7 +23,7 @@ export const Contact: React.FC = () => {
             Hablemos<br /><span className="text-jay-red">en la calle.</span>
           </h1>
           <p className="mt-4 max-w-md text-base text-gray-400">
-            Escribinos por el formulario, vení a la concesionaria o contanos qué moto buscás por WhatsApp.
+            Escribinos, vení a la concesionaria o hablemos por WhatsApp. Corrientes 1440, Tucumán.
           </p>
         </div>
       </section>
@@ -34,7 +36,7 @@ export const Contact: React.FC = () => {
               <CheckCircle size={48} className="text-green-400" />
               <h2 className="mt-5 font-display text-3xl font-bold uppercase text-white">Consulta enviada</h2>
               <p className="mt-2 max-w-sm text-sm text-gray-400">
-                Gracias por contactar con JAY MOTOS. Te respondemos dentro del mismo día hábil.
+                Gracias por comunicarte con JAY MOTOS. Nos ponemos en contacto a la brevedad.
               </p>
               <button onClick={() => setSent(false)} className="btn btn-ghost mt-6 px-6 py-3 text-xs">
                 Enviar otra consulta
@@ -54,11 +56,11 @@ export const Contact: React.FC = () => {
               </div>
               <div className="space-y-1.5">
                 <label htmlFor="telefono" className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500">Teléfono</label>
-                <input id="telefono" type="tel" placeholder="+54 9 11 ..." className="h-13 w-full rounded-xl border border-white/10 bg-jay-surface px-4 text-sm text-white outline-none transition-colors placeholder:text-gray-600 focus:border-jay-red" />
+                <input id="telefono" type="tel" placeholder="381 ..." className="h-13 w-full rounded-xl border border-white/10 bg-jay-surface px-4 text-sm text-white outline-none transition-colors placeholder:text-gray-600 focus:border-jay-red" />
               </div>
               <div className="space-y-1.5">
-                <label htmlFor="mensaje" className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500">¿Qué estás buscando?</label>
-                <textarea id="mensaje" required rows={4} placeholder="Quiero una 0 km con entrega inmediata..." className="w-full rounded-xl border border-white/10 bg-jay-surface p-4 text-sm text-white outline-none transition-colors placeholder:text-gray-600 focus:border-jay-red" />
+                <label htmlFor="mensaje" className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500">¿Qué moto buscás?</label>
+                <textarea id="mensaje" required rows={4} placeholder="Quiero info sobre la moto enduro que vi publicada..." className="w-full rounded-xl border border-white/10 bg-jay-surface p-4 text-sm text-white outline-none transition-colors placeholder:text-gray-600 focus:border-jay-red" />
               </div>
               <button type="submit" className="btn btn-red w-full py-4 text-sm">
                 <Send size={17} />
@@ -73,12 +75,12 @@ export const Contact: React.FC = () => {
           <div className="overflow-hidden rounded-2xl border border-white/8">
             <div className="flex h-44 flex-col justify-center bg-jay-surface p-6">
               <p className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.25em] text-jay-red-soft"><MapPin size={13} /> Concesionaria</p>
-              <p className="mt-3 font-display text-2xl font-bold uppercase leading-tight text-white">Av. Libertador 5400<br />CABA, Argentina</p>
+              <p className="mt-3 font-display text-3xl font-bold uppercase leading-tight text-white">{BUSINESS.address}</p>
               <a
-                href="https://maps.google.com/?q=Av.+Libertador+5400+Buenos+Aires"
+                href={BUSINESS.addressLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-3 inline-flex w-fit items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-gray-400 hover:text-white"
+                className="mt-3 inline-flex w-fit items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-gray-400 transition-colors hover:text-white"
               >
                 Abrir en Google Maps →
               </a>
@@ -86,17 +88,19 @@ export const Contact: React.FC = () => {
           </div>
 
           <ul className="space-y-4 rounded-2xl border border-white/8 bg-jay-surface p-6 text-sm text-gray-300">
-            <li className="flex items-start gap-3"><Clock size={18} className="mt-0.5 shrink-0 text-jay-red" />Lun–Sáb: 9:00–19:00 · Dom: cerrado</li>
-            <li className="flex items-start gap-3"><Phone size={18} className="mt-0.5 shrink-0 text-jay-red" />+54 9 11 1234-5678</li>
-            <li className="flex items-start gap-3"><Mail size={18} className="mt-0.5 shrink-0 text-jay-red" />ventas@jaymotos.com.ar</li>
+            <li className="flex items-start gap-3"><Truck size={18} className="mt-0.5 shrink-0 text-jay-red" />{BUSINESS.shippingLabel}</li>
+            <li className="flex items-start gap-3"><Phone size={18} className="mt-0.5 shrink-0 text-jay-red" />{BUSINESS.phoneDisplay} (WhatsApp)</li>
           </ul>
 
-          <WhatsAppButton
-            phone="5491112345678"
-            message="Hola JAY MOTOS, vi su página web y me gustaría consultar sobre una moto."
-            label="Abrir WhatsApp ahora"
+          <a
+            href={waGeneral}
+            target="_blank"
+            rel="noopener noreferrer"
             className="btn btn-red flex w-full items-center justify-center gap-2 rounded-2xl py-5 text-sm"
-          />
+          >
+            <Phone size={19} />
+            Abrir WhatsApp ahora
+          </a>
         </div>
       </section>
     </div>

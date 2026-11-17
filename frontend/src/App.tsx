@@ -5,6 +5,7 @@ import { Catalog } from '@/pages/public/Catalog';
 import { BikeDetail } from '@/pages/public/BikeDetail';
 import { Compare } from '@/pages/public/Compare';
 import { Favorites } from '@/pages/public/Favorites';
+import { Financiacion } from '@/pages/public/Financiacion';
 import { About } from '@/pages/public/About';
 import { Contact } from '@/pages/public/Contact';
 
@@ -23,6 +24,7 @@ export const App = () => (
     <Route path="/motos/:slug" element={<BikeDetail />} />
     <Route path="/comparador" element={<Compare />} />
     <Route path="/favoritos" element={<Favorites />} />
+    <Route path="/financiacion" element={<Financiacion />} />
     <Route path="/nosotros" element={<About />} />
     <Route path="/contacto" element={<Contact />} />
 

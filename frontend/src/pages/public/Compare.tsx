@@ -3,6 +3,7 @@ import { useCallback } from 'react';
 import { ChevronRight, X, Scale, ShieldCheck, Truck } from 'lucide-react';
 import { Link } from '@/components/shared/Link';
 import { ImagePlaceholder } from '@/components/shared/ImagePlaceholder';
+import { BUSINESS } from '@/lib/constants';
 import { useCompareStore } from '@/stores/compare';
 import type { Bike } from '@/types';
 import { cn } from '@/lib/utils';
@@ -45,7 +46,7 @@ export const Compare: React.FC = () => {
   const clear = useCompareStore((state) => state.clear);
 
   const handleWhatsApp = useCallback(() => {
-    const phones = import.meta.env.VITE_WHATSAPP_PHONE ?? '5491112345678';
+    const phones = BUSINESS.whatsappNumber;
     const text = bikes
       .map((b) => `${b.title} (${b.year}) - $${b.price.toLocaleString('es-AR')} ${b.currency}`)
       .join('%0A');

@@ -2,16 +2,18 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { Link } from '@/components/shared/Link';
 import { Logo } from '@/components/shared/Logo';
-import { Menu, X, Scale, Phone, MapPin, Clock } from 'lucide-react';
+import { buildWhatsAppLink, BUSINESS } from '@/lib/constants';
+import { Menu, X, Scale, Phone, MapPin, Truck } from 'lucide-react';
 import { useFavoritesStore } from '@/stores/favorites';
 import { useCompareStore } from '@/stores/compare';
 
 const NAV_LINKS = [
   { to: '/', label: 'Inicio' },
   { to: '/motos', label: 'Catálogo' },
-  { to: '/motos?condition=NUEVA', label: 'Motos 0 km' },
+  { to: '/motos?condition=NUEVA', label: 'Motos 0 KM' },
   { to: '/motos?condition=USADA', label: 'Motos usadas' },
-  { to: '/nosotros', label: 'Nosotros' },
+  { to: '/financiacion', label: 'Financiación' },
+  { to: '/nosotros', label: 'Sobre nosotros' },
   { to: '/contacto', label: 'Contacto' },
 ];
 
@@ -33,48 +35,48 @@ export const Navbar: React.FC = () => {
 
   return (
     <header className="sticky top-0 z-50">
-      {/* Barra superior — sólo escritorio */}
+      {/* Barra superior fina — escritorio */}
       <div className="hidden border-b border-white/5 bg-black lg:block">
-        <div className="container-jay flex h-9 items-center justify-between text-[11px] tracking-wide text-gray-400">
-          <div className="flex items-center gap-5">
+        <div className="container-jay flex h-10 items-center justify-between text-[11px] tracking-wide text-gray-400">
+          <div className="flex items-center gap-6">
             <span className="flex items-center gap-1.5">
               <MapPin size={12} className="text-jay-red" />
-              Av. Libertador 5400, CABA
+              {BUSINESS.address}
             </span>
-            <span className="flex items-center gap-1.5">
-              <Clock size={12} className="text-jay-red" />
-              Lun–Sáb: 9:00–19:00
+            <span className="flex items-center gap-1.5 font-semibold text-jay-red-soft">
+              <Truck size={12} />
+              {BUSINESS.shippingLabel}
             </span>
           </div>
           <a
-            href="https://wa.me/5491112345678"
+            href={buildWhatsAppLink(BUSINESS.whatsappGeneralMessage)}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 text-gray-300 transition-colors hover:text-white"
+            className="flex items-center gap-1.5 font-semibold text-gray-200 transition-colors hover:text-white"
           >
             <Phone size={12} className="text-jay-red" />
-            +54 9 11 1234-5678
+            {BUSINESS.phoneDisplay}
           </a>
         </div>
       </div>
 
       {/* Barra principal */}
-      <nav className="border-b border-white/5 bg-jay-black/85 backdrop-blur-xl">
+      <nav className="border-b border-white/5 bg-jay-black/90 backdrop-blur-xl">
         <div className="container-jay">
-          <div className="flex h-16 items-center justify-between gap-4 md:h-[72px] lg:h-20">
+          <div className="flex h-16 items-center justify-between gap-3 md:h-[72px] lg:h-20 xl:gap-6">
             {/* Logo */}
             <Link to="/" aria-label="JAY MOTOS — Inicio" className="shrink-0">
-              <Logo className="h-10 sm:h-11 lg:h-14" />
+              <Logo className="h-11 w-auto sm:h-12 lg:h-16" />
             </Link>
 
             {/* Navegación desktop */}
-            <div className="hidden xl:flex items-center gap-8">
+            <div className="hidden items-center gap-3 min-[1150px]:flex min-[1440px]:gap-5">
               {NAV_LINKS.map((link) => (
                 <Link
                   key={link.to}
                   to={link.to}
                   className={({ isActive }) =>
-                    `group relative py-2 font-display text-[13px] font-semibold uppercase tracking-[0.18em] transition-colors ${
+                    `group relative whitespace-nowrap py-2 font-display text-[11px] font-semibold uppercase tracking-[0.12em] transition-colors min-[1440px]:text-[13px] ${
                       isActive ? 'text-white' : 'text-gray-400 hover:text-white'
                     }`
                   }
@@ -124,17 +126,17 @@ export const Navbar: React.FC = () => {
                 )}
               </Link>
               <a
-                href="https://wa.me/5491112345678"
+                href={buildWhatsAppLink(BUSINESS.whatsappGeneralMessage)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn btn-red hidden px-5 py-2.5 text-xs md:inline-flex"
+                className="btn btn-red hidden px-4 py-2.5 text-[11px] min-[1440px]:px-5 md:inline-flex"
               >
-                <Phone size={15} />
-                Consultar
+                <Phone size={14} />
+                WhatsApp
               </a>
               <button
                 onClick={() => setOpen(true)}
-                className="rounded-lg p-2 text-gray-200 xl:hidden"
+                className="rounded-lg p-2 text-gray-200 min-[1150px]:hidden"
                 aria-label="Abrir menú"
               >
                 <Menu size={26} />
@@ -146,43 +148,46 @@ export const Navbar: React.FC = () => {
 
       {/* Panel móvil */}
       {open && (
-        <div className="fixed inset-0 z-50 xl:hidden">
+        <div className="fixed inset-0 z-50 min-[1150px]:hidden">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setOpen(false)} aria-hidden="true" />
-          <div className="absolute right-0 top-0 h-full w-full max-w-sm border-l border-white/10 bg-jay-black">
-            <div className="flex h-16 items-center justify-between border-b border-white/5 px-5">
-              <Logo className="h-9" />
+          <div className="absolute right-0 top-0 flex h-full w-full max-w-sm flex-col border-l border-white/10 bg-jay-black">
+            <div className="flex h-16 shrink-0 items-center justify-between border-b border-white/5 px-5">
+              <Logo className="h-10" />
               <button onClick={() => setOpen(false)} className="rounded-lg p-2 text-gray-300 hover:text-white" aria-label="Cerrar menú">
                 <X size={24} />
               </button>
             </div>
-            <nav className="flex flex-col gap-1 overflow-y-auto p-4">
-              {NAV_LINKS.map((link) => (
-                <Link
-                  key={link.to}
-                  to={link.to}
-                  onClick={() => setOpen(false)}
-                  className={({ isActive }) =>
-                    `rounded-xl px-4 py-4 font-display text-base font-semibold uppercase tracking-[0.15em] transition-colors ${
-                      isActive ? 'bg-jay-red/10 text-jay-red-soft' : 'text-gray-300 hover:bg-white/5 hover:text-white'
-                    }`
-                  }
-                >
-                  {link.label}
-                </Link>
-              ))}
+            <nav className="flex-1 overflow-y-auto p-4">
+              <p className="px-4 pb-2 text-[10px] font-bold uppercase tracking-[0.25em] text-gray-600">Navegación</p>
+              <div className="flex flex-col gap-1">
+                {NAV_LINKS.map((link) => (
+                  <Link
+                    key={link.to}
+                    to={link.to}
+                    onClick={() => setOpen(false)}
+                    className={({ isActive }) =>
+                      `rounded-xl px-4 py-3.5 font-display text-base font-semibold uppercase tracking-[0.12em] transition-colors ${
+                        isActive ? 'bg-jay-red/10 text-jay-red-soft' : 'text-gray-300 hover:bg-white/5 hover:text-white'
+                      }`
+                    }
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
             </nav>
-            <div className="border-t border-white/5 p-5">
+            <div className="shrink-0 border-t border-white/5 p-5">
               <a
-                href="https://wa.me/5491112345678"
+                href={buildWhatsAppLink(BUSINESS.whatsappGeneralMessage)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-red w-full py-4 text-sm"
               >
                 <Phone size={18} />
-                WhatsApp directo
+                WhatsApp {BUSINESS.phoneDisplay}
               </a>
               <p className="mt-4 text-center text-[11px] text-gray-500">
-                Lun–Sáb 9:00–19:00 · Av. Libertador 5400, CABA
+                {BUSINESS.address} · {BUSINESS.shippingLabel}
               </p>
             </div>
           </div>
