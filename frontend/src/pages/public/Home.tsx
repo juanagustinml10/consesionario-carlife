@@ -8,7 +8,6 @@ import {
   Phone,
   BadgeCheck,
   MapPin,
-  Bike as BikeIcon,
 } from 'lucide-react';
 import { Link } from '@/components/shared/Link';
 import { Logo } from '@/components/shared/Logo';
@@ -62,37 +61,20 @@ export const Home: React.FC = () => {
         <div className="container-jay relative">
           <div className="flex min-h-[92svh] items-center py-14 lg:min-h-[90svh] lg:py-10">
             <div className="max-w-2xl">
-              {/* Logo + marca de identidad */}
+              {/* Logo oficial integrado */}
               <motion.div
                 initial={{ opacity: 0, y: 18 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
-                className="flex items-center gap-4"
               >
-                <Logo className="h-16 w-auto drop-shadow-[0_0_35px_rgba(227,38,54,0.45)] sm:h-20 lg:h-24" />
-                <div className="hidden border-l border-white/15 pl-4 sm:block">
-                  <p className="font-display text-[10px] font-bold uppercase leading-tight tracking-[0.3em] text-white/60">
-                    Concesionaria<br />Multimarca
-                  </p>
-                  <p className="mt-1 font-display text-[10px] font-semibold uppercase tracking-[0.3em] text-jay-red-soft">Tucumán</p>
-                </div>
+                <Logo className="h-20 w-auto drop-shadow-[0_0_35px_rgba(227,38,54,0.4)] sm:h-24 lg:h-32" />
               </motion.div>
-
-              <motion.p
-                initial={{ opacity: 0, y: 18 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.12 }}
-                className="mt-6 flex items-center gap-2 font-display text-[11px] font-semibold uppercase tracking-[0.35em] text-jay-red-soft"
-              >
-                <BikeIcon size={14} />
-                Enduro · Motocross · Off-road
-              </motion.p>
 
               <motion.h1
                 initial={{ opacity: 0, y: 26 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.22 }}
-                className="mt-2 font-display text-[3.6rem] font-extrabold italic uppercase leading-[0.85] text-white sm:text-7xl lg:text-[5.4rem]"
+                transition={{ duration: 0.7, delay: 0.15 }}
+                className="mt-6 font-display text-5xl font-extrabold italic uppercase leading-[0.9] text-white sm:text-7xl lg:text-[5.2rem]"
               >
                 Tu próxima<br />
                 <span className="text-jay-red">aventura</span><br />
@@ -100,21 +82,21 @@ export const Home: React.FC = () => {
               </motion.h1>
 
               <motion.p
-                initial={{ opacity: 0, y: 18 }}
+                initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.3 }}
-                className="mt-4 font-display text-base font-bold uppercase tracking-[0.3em] text-white/70 sm:text-lg"
+                transition={{ duration: 0.7, delay: 0.28 }}
+                className="mt-5 font-display text-base font-bold uppercase tracking-[0.35em] text-white/75 sm:text-lg"
               >
                 {BUSINESS.tagline}
               </motion.p>
 
               <motion.p
-                initial={{ opacity: 0, y: 22 }}
+                initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.38 }}
-                className="mt-3 max-w-md text-base text-gray-300"
+                transition={{ duration: 0.7, delay: 0.36 }}
+                className="mt-2 text-base text-gray-300"
               >
-                Motos 0 km y usadas seleccionadas. Tu próxima aventura comienza acá.
+                Motos 0 km y usadas seleccionadas.
               </motion.p>
 
               <motion.div

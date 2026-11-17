@@ -4,19 +4,21 @@ import { cn } from '@/lib/utils';
 interface LogoProps {
   className?: string;
   alt?: string;
+  onDark?: boolean;
 }
 
 /**
  * Logo oficial de JAY MOTOS.
- * Archivo preparado desde el JPEG original (negro normalizado) para fundido perfecto con fondos oscuros.
- * No deformar ni recortar: usar siempre manteniendo la proporción original (~1282x282).
+ * PNG con fondo transparente generado desde el JPEG original
+ * (conserva diseño, letras, trazos blancos y detalles rojos).
+ * Mantener siempre las proporciones originales (~1274x274).
  */
 export const Logo: React.FC<LogoProps> = ({
   className,
-  alt = 'JAY MOTOS — Concesionaria Oficial',
+  alt = 'JAY MOTOS — Concesionaria Multimarca',
 }) => (
   <img
-    src="/logo/logo-jaymotos-web.jpg"
+    src="/logo/logo-jaymotos-transparent.png"
     alt={alt}
     className={cn('w-auto select-none object-contain', className)}
     draggable={false}
