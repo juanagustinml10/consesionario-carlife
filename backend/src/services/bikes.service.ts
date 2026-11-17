@@ -1,9 +1,8 @@
-import fs from 'node:fs/promises';
-import path from 'node:path';
 import crypto from 'node:crypto';
 import { Prisma } from '@prisma/client';
-import prisma from '../lib/prisma';
-import { env } from '../config/env';
+import prisma from '../lib/prisma.js';
+
+export { saveUploadedFile, deleteUploadedFile } from './storage.service.js';
 
 type BikeStatusValue = 'BORRADOR' | 'DISPONIBLE' | 'RESERVADA' | 'VENDIDA';
 
@@ -245,15 +244,6 @@ export const updateBike = async (id: string, input: UpdateBikeInput) => {
 
 export const deleteBike = async (id: string) => {
   return prisma.bike.delete({ where: { id } });
-};
-
-export const saveUploadedFile = async (buffer: Buffer, originalName: string) => {
-  await fs.mkdir(env.UPLOAD_DIR, { recursive: true });
-  const ext = path.extname(originalName).toLowerCase();
-  const filename = `${Date.now()}-${crypto.randomBytes(4).toString('hex')}${ext}`;
-  const filePath = path.join(env.UPLOAD_DIR, filename);
-  await fs.writeFile(filePath, buffer);
-  return `${env.PUBLIC_BASE_URL}/uploads/${filename}`;
 };
 
 export const addBikeImages = async (

@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
-import { AuthenticatedRequest } from '../types/express';
-import { env } from '../config/env';
+import { AuthenticatedRequest } from '../types/express.js';
+import { env } from '../config/env.js';
 
 /**
  * Middleware de autenticación por JWT (access token).

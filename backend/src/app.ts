@@ -1,26 +1,60 @@
 import express from 'express';
 import helmet from 'helmet';
-import cors from 'cors';
+import cors, { type CorsOptions } from 'cors';
 import cookieParser from 'cookie-parser';
-import { env } from './config/env';
-import { errorHandler } from './middleware/error';
-import router from './routes';
+import { env } from './config/env.js';
+import prisma from './lib/prisma.js';
+import { errorHandler } from './middleware/error.js';
+import router from './routes/index.js';
 
 const app = express();
 
-// Las fotos subidas se sirven desde otro puerto que la SPA en desarrollo.
+// Las fotos se sirven desde otro origen (Cloudflare Pages / vite en dev).
 // CORP "same-origin" de Helmet las bloquearía en el <img>; los uploads son públicos.
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
-app.use(cors({ origin: env.CORS_ORIGIN, credentials: true }));
+
+const allowedOrigins = env.CORS_ORIGIN.split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+const corsOptions: CorsOptions = {
+  credentials: true,
+  origin: (origin, callback) => {
+    // Health checks y clientes sin header Origin (curl, Vercel) pasan sin eco.
+    if (!origin) return callback(null, true);
+
+    const isAllowed = allowedOrigins.some((allowed) => {
+      if (!allowed.includes('*')) return allowed === origin;
+      const escaped = allowed
+        .replace(/[.+?^${}()|[\]\\]/g, '\\$&')
+        .replace(/\*/g, '.*');
+      return new RegExp(`^${escaped}$`).test(origin);
+    });
+
+    if (isAllowed) return callback(null, origin);
+    // Sin cabecera ACAO: el navegador bloquea la respuesta, sin 500 en el API.
+    return callback(null, false);
+  },
+};
+app.use(cors(corsOptions));
+
 app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-app.get('/health', (_req, res) => {
-  res.json({ ok: true, service: 'jaymotos-backend' });
+app.get('/health', async (_req, res) => {
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    res.json({ ok: true, service: 'jaymotos-backend', db: 'ok' });
+  } catch {
+    res.status(503).json({ ok: false, service: 'jaymotos-backend', db: 'unavailable' });
+  }
 });
 
-app.use('/uploads', express.static(env.UPLOAD_DIR));
+// En Vercel no hay disco persistente: las fotos se sirven desde el bucket S3.
+if (env.STORAGE_DRIVER === 'local') {
+  app.use('/uploads', express.static(env.UPLOAD_DIR));
+}
 
 app.use('/api', router);
 

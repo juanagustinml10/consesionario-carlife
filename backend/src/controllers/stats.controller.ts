@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
-import { getDashboardStats, getRecentBikes } from '../services/stats.service';
-import { asyncHandler } from '../middleware/asyncHandler';
+import { getDashboardStats, getRecentBikes } from '../services/stats.service.js';
+import { asyncHandler } from '../middleware/asyncHandler.js';
 
 export const dashboard = asyncHandler(async (_req: Request, res: Response) => {
   const stats = await getDashboardStats();

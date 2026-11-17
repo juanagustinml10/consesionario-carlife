@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import multer from 'multer';
-import { validate } from './_validation';
+import { validate } from './_validation.js';
 import {
   list,
   getBySlug,
@@ -16,9 +16,9 @@ import {
   brands,
   listAdmin,
   reorderImages,
-} from '../controllers/bikes.controller';
-import { authenticateAccess } from '../middleware/auth';
-import { env } from '../config/env';
+} from '../controllers/bikes.controller.js';
+import { authenticateAccess } from '../middleware/auth.js';
+import { env } from '../config/env.js';
 
 const router = Router();
 

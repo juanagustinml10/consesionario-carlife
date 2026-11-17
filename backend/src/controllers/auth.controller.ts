@@ -1,37 +1,12 @@
 import type { Request, Response } from 'express';
-import { asyncHandler } from '../middleware/asyncHandler';
+import { asyncHandler } from '../middleware/asyncHandler.js';
 import {
   comparePassword,
   createSession,
-  hashPassword,
   revokeSession,
   rotateSession,
-} from '../services/auth.service';
-import prisma from '../lib/prisma';
-
-export const register = asyncHandler(async (req: Request, res: Response) => {
-  const { email, password } = req.body as { email: string; password: string };
-
-  const existing = await prisma.adminUser.findUnique({ where: { email } });
-  if (existing) {
-    const err: any = new Error('El email ya está registrado');
-    err.statusCode = 409;
-    throw err;
-  }
-
-  const passwordHash = await hashPassword(password);
-  const user = await prisma.adminUser.create({
-    data: { email, passwordHash, role: 'ADMIN' },
-  });
-
-  const { accessToken, refreshToken } = await createSession(user.id, email, user.role);
-
-  res.status(201).json({
-    accessToken,
-    refreshToken,
-    user: { id: user.id, email: user.email, role: user.role },
-  });
-});
+} from '../services/auth.service.js';
+import prisma from '../lib/prisma.js';
 
 export const login = asyncHandler(async (req: Request, res: Response) => {
   const { email, password } = req.body as { email: string; password: string };

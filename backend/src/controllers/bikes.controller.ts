@@ -2,6 +2,7 @@ import type { Request, Response } from 'express';
 import {
   createBike,
   deleteBike,
+  deleteUploadedFile,
   getBikeById,
   getBikeBySlug,
   generateSlug,
@@ -15,12 +16,10 @@ import {
   addBikeImages,
   listAdminBikes,
   reorderBikeImages,
-} from '../services/bikes.service';
-import { asyncHandler } from '../middleware/asyncHandler';
-import type { AuthenticatedRequest } from '../types/express';
-import fs from 'node:fs/promises';
-import path from 'node:path';
-import prisma from '../lib/prisma';
+} from '../services/bikes.service.js';
+import { asyncHandler } from '../middleware/asyncHandler.js';
+import type { AuthenticatedRequest } from '../types/express.js';
+import prisma from '../lib/prisma.js';
 
 type ValidatedRequest = AuthenticatedRequest & { validated?: unknown };
 
@@ -95,7 +94,7 @@ export const uploadImages = asyncHandler(async (req: AuthenticatedRequest, res: 
   }
 
   const urls = await Promise.all(
-    files.map((file) => saveUploadedFile(file.buffer, file.originalname)),
+    files.map((file) => saveUploadedFile(file.buffer, file.originalname, file.mimetype)),
   );
 
   const images = urls.map((url, i) => ({ url, isPrimary: i === 0 }));
@@ -130,12 +129,7 @@ export const deleteImage = asyncHandler(async (req: AuthenticatedRequest, res: R
     throw err;
   }
 
-  try {
-    const filePath = path.join(process.cwd(), 'uploads', path.basename(image.url));
-    await fs.unlink(filePath);
-  } catch {
-    // ignorar si el archivo ya no existe
-  }
+  await deleteUploadedFile(image.url);
 
   await removeBikeImage(id, imageId);
   res.json({ ok: true });

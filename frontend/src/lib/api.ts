@@ -1,7 +1,9 @@
 import axios from 'axios';
 import type { AxiosError, InternalAxiosRequestConfig } from 'axios';
 
-const configuredBase = (import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000').replace(/\/+$/, '');
+// En producción VITE_API_BASE_URL apunta al dominio de Vercel. El default
+// relativo /api evita dejar un localhost hardcodeado en el bundle.
+const configuredBase = (import.meta.env.VITE_API_BASE_URL ?? '/api').replace(/\/+$/, '');
 const API_BASE_URL = configuredBase.endsWith('/api') ? configuredBase : `${configuredBase}/api`;
 
 export const api = axios.create({

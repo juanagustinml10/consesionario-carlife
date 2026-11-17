@@ -11,7 +11,7 @@ Plataforma web para la concesionaria de motocicletas **JAY MOTOS**: catálogo p�
 | ORM / Base de datos | Prisma + PostgreSQL |
 | Autenticación | JWT (access + refresh) con sesiones en base de datos, bcryptjs |
 | Validación | Zod |
-| Subida de imágenes | Multer (disco local en esta etapa; preparado para S3/Neon Storage) |
+| Subida de imágenes | Multer + disco local en desarrollo, bucket S3-compatible en producción |
 
 ## Estructura del monorepo
 
@@ -80,7 +80,7 @@ npm run dev                        # http://localhost:5173
 Endpoints principales:
 
 - `GET /health`
-- `POST /api/auth/login`, `POST /api/auth/refresh`, `POST /api/auth/logout`, `POST /api/auth/register`
+- `POST /api/auth/login`, `POST /api/auth/refresh`, `POST /api/auth/logout`
 - `GET /api/bikes` (filtros: `q`, `brand`, `model`, `year`, `condition`, `priceMin`, `priceMax`, `status`, `featured`, `page`, `limit`)
 - `GET /api/bikes/slug/:slug`, `GET /api/bikes/:id`
 - `POST /api/bikes` (auth), `PATCH /api/bikes/:id` (auth), `DELETE /api/bikes/:id` (auth)
@@ -114,9 +114,11 @@ npm run build                      # en la raíz compila frontend y backend
 | `DATABASE_URL` | Conexión PostgreSQL |
 | `JWT_ACCESS_SECRET` / `JWT_REFRESH_SECRET` | Secretos de firma JWT (generar valores aleatorios) |
 | `JWT_ACCESS_TTL` / `JWT_REFRESH_TTL` | Duración en segundos (900 / 604800 por defecto) |
-| `CORS_ORIGIN` | Origen permitido (el del frontend) |
-| `UPLOAD_DIR` | Carpeta de subidas (servida en `/uploads`) |
-| `MAX_FILE_SIZE` | Tamaño máximo por imagen en bytes |
+| `CORS_ORIGIN` | Orígenes permitidos, separados por coma (admite `*`) |
+| `STORAGE_DRIVER` | `local` en desarrollo, `s3` en producción |
+| `STORAGE_S3_BUCKET`, `STORAGE_PUBLIC_BASE_URL`, `AWS_*` | Configuración del bucket cuando `STORAGE_DRIVER=s3` |
+| `UPLOAD_DIR` | Carpeta de subidas solo con `STORAGE_DRIVER=local` |
+| `MAX_FILE_SIZE` | Tamaño máximo por imagen en bytes (4 MB en producción) |
 | `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` | Credenciales del administrador inicial para el seed |
 
 **Importante:** `.env` nunca debe subirse a control de versiones. Los valores de ejemplo en `.env.example` son ficticios.
@@ -125,7 +127,7 @@ npm run build                      # en la raíz compila frontend y backend
 
 - No hay datos ficticios cargados como publicaciones reales: el catálogo arranca vacío hasta que el panel admin publique motos. Las imágenes de marcador de posición están claramente etiquetadas como "Foto de prueba".
 - Favoritos y comparador persisten en `localStorage` del navegador (funcionalidad del lado del cliente; no requieren cuenta).
-- El panel administrativo requiere un usuario admin creado vía seed (`SEED_ADMIN_*`) o registrado por un endpoint de registro existente.
+- El panel administrativo requiere un usuario admin creado vía seed (`SEED_ADMIN_*`). No hay registro público de administradores.
 - La autenticación del frontend usa JWT access + refresh con rotación y persistencia en `localStorage`.
 - No se implementó calculadora de financiación ni de permuta (fuera de alcance).
 - Las visitas se contabilizan mediante `POST /api/bikes/:id/visits`.
@@ -133,8 +135,8 @@ npm run build                      # en la raíz compila frontend y backend
 ## Próximos pasos
 
 1. Diseño visual completo e integración con el backend real (datos de motos y fotos reales).
-2. Módulo de fotografías definitivo (o almacenamiento S3/Neon Storage) y CDN.
+2. CDN delante del bucket de fotografías.
 3. Dashboard admin completo: edición masiva, destacadas, estados, historial.
 4. Buscador avanzado con full-text search y autocompletado.
 5. Tests E2E (Playwright) y de integración (Vitest + Supertest).
-6. Despliegue: frontend (Vercel/Netlify), backend (contenedor/VM), base de datos Neon PostgreSQL.
+6. Despliegue: frontend en Cloudflare Pages, backend en Vercel Functions, base de datos Neon PostgreSQL. Ver `DEPLOYMENT.md`.

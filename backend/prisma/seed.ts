@@ -1,6 +1,6 @@
-import { hashPassword } from '../src/services/auth.service';
-import prisma from '../src/lib/prisma';
-import { env } from '../src/config/env';
+import { hashPassword } from '../src/services/auth.service.js';
+import prisma from '../src/lib/prisma.js';
+import { env } from '../src/config/env.js';
 
 async function main() {
   if (!env.SEED_ADMIN_EMAIL || !env.SEED_ADMIN_PASSWORD) {

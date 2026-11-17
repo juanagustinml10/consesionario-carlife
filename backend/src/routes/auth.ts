@@ -1,13 +1,8 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import { validate } from './_validation';
-import {
-  register,
-  login,
-  refresh,
-  logout,
-} from '../controllers/auth.controller';
-import { authenticateAccess } from '../middleware/auth';
+import { validate } from './_validation.js';
+import { login, refresh, logout } from '../controllers/auth.controller.js';
+import { authenticateAccess } from '../middleware/auth.js';
 
 const router = Router();
 
@@ -20,7 +15,8 @@ const tokenSchema = z.object({
   refreshToken: z.string().min(1, 'Refresh token requerido'),
 });
 
-router.post('/register', validate(credentialsSchema), register);
+// El alta de administradores se hace con `npm run prisma:seed`.
+// No se expone registro público: cualquiera podría crear un ADMIN.
 router.post('/login', validate(credentialsSchema), login);
 router.post('/refresh', validate(tokenSchema), refresh);
 router.post('/logout', authenticateAccess, validate(tokenSchema), logout);
