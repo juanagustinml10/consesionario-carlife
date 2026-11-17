@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Link } from '@/components/shared/Link';
 import { Logo } from '@/components/shared/Logo';
 import { buildWhatsAppLink, BUSINESS } from '@/lib/constants';
-import { MessageCircle, MapPin, Truck, ArrowUpRight } from 'lucide-react';
+import { MessageCircle, MapPin, Truck, ArrowUpRight, LockKeyhole } from 'lucide-react';
 
 const LINKS = [
   { label: 'Inicio', to: '/' },
@@ -87,7 +87,16 @@ export const Footer: React.FC = () => (
 
       {/* Barra inferior */}
       <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-white/8 pt-6 text-[10px] leading-relaxed text-gray-600 sm:flex-row sm:text-left">
-        <p>© {CURRENT_YEAR} {BUSINESS.name} · {BUSINESS.tagline}</p>
+        <div>
+          <p>© {CURRENT_YEAR} {BUSINESS.name} · {BUSINESS.tagline}</p>
+          <Link
+            to="/admin/login"
+            className="mt-3 inline-flex min-h-10 w-fit items-center gap-2 rounded-md border border-white/12 bg-white/[0.02] px-3 py-2 text-[11px] font-medium text-gray-400 transition-colors hover:border-jay-red/50 hover:bg-jay-red/5 hover:text-white"
+          >
+            <LockKeyhole size={13} className="shrink-0 text-jay-red-soft" aria-hidden="true" />
+            Acceso administrativo
+          </Link>
+        </div>
         <p className="max-w-2xl text-center sm:text-right">
           Fotos: Beta RR Freenduro — Jimmy Boakes / Jix31 (CC BY 4.0) · KTM forest — Tim Gotzkowsky (CC BY 3.0). Precios y condiciones sujetos a confirmación.
         </p>

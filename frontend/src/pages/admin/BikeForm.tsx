@@ -8,11 +8,16 @@ import {
   ArrowUp,
   Bike as BikeIcon,
   Check,
+  CircleHelp,
+  EyeOff,
+  FileText,
   Gauge,
   Image as ImageIcon,
+  Info,
   Plus,
   Save,
   Send,
+  Sparkles,
   Trash2,
   Upload,
 } from 'lucide-react';
@@ -26,21 +31,24 @@ const CURRENT_YEAR = new Date().getFullYear();
 const YEARS = Array.from({ length: 12 }, (_, index) => CURRENT_YEAR - index);
 const CONDITIONS: BikeCondition[] = ['NUEVA', 'USADA'];
 const STEPS = [
-  { id: 1, label: 'Datos' },
-  { id: 2, label: 'Estado' },
-  { id: 3, label: 'Detalles' },
-  { id: 4, label: 'Fotografías' },
-  { id: 5, label: 'Publicación' },
+  { id: 1, label: 'Datos', hint: 'Identificá la moto' },
+  { id: 2, label: 'Estado', hint: '0 km o usada' },
+  { id: 3, label: 'Detalles', hint: 'Ficha y características' },
+  { id: 4, label: 'Fotografías', hint: 'Subí y ordená fotos' },
+  { id: 5, label: 'Publicación', hint: 'Revisá y guardá' },
 ] as const;
 
 const inputClass =
-  'w-full rounded-lg border border-white/10 bg-jay-elevated px-3 py-3 text-sm text-white placeholder:text-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-jay-red/40';
-const labelClass = 'mb-2 block text-sm font-medium text-gray-300';
-const cardClass = 'rounded-2xl border border-white/8 bg-jay-surface p-6 shadow-card sm:p-8';
+  'w-full rounded-lg border border-white/12 bg-jay-elevated px-4 py-3.5 text-base text-white placeholder:text-gray-600 transition-colors focus:border-jay-red focus:outline-none focus:ring-2 focus:ring-jay-red/40';
+const labelClass = 'mb-2 block text-sm font-medium text-gray-200';
+const cardClass = 'rounded-2xl border border-white/8 bg-jay-surface p-5 shadow-card sm:p-8';
 const buttonClass =
-  'inline-flex items-center justify-center gap-2 rounded-lg border px-5 py-3 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50';
+  'inline-flex min-h-12 items-center justify-center gap-2 rounded-lg border px-5 py-3 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50';
 const iconButtonClass =
-  'flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-black/50 text-gray-300 transition-colors hover:border-jay-red hover:text-white disabled:cursor-not-allowed disabled:opacity-30';
+  'flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-white/12 bg-black/50 text-gray-300 transition-colors hover:border-jay-red hover:text-white disabled:cursor-not-allowed disabled:opacity-30';
+const stepHeadingClass = 'mb-6 flex items-center gap-3';
+const stepEyebrowClass = 'font-display text-xs font-extrabold tracking-[0.2em] text-jay-red';
+const stepTitleClass = 'text-sm font-semibold uppercase tracking-wider text-gray-300';
 
 interface FeatureDraft {
   id?: string;
@@ -158,7 +166,8 @@ export const BikeForm: React.FC = () => {
     setForm((prev) => ({
       ...prev,
       condition,
-      // Las horas no aplican a unidades 0 km: se descartan al cambiar de estado.
+      // Kilómetros y horas no aplican a unidades 0 km: se descartan al cambiar de estado.
+      mileageKm: condition === 'NUEVA' ? '' : prev.mileageKm,
       usageHours: condition === 'NUEVA' ? '' : prev.usageHours,
     }));
 
@@ -273,67 +282,92 @@ export const BikeForm: React.FC = () => {
   return (
     <div className="bg-transparent">
       <div className="container-jay pb-16">
-        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <Link to="/admin/motos" className="flex items-center gap-2 text-sm text-gray-400 transition-colors hover:text-jay-red">
+        <div className="mb-6">
+          <Link
+            to="/admin/motos"
+            className="mb-4 inline-flex min-h-11 items-center gap-2 text-sm text-gray-400 transition-colors hover:text-jay-red"
+          >
             <ArrowLeft size={18} /> Volver al listado
           </Link>
-          <h1 className="font-display text-2xl font-bold">
+          <h1 className="font-display text-3xl font-bold sm:text-4xl">
             {isEdit ? 'Editar publicación' : 'Nueva publicación'}
           </h1>
+          <p className="mt-2 text-sm text-gray-400">
+            Completá los pasos en orden. Podés guardar como borrador cuando quieras.
+          </p>
         </div>
 
         {error && (
-          <div role="alert" className="mb-6 rounded-lg border border-jay-red/40 bg-jay-red/10 px-4 py-3 text-sm text-jay-red-soft">
+          <div role="alert" className="mb-6 flex items-start gap-3 rounded-lg border border-jay-red/40 bg-jay-red/10 px-4 py-3 text-sm text-jay-red-soft">
+            <Info size={18} className="mt-0.5 shrink-0" />
             {error}
           </div>
         )}
 
         {/* Pasos: se navega hacia adelante solo con los datos válidos. */}
-        <div className="mb-8 flex flex-wrap items-center gap-2">
-          {STEPS.map((item) => {
-            const active = step === item.id;
-            const done = step > item.id;
-            return (
-              <button
-                key={item.id}
-                type="button"
-                disabled={item.id > step}
-                onClick={() => setStep(item.id)}
-                className={cn(
-                  'flex items-center gap-2 rounded-lg border px-3 py-2 text-[11px] font-bold uppercase tracking-wider transition-colors',
-                  active
-                    ? 'border-jay-red bg-jay-red/10 text-jay-red-soft'
-                    : done
-                      ? 'border-white/10 text-gray-400 hover:border-jay-red/60'
-                      : 'border-white/5 text-gray-600'
-                )}
-              >
-                <span
-                  className={cn(
-                    'flex h-6 w-6 items-center justify-center rounded-full text-[10px]',
-                    active ? 'bg-jay-red text-white' : done ? 'bg-white/10 text-gray-300' : 'bg-white/5'
-                  )}
-                >
-                  {done ? <Check size={12} /> : item.id}
-                </span>
-                {item.label}
-              </button>
-            );
-          })}
-        </div>
+        <nav aria-label="Pasos de la publicación" className="mb-8 rounded-xl border border-white/8 bg-jay-surface p-3 sm:p-4">
+          <p className="mb-3 px-1 text-[10px] font-bold uppercase tracking-widest text-gray-500">
+            Paso {step} de {STEPS.length}
+          </p>
+          <ol className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
+            {STEPS.map((item) => {
+              const active = step === item.id;
+              const done = step > item.id;
+              return (
+                <li key={item.id}>
+                  <button
+                    type="button"
+                    disabled={item.id > step}
+                    aria-current={active ? 'step' : undefined}
+                    onClick={() => setStep(item.id)}
+                    className={cn(
+                      'flex h-full w-full flex-col items-start gap-2 rounded-lg border px-3 py-3 text-left transition-colors',
+                      active
+                        ? 'border-jay-red bg-jay-red/10'
+                        : done
+                          ? 'border-white/10 bg-white/[0.02] hover:border-jay-red/60'
+                          : 'border-white/5 bg-transparent opacity-60'
+                    )}
+                  >
+                    <span className="flex w-full items-center gap-2">
+                      <span
+                        className={cn(
+                          'flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-bold',
+                          active ? 'bg-jay-red text-white' : done ? 'bg-white/10 text-gray-300' : 'bg-white/5 text-gray-600'
+                        )}
+                      >
+                        {done ? <Check size={12} /> : item.id}
+                      </span>
+                      <span className={cn(
+                        'text-xs font-bold uppercase tracking-wider',
+                        active ? 'text-white' : done ? 'text-gray-300' : 'text-gray-600'
+                      )}>
+                        {item.label}
+                      </span>
+                    </span>
+                    <span className="text-[11px] leading-tight text-gray-500">{item.hint}</span>
+                  </button>
+                </li>
+              );
+            })}
+          </ol>
+        </nav>
 
         <form onSubmit={(event) => { event.preventDefault(); void save('DISPONIBLE'); }}>
           {/* Paso 1 — Datos */}
           {step === 1 && (
             <section className={cardClass}>
-              <div className="mb-6 flex items-center gap-3">
-                <span className="font-display text-xs font-extrabold tracking-[0.2em] text-jay-red">01</span>
+              <div className={stepHeadingClass}>
+                <span className={stepEyebrowClass}>01</span>
                 <span className="h-px w-8 bg-jay-red" />
-                <h2 className="text-sm font-semibold uppercase tracking-wider text-gray-400">Datos</h2>
+                <h2 className={stepTitleClass}>Datos</h2>
               </div>
+              <p className="-mt-2 mb-6 text-sm text-gray-500">
+                Lo básico para identificar la moto en el catálogo.
+              </p>
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
                 <div className="space-y-2 sm:col-span-2 lg:col-span-4">
-                  <label htmlFor="bike-title" className={labelClass}>Título</label>
+                  <label htmlFor="bike-title" className={labelClass}>Titulo de la Publicacion</label>
                   <input
                     id="bike-title"
                     required
@@ -365,6 +399,17 @@ export const BikeForm: React.FC = () => {
                     required
                     value={form.model}
                     onChange={(event) => update('model', event.target.value)}
+                    className={inputClass}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="bike-cc" className={labelClass}>Cilindrada (cc)</label>
+                  <input
+                    id="bike-cc"
+                    type="number"
+                    min="0"
+                    value={form.displacementCc}
+                    onChange={(event) => update('displacementCc', event.target.value)}
                     className={inputClass}
                   />
                 </div>
@@ -412,12 +457,15 @@ export const BikeForm: React.FC = () => {
           {/* Paso 2 — Estado */}
           {step === 2 && (
             <section className={cardClass}>
-              <div className="mb-6 flex items-center gap-3">
-                <span className="font-display text-xs font-extrabold tracking-[0.2em] text-jay-red">02</span>
+              <div className={stepHeadingClass}>
+                <span className={stepEyebrowClass}>02</span>
                 <span className="h-px w-8 bg-jay-red" />
-                <h2 className="text-sm font-semibold uppercase tracking-wider text-gray-400">Estado</h2>
+                <h2 className={stepTitleClass}>Estado</h2>
               </div>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <p className="-mt-2 mb-6 text-sm text-gray-500">
+                Elegí si es 0 km o usada. Esto define qué datos se muestran después.
+              </p>
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
                 {CONDITIONS.map((condition) => {
                   const selected = form.condition === condition;
                   return (
@@ -427,27 +475,33 @@ export const BikeForm: React.FC = () => {
                       onClick={() => changeCondition(condition)}
                       aria-pressed={selected}
                       className={cn(
-                        'flex flex-col items-start gap-3 rounded-xl border p-6 text-left transition-colors',
+                        'flex min-h-36 flex-col items-start gap-3 rounded-xl border p-5 text-left transition-colors',
                         selected
                           ? 'border-jay-red bg-jay-red/10'
                           : 'border-white/10 bg-jay-elevated/40 hover:border-white/25'
                       )}
                     >
-                      <span className={cn(
-                        'flex h-10 w-10 items-center justify-center rounded-lg',
-                        selected ? 'bg-jay-red text-white' : 'bg-white/5 text-gray-400'
-                      )}>
-                        {condition === 'NUEVA' ? <BikeIcon size={20} /> : <Gauge size={20} />}
+                      <span className="flex w-full items-start justify-between">
+                        <span className={cn(
+                          'flex h-10 w-10 items-center justify-center rounded-lg',
+                          selected ? 'bg-jay-red text-white' : 'bg-white/5 text-gray-400'
+                        )}>
+                          {condition === 'NUEVA' ? <BikeIcon size={20} /> : <Gauge size={20} />}
+                        </span>
+                        {selected && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-jay-red/20 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-jay-red-soft">
+                            <Check size={12} /> Seleccionada
+                          </span>
+                        )}
                       </span>
-                      <span className="font-display text-lg font-bold text-white">
+                      <span className="font-display text-xl font-bold text-white">
                         {condition === 'NUEVA' ? '0 km' : 'Usada'}
                       </span>
-                      <span className="text-xs text-gray-500">
+                      <span className="max-w-xs text-xs leading-relaxed text-gray-500">
                         {condition === 'NUEVA'
-                          ? 'Sin horas de uso declaradas.'
-                          : 'Con kilometraje y horas de uso opcionales.'}
+                          ? 'Sin kilómetros ni horas de uso declarados.'
+                          : 'Podés cargar kilómetros y horas de uso (opcional).'}
                       </span>
-                      {selected && <Check size={16} className="ml-auto text-jay-red" />}
                     </button>
                   );
                 })}
@@ -458,36 +512,30 @@ export const BikeForm: React.FC = () => {
           {/* Paso 3 — Detalles */}
           {step === 3 && (
             <section className={cardClass}>
-              <div className="mb-6 flex items-center gap-3">
-                <span className="font-display text-xs font-extrabold tracking-[0.2em] text-jay-red">03</span>
+              <div className={stepHeadingClass}>
+                <span className={stepEyebrowClass}>03</span>
                 <span className="h-px w-8 bg-jay-red" />
-                <h2 className="text-sm font-semibold uppercase tracking-wider text-gray-400">Detalles</h2>
+                <h2 className={stepTitleClass}>Detalles</h2>
               </div>
+              <p className="-mt-2 mb-6 text-sm text-gray-500">
+                Sumá información técnica y características. Todo es opcional.
+              </p>
 
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
-                <div className="space-y-2">
-                  <label htmlFor="bike-cc" className={labelClass}>Cilindrada (cc)</label>
-                  <input
-                    id="bike-cc"
-                    type="number"
-                    min="0"
-                    value={form.displacementCc}
-                    onChange={(event) => update('displacementCc', event.target.value)}
-                    className={inputClass}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label htmlFor="bike-km" className={labelClass}>Kilometraje (km)</label>
-                  <input
-                    id="bike-km"
-                    type="number"
-                    min="0"
-                    placeholder="Ej.: 12000"
-                    value={form.mileageKm}
-                    onChange={(event) => update('mileageKm', event.target.value)}
-                    className={inputClass}
-                  />
-                </div>
+                {form.condition === 'USADA' && (
+                  <div className="space-y-2">
+                    <label htmlFor="bike-km" className={labelClass}>Kilometraje (km)</label>
+                    <input
+                      id="bike-km"
+                      type="number"
+                      min="0"
+                      placeholder="Ej.: 12000"
+                      value={form.mileageKm}
+                      onChange={(event) => update('mileageKm', event.target.value)}
+                      className={inputClass}
+                    />
+                  </div>
+                )}
                 {form.condition === 'USADA' && (
                   <div className="space-y-2">
                     <label htmlFor="bike-hours" className={labelClass}>Horas de uso</label>
@@ -501,7 +549,8 @@ export const BikeForm: React.FC = () => {
                       onChange={(event) => update('usageHours', event.target.value)}
                       className={inputClass}
                     />
-                    <p className="text-[11px] leading-relaxed text-gray-500">
+                    <p className="flex items-start gap-1.5 text-[11px] leading-relaxed text-gray-500">
+                      <CircleHelp size={13} className="mt-0.5 shrink-0" />
                       Opcional y decimal. Solo se muestra en la ficha si es mayor a 0.
                     </p>
                   </div>
@@ -531,9 +580,9 @@ export const BikeForm: React.FC = () => {
                     type="button"
                     disabled={features.length >= 30}
                     onClick={() => setFeatures((prev) => [...prev, { key: '', value: '' }])}
-                    className={cn(buttonClass, 'border-white/10 text-gray-300 hover:border-jay-red hover:text-white')}
+                    className={cn(buttonClass, 'w-full border-white/10 text-gray-300 hover:border-jay-red hover:text-white sm:w-auto')}
                   >
-                    <Plus size={15} /> Agregar característica
+                    <Plus size={16} /> Agregar característica
                   </button>
                 </div>
                 <div className="space-y-3">
@@ -564,7 +613,7 @@ export const BikeForm: React.FC = () => {
                         type="button"
                         aria-label={`Eliminar característica ${index + 1}`}
                         onClick={() => setFeatures((prev) => prev.filter((_, i) => i !== index))}
-                        className={cn(iconButtonClass, 'sm:h-[46px] sm:w-[46px] hover:border-jay-red hover:text-jay-red')}
+                        className={cn(iconButtonClass, 'h-11 w-11 sm:h-[52px] sm:w-[52px] hover:border-jay-red hover:text-jay-red')}
                       >
                         <Trash2 size={16} />
                       </button>
@@ -578,72 +627,73 @@ export const BikeForm: React.FC = () => {
           {/* Paso 4 — Fotografías */}
           {step === 4 && (
             <section className={cardClass}>
-              <div className="mb-6 flex items-center gap-3">
-                <span className="font-display text-xs font-extrabold tracking-[0.2em] text-jay-red">04</span>
+              <div className={stepHeadingClass}>
+                <span className={stepEyebrowClass}>04</span>
                 <span className="h-px w-8 bg-jay-red" />
-                <h2 className="text-sm font-semibold uppercase tracking-wider text-gray-400">Fotografías</h2>
+                <h2 className={stepTitleClass}>Fotografías</h2>
               </div>
-              <p className="mb-6 text-sm text-gray-400">
-                Subí varias imágenes, elegí la portada y cambiá el orden con las flechas.
+              <p className="-mt-2 mb-4 text-sm text-gray-500">
+                Subí imágenes, elegí la portada y ordenalas. Se guardan al guardar la publicación.
               </p>
+              <div className="mb-6 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-gray-500">
+                <span>↑ ↓ = ordenar</span>
+                <span>✓ = usar como portada</span>
+                <span>✕ = quitar</span>
+              </div>
 
               {existingImages.length > 0 && (
                 <div className="mb-8">
                   <p className="mb-3 text-[11px] font-bold uppercase tracking-wider text-gray-500">Fotos de la publicación</p>
                   <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
                     {existingImages.map((image, index) => (
-                      <div key={image.id} className="relative overflow-hidden rounded-lg border border-white/10 bg-black">
-                        <div className="aspect-square">
+                      <div key={image.id} className="overflow-hidden rounded-lg border border-white/10 bg-black">
+                        <div className="relative aspect-square">
                           <img src={image.url} alt="" className="h-full w-full object-cover" />
+                          {image.isPrimary && (
+                            <span className="absolute left-2 top-2 rounded-md border border-jay-red/60 bg-black/75 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-jay-red-soft backdrop-blur">
+                              Portada
+                            </span>
+                          )}
                         </div>
-                        {image.isPrimary && (
-                          <span className="absolute left-2 top-2 rounded-md border border-jay-red/60 bg-black/75 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-jay-red-soft backdrop-blur">
-                            Portada
-                          </span>
-                        )}
-                        <div className="absolute inset-x-2 bottom-2 flex items-center justify-between gap-1">
-                          <div className="flex gap-1">
+                        <div className="flex items-center justify-center gap-1.5 border-t border-white/10 bg-jay-elevated/60 p-2">
+                          <button
+                            type="button"
+                            aria-label={`Mover foto ${index + 1} hacia arriba`}
+                            disabled={index === 0}
+                            onClick={() => void moveExisting(index, -1)}
+                            className={cn(iconButtonClass, 'h-8 w-8 sm:h-10 sm:w-10')}
+                          >
+                            <ArrowUp size={14} />
+                          </button>
+                          <button
+                            type="button"
+                            aria-label={`Mover foto ${index + 1} hacia abajo`}
+                            disabled={index === existingImages.length - 1}
+                            onClick={() => void moveExisting(index, 1)}
+                            className={cn(iconButtonClass, 'h-8 w-8 sm:h-10 sm:w-10')}
+                          >
+                            <ArrowDown size={14} />
+                          </button>
+                          {!image.isPrimary && (
                             <button
                               type="button"
-                              aria-label={`Mover foto ${index + 1} hacia arriba`}
-                              disabled={index === 0}
-                              onClick={() => void moveExisting(index, -1)}
-                              className={iconButtonClass}
+                              title="Usar como portada"
+                              aria-label={`Usar foto ${index + 1} como portada`}
+                              onClick={() => void makePrimary(image.id)}
+                              className={cn(iconButtonClass, 'h-8 w-8 sm:h-10 sm:w-10')}
                             >
-                              <ArrowUp size={14} />
+                              <Check size={14} />
                             </button>
-                            <button
-                              type="button"
-                              aria-label={`Mover foto ${index + 1} hacia abajo`}
-                              disabled={index === existingImages.length - 1}
-                              onClick={() => void moveExisting(index, 1)}
-                              className={iconButtonClass}
-                            >
-                              <ArrowDown size={14} />
-                            </button>
-                          </div>
-                          <div className="flex gap-1">
-                            {!image.isPrimary && (
-                              <button
-                                type="button"
-                                title="Usar como portada"
-                                aria-label={`Usar foto ${index + 1} como portada`}
-                                onClick={() => void makePrimary(image.id)}
-                                className={iconButtonClass}
-                              >
-                                <Check size={14} />
-                              </button>
-                            )}
-                            <button
-                              type="button"
-                              title="Eliminar fotografía"
-                              aria-label={`Eliminar foto ${index + 1}`}
-                              onClick={() => void deleteExisting(image.id)}
-                              className={cn(iconButtonClass, 'hover:border-jay-red hover:text-jay-red')}
-                            >
-                              <Trash2 size={14} />
-                            </button>
-                          </div>
+                          )}
+                          <button
+                            type="button"
+                            title="Eliminar fotografía"
+                            aria-label={`Eliminar foto ${index + 1}`}
+                            onClick={() => void deleteExisting(image.id)}
+                            className={cn(iconButtonClass, 'h-8 w-8 hover:border-jay-red hover:text-jay-red sm:h-10 sm:w-10')}
+                          >
+                            <Trash2 size={14} />
+                          </button>
                         </div>
                       </div>
                     ))}
@@ -656,35 +706,37 @@ export const BikeForm: React.FC = () => {
                   <p className="mb-3 text-[11px] font-bold uppercase tracking-wider text-gray-500">Fotos nuevas (se suben al guardar)</p>
                   <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
                     {newImages.map((file, index) => (
-                      <div key={`${file.name}-${index}`} className="relative flex aspect-square flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-white/15 bg-jay-elevated/40 p-3">
-                        <ImageIcon size={22} className="text-gray-500" />
-                        <span className="w-full truncate text-center text-[10px] text-gray-400">{file.name}</span>
-                        <div className="flex gap-1">
+                      <div key={`${file.name}-${index}`} className="flex min-h-40 flex-col items-center justify-between gap-3 rounded-lg border border-dashed border-white/15 bg-jay-elevated/40 p-3">
+                        <div className="flex w-full flex-col items-center gap-2 pt-2">
+                          <ImageIcon size={24} className="text-gray-500" />
+                          <span className="w-full truncate text-center text-[10px] text-gray-400">{file.name}</span>
+                        </div>
+                        <div className="flex items-center justify-center gap-1.5">
                           <button
                             type="button"
                             aria-label={`Mover foto nueva ${index + 1} antes`}
                             disabled={index === 0}
                             onClick={() => moveNew(index, -1)}
-                            className={iconButtonClass}
+                            className={cn(iconButtonClass, 'h-8 w-8 sm:h-10 sm:w-10')}
                           >
-                            <ArrowUp size={13} />
+                            <ArrowUp size={14} />
                           </button>
                           <button
                             type="button"
                             aria-label={`Mover foto nueva ${index + 1} después`}
                             disabled={index === newImages.length - 1}
                             onClick={() => moveNew(index, 1)}
-                            className={iconButtonClass}
+                            className={cn(iconButtonClass, 'h-8 w-8 sm:h-10 sm:w-10')}
                           >
-                            <ArrowDown size={13} />
+                            <ArrowDown size={14} />
                           </button>
                           <button
                             type="button"
                             aria-label={`Quitar foto nueva ${index + 1}`}
                             onClick={() => setNewImages((prev) => prev.filter((_, i) => i !== index))}
-                            className={cn(iconButtonClass, 'hover:border-jay-red hover:text-jay-red')}
+                            className={cn(iconButtonClass, 'h-8 w-8 hover:border-jay-red hover:text-jay-red sm:h-10 sm:w-10')}
                           >
-                            <Trash2 size={13} />
+                            <Trash2 size={14} />
                           </button>
                         </div>
                       </div>
@@ -693,10 +745,12 @@ export const BikeForm: React.FC = () => {
                 </div>
               )}
 
-              <label className="flex min-h-40 cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-white/15 bg-jay-elevated/30 p-8 text-center transition-colors hover:border-jay-red hover:bg-white/[0.03]">
-                <Upload size={24} className="text-jay-red" />
-                <span className="text-sm font-medium text-gray-300">Agregar fotografías</span>
-                <span className="text-[11px] text-gray-600">JPG, PNG o WebP · hasta 10 por carga</span>
+              <label className="flex min-h-44 cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-white/20 bg-jay-elevated/30 p-8 text-center transition-colors hover:border-jay-red hover:bg-jay-red/5">
+                <span className="flex h-12 w-12 items-center justify-center rounded-full bg-jay-red/10">
+                  <Upload size={24} className="text-jay-red" />
+                </span>
+                <span className="text-sm font-semibold text-white">Tocá para agregar fotografías</span>
+                <span className="text-[11px] text-gray-500">JPG, PNG o WebP · podés elegir varias</span>
                 <input
                   type="file"
                   multiple
@@ -714,15 +768,18 @@ export const BikeForm: React.FC = () => {
           {/* Paso 5 — Publicación */}
           {step === 5 && (
             <section className={cardClass}>
-              <div className="mb-6 flex items-center gap-3">
-                <span className="font-display text-xs font-extrabold tracking-[0.2em] text-jay-red">05</span>
+              <div className={stepHeadingClass}>
+                <span className={stepEyebrowClass}>05</span>
                 <span className="h-px w-8 bg-jay-red" />
-                <h2 className="text-sm font-semibold uppercase tracking-wider text-gray-400">Publicación</h2>
+                <h2 className={stepTitleClass}>Publicación</h2>
               </div>
+              <p className="-mt-2 mb-6 text-sm text-gray-500">
+                Revisá el resumen y elegí cómo guardar.
+              </p>
 
-              <div className="grid gap-4 sm:grid-cols-3">
+              <div className="grid gap-3 sm:grid-cols-3 sm:gap-4">
                 <div className="rounded-lg border border-white/10 bg-jay-elevated/40 p-4">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500">Publicación</p>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500">La moto</p>
                   <p className="mt-2 truncate text-sm font-semibold text-white">{form.title || 'Sin título'}</p>
                   <p className="mt-1 text-xs text-gray-500">{form.year} · {form.currency} {form.price || '—'}</p>
                 </div>
@@ -738,37 +795,68 @@ export const BikeForm: React.FC = () => {
                   </p>
                 </div>
                 <div className="rounded-lg border border-white/10 bg-jay-elevated/40 p-4">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500">Contenido</p>
+                  <p className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-gray-500">
+                    <FileText size={12} /> Contenido
+                  </p>
                   <p className="mt-2 text-sm font-semibold text-white">{imageCount} foto(s)</p>
                   <p className="mt-1 text-xs text-gray-500">{features.filter((f) => f.key && f.value).length} característica(s)</p>
                 </div>
               </div>
 
-              <label className="mt-6 flex cursor-pointer items-center gap-3 select-none">
+              <label className="mt-6 flex min-h-11 cursor-pointer items-center gap-3 select-none">
                 <input
                   type="checkbox"
                   checked={form.featured}
                   onChange={(event) => update('featured', event.target.checked)}
-                  className="h-4 w-4 rounded border-white/20 bg-transparent text-jay-red focus:ring-jay-red"
+                  className="h-5 w-5 rounded border-white/20 bg-transparent text-jay-red focus:ring-jay-red"
                 />
-                <span className="text-sm font-medium text-gray-300">Destacar en la portada</span>
+                <span className="text-sm font-medium text-gray-200">Destacar en la portada</span>
               </label>
 
-              <div className="mt-6 space-y-2 border-l-2 border-jay-red bg-jay-elevated/40 p-4 text-xs leading-relaxed text-gray-400">
-                <p><strong className="text-white">Guardar como borrador:</strong> queda guardado y solo se ve desde este panel.</p>
-                <p><strong className="text-white">Publicar:</strong> la moto pasa a estar disponible en el catálogo público.</p>
+              <p className="mb-3 mt-8 text-[10px] font-bold uppercase tracking-widest text-gray-500">
+                Elegí qué hacer con esta publicación
+              </p>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="rounded-xl border border-white/12 bg-jay-elevated/40 p-4">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/5 text-gray-300">
+                      <EyeOff size={18} />
+                    </span>
+                    <span className="rounded-full border border-white/15 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-gray-400">
+                      Privado
+                    </span>
+                  </div>
+                  <p className="mt-3 text-sm font-semibold text-white">Guardar como borrador</p>
+                  <p className="mt-1 text-xs leading-relaxed text-gray-500">
+                    Queda guardado y solo se ve desde este panel. Podés seguir editando después.
+                  </p>
+                </div>
+                <div className="rounded-xl border border-jay-red/30 bg-jay-red/[0.06] p-4">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-jay-red/15 text-jay-red-soft">
+                      <Sparkles size={18} />
+                    </span>
+                    <span className="rounded-full border border-jay-red/40 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-jay-red-soft">
+                      Visible
+                    </span>
+                  </div>
+                  <p className="mt-3 text-sm font-semibold text-white">Publicar</p>
+                  <p className="mt-1 text-xs leading-relaxed text-gray-400">
+                    La moto pasa a estar disponible en el catálogo público.
+                  </p>
+                </div>
               </div>
             </section>
           )}
 
           {/* Navegación entre pasos y acciones finales */}
-          <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mt-8 flex flex-col-reverse gap-3 border-t border-white/8 pt-6 sm:flex-row sm:items-center sm:justify-between">
             <div>
               {step > 1 && (
                 <button
                   type="button"
                   onClick={() => setStep((current) => current - 1)}
-                  className={cn(buttonClass, 'border-white/10 text-gray-300 hover:bg-white/5')}
+                  className={cn(buttonClass, 'w-full border-white/10 text-gray-300 hover:bg-white/5 sm:w-auto')}
                 >
                   <ArrowLeft size={16} /> Anterior
                 </button>
@@ -782,7 +870,7 @@ export const BikeForm: React.FC = () => {
                   onClick={() => setStep((current) => current + 1)}
                   className={cn(
                     buttonClass,
-                    'border-jay-red bg-jay-red text-white hover:bg-black disabled:border-white/10 disabled:bg-white/5 disabled:text-gray-600'
+                    'w-full border-jay-red bg-jay-red text-white hover:bg-jay-red-dark disabled:border-white/10 disabled:bg-white/5 disabled:text-gray-600 sm:w-auto'
                   )}
                 >
                   Siguiente <ArrowRight size={16} />
@@ -794,14 +882,20 @@ export const BikeForm: React.FC = () => {
                     type="button"
                     disabled={saving}
                     onClick={() => void save('BORRADOR')}
-                    className={cn(buttonClass, 'border-white/15 text-gray-300 hover:border-white/40 hover:text-white')}
+                    className={cn(
+                      buttonClass,
+                      'order-2 w-full border-white/15 bg-transparent text-gray-300 hover:border-white/40 hover:bg-white/5 hover:text-white sm:order-1 sm:w-auto'
+                    )}
                   >
                     <Save size={16} /> {saving ? 'Guardando...' : 'Guardar como borrador'}
                   </button>
                   <button
                     type="submit"
                     disabled={saving}
-                    className={cn(buttonClass, 'border-jay-red bg-jay-red text-white hover:bg-black')}
+                    className={cn(
+                      buttonClass,
+                      'order-1 w-full border-jay-red bg-jay-red text-white hover:bg-jay-red-dark sm:order-2 sm:w-auto'
+                    )}
                   >
                     <Send size={16} /> {saving ? 'Publicando...' : 'Publicar'}
                   </button>

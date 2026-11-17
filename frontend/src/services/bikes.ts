@@ -134,7 +134,7 @@ export const bikesService = {
   /** Marcas disponibles */
   listBrands: async () => {
     const { data } = await api.get<Array<{ id: string; name: string; slug: string }>>(
-      '/brands'
+      '/bikes/brands'
     );
     return data;
   },
