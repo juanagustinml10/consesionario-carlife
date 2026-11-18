@@ -48,8 +48,8 @@ const envSchema = z
 const parsed = envSchema.safeParse(process.env);
 
 if (!parsed.success) {
-  console.error('❌ Variables de entorno inválidas:', parsed.error.flatten().fieldErrors);
-  process.exit(1);
+  const fieldNames = Object.keys(parsed.error.flatten().fieldErrors).join(', ');
+  throw new Error(`Variables de entorno inválidas o faltantes: ${fieldNames}`);
 }
 
 export const env = parsed.data;
