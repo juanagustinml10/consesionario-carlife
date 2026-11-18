@@ -1,5 +1,5 @@
 import express from 'express';
-import helmet from 'helmet';
+import { default as helmet } from 'helmet';
 import cors, { type CorsOptions } from 'cors';
 import cookieParser from 'cookie-parser';
 import { env } from './config/env.js';
