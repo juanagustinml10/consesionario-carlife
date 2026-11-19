@@ -268,7 +268,7 @@ export const Catalog: React.FC = () => {
       <PageIntro
         index="01"
         eyebrow="Inventario JAY MOTOS"
-        title={<>Encontrá tu <span className="text-jay-red">próxima moto.</span></>}
+        title={<>Encontrá tu <span className="text-jay-red">próxima moto</span></>}
         outline="MOTOS"
         size="compact"
         description={
@@ -362,7 +362,7 @@ export const Catalog: React.FC = () => {
               tone="light"
               icon={<SearchX size={30} />}
               code="00"
-              title={<>Sin resultados<span className="text-jay-red">.</span></>}
+              title={<>Sin resultados</>}
               description="Ninguna moto coincide con tu búsqueda. Probá con otros filtros."
               actions={hasActiveFilters ? (
                 <button type="button" onClick={clearFilters} className="btn btn-red px-6 py-3 text-xs">

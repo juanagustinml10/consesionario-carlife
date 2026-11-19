@@ -51,7 +51,7 @@ export const Favorites: React.FC = () => {
         <EmptyState
           icon={<Heart size={30} />}
           code="00"
-          title={<>Aún no hay <span className="text-jay-red">favoritos.</span></>}
+          title={<>Aún no hay <span className="text-jay-red">favoritos</span></>}
           description="Tocá el corazón en las motos que te gusten y guardalas aquí para compararlas o consultarlas después."
           actions={
             <Link to="/motos" className="btn btn-red px-7 py-4 text-xs">
@@ -70,7 +70,7 @@ export const Favorites: React.FC = () => {
       <PageIntro
         index="01"
         eyebrow="Tu garaje digital"
-        title={<>Favoritos<span className="text-jay-red">.</span></>}
+        title={<>Favoritos</>}
         outline="GARAGE"
         description={
           <p>
@@ -107,7 +107,7 @@ export const Favorites: React.FC = () => {
           <EmptyState
             icon={<SearchX size={30} />}
             code="404"
-            title={<>Ya no están <span className="text-jay-red">publicadas.</span></>}
+            title={<>Ya no están <span className="text-jay-red">publicadas</span></>}
             description="No encontramos las motos guardadas en el catálogo actual. Pueden haber dejado de estar publicadas."
             actions={
               <Link to="/motos" className="btn btn-red px-7 py-4 text-xs">

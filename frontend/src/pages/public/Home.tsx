@@ -169,7 +169,7 @@ export const Home: React.FC = () => {
                 <span className="font-display text-[10px] font-bold uppercase tracking-[0.35em] text-black/50">Catálogo</span>
               </div>
               <h2 className="mt-3 font-display text-5xl font-extrabold uppercase italic leading-[0.88] sm:text-7xl">
-                Dos formas de <span className="text-jay-red">arrancar.</span>
+                Dos formas de <span className="text-jay-red">arrancar</span>
               </h2>
             </div>
             <p className="max-w-sm text-sm leading-relaxed text-black/60">
@@ -186,7 +186,7 @@ export const Home: React.FC = () => {
               <span className="pointer-events-none absolute -right-4 -top-10 select-none font-display text-[13rem] font-extrabold italic leading-none text-outline sm:text-[17rem]" aria-hidden="true">0</span>
               <div className="relative">
                 <span className="font-display text-[10px] font-bold uppercase tracking-[0.35em] text-jay-red-soft">Catálogo 0 km</span>
-                <h3 className="mt-4 font-display text-7xl font-extrabold italic leading-[0.82] sm:text-8xl">0 KM<span className="text-jay-red">.</span></h3>
+                <h3 className="mt-4 font-display text-7xl font-extrabold italic leading-[0.82] sm:text-8xl">0 KM</h3>
               </div>
               <div className="relative mt-10 flex items-end justify-between gap-6">
                 <p className="max-w-[15rem] text-sm text-gray-300">Motos 0 km publicadas en nuestro catálogo.</p>
@@ -229,7 +229,7 @@ export const Home: React.FC = () => {
           <SectionHeading
             index="02"
             eyebrow="Selección JAY MOTOS"
-            title={<>Destacadas<span className="text-jay-red">.</span></>}
+            title={<>Destacadas</>}
             actionLabel="Ver todas"
             actionTo="/motos?featured=true"
           />
@@ -243,7 +243,7 @@ export const Home: React.FC = () => {
             <EmptyState
               icon={<BadgeCheck size={30} />}
               code="00"
-              title={<>Sin destacadas<span className="text-jay-red">.</span></>}
+              title={<>Sin destacadas</>}
               description="Todavía no hay motos destacadas publicadas."
             />
           ) : (
@@ -272,7 +272,7 @@ export const Home: React.FC = () => {
                 <span className="font-display text-[10px] font-bold uppercase tracking-[0.35em] text-black/50">Recién publicadas</span>
               </div>
               <h2 className="mt-2 font-display text-4xl font-extrabold uppercase italic leading-[0.88] sm:text-6xl">
-                Últimos ingresos<span className="text-jay-red">.</span>
+                Últimos ingresos
               </h2>
             </div>
             {!loading && !latestError && latest.length > 0 && (
@@ -308,7 +308,7 @@ export const Home: React.FC = () => {
               tone="light"
               icon={<SearchX size={30} />}
               code="00"
-              title={<>Catálogo vacío<span className="text-jay-red">.</span></>}
+              title={<>Catálogo vacío</>}
               description="Todavía no hay motos publicadas en el catálogo."
             />
           ) : (
@@ -334,7 +334,7 @@ export const Home: React.FC = () => {
               <span className="font-display text-[10px] font-bold uppercase tracking-[0.35em] text-gray-500">Decisión informada</span>
             </div>
             <h2 className="mt-3 font-display text-7xl font-extrabold italic leading-[0.8] text-white sm:text-9xl">
-              VS<span className="text-jay-red">.</span>
+              VS
             </h2>
           </div>
           <div className="lg:col-span-5 lg:col-start-8">
@@ -376,7 +376,7 @@ export const Home: React.FC = () => {
               <span className="font-display text-[10px] font-bold uppercase tracking-[0.35em] text-gray-500">Especialidad</span>
             </div>
             <h2 className="mt-3 font-display text-5xl font-extrabold uppercase leading-[0.88] text-white sm:text-6xl">
-              Enduro<br /><span className="text-jay-red">& off-road.</span>
+              Enduro<br /><span className="text-jay-red">& off-road</span>
             </h2>
             <p className="mt-5 text-base leading-relaxed text-gray-300">
               JAY MOTOS es una concesionaria multimarca con especial identidad en las motos enduro y off-road:
@@ -449,7 +449,7 @@ export const Home: React.FC = () => {
             </div>
             <div>
               <h2 className="font-display text-3xl font-extrabold uppercase leading-[0.9] text-white sm:text-5xl">
-                Envíos a<br /><span className="text-jay-red">todo el país.</span>
+                Envíos a<br /><span className="text-jay-red">todo el país</span>
               </h2>
               <p className="mt-2 max-w-xs text-xs text-gray-400 sm:text-sm">
                 Coordinamos la entrega de tu moto a cualquier punto del territorio argentino.
@@ -477,7 +477,7 @@ export const Home: React.FC = () => {
               <span className="font-display text-[10px] font-bold uppercase tracking-[0.35em] text-black/50">Ubicación y contacto</span>
             </div>
             <h2 className="mt-3 font-display text-5xl font-extrabold uppercase italic leading-[0.88] sm:text-7xl">
-              Vení a<br /><span className="text-jay-red">Corrientes 1440.</span>
+              Vení a<br /><span className="text-jay-red">Corrientes 1440</span>
             </h2>
 
             <div className="mt-8 bg-jay-black p-7 text-white sm:p-8">

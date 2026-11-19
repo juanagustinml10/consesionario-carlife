@@ -55,7 +55,7 @@ export const Compare: React.FC = () => {
         <EmptyState
           icon={<Scale size={30} />}
           code="00"
-          title={<>Comparador <span className="text-jay-red">vacío.</span></>}
+          title={<>Comparador <span className="text-jay-red">vacío</span></>}
           description="Agregá hasta dos motos desde el catálogo y compará año, cilindrada, kilometraje y precio lado a lado."
           actions={
             <Link to="/motos" className="btn btn-red px-7 py-4 text-xs">
@@ -74,7 +74,7 @@ export const Compare: React.FC = () => {
       <PageIntro
         index="01"
         eyebrow="Decisión informada"
-        title={<>Comparador<span className="text-jay-red">.</span></>}
+        title={<>Comparador</>}
         outline="VS"
         description={
           <p>

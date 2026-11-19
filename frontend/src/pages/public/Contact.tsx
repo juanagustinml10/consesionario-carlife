@@ -50,7 +50,7 @@ export const Contact: React.FC = () => {
       <PageIntro
         index="01"
         eyebrow="Contacto · JAY MOTOS"
-        title={<>Hablemos<br /><span className="text-jay-red">en la calle.</span></>}
+        title={<>Hablemos<br /><span className="text-jay-red">en la calle</span></>}
         outline="HOLA"
         description={
           <>
@@ -82,7 +82,7 @@ export const Contact: React.FC = () => {
                     <CheckCircle size={34} />
                   </div>
                   <h2 className="mt-6 font-display text-4xl font-extrabold uppercase italic leading-[0.9] text-white sm:text-5xl">
-                    Consulta <span className="text-jay-red">preparada.</span>
+                    Consulta <span className="text-jay-red">preparada</span>
                   </h2>
                   <p className="mt-3 max-w-md text-sm leading-relaxed text-gray-400">
                     Abrimos WhatsApp con los datos que ingresaste. Revisá la ventana nueva y enviá el mensaje

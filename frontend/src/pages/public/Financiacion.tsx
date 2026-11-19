@@ -63,7 +63,7 @@ export const Financiacion: React.FC = () => (
         <div>
           <span className="font-display text-xs font-extrabold tracking-[0.2em] text-jay-red">02</span>
           <h2 className="mt-3 font-display text-5xl font-extrabold uppercase italic leading-[0.88] text-white sm:text-7xl">
-            Elegí, consultá<br /><span className="text-jay-red">y coordiná.</span>
+            Elegí, consultá<br /><span className="text-jay-red">y coordiná</span>
           </h2>
         </div>
         <p className="max-w-sm text-sm text-gray-400">Tres pasos, sin letra chica: cada consulta se responde de forma personalizada.</p>
@@ -91,7 +91,7 @@ export const Financiacion: React.FC = () => (
         <div className="lg:col-span-5">
           <span className="section-index">Aclaración</span>
           <h2 className="mt-4 font-display text-5xl font-extrabold uppercase italic leading-[0.85] sm:text-7xl">
-            Las condiciones<br /><span className="text-jay-red">se consultan.</span>
+            Las condiciones<br /><span className="text-jay-red">se consultan</span>
           </h2>
         </div>
         <div className="lg:col-span-6 lg:col-start-7">
@@ -135,7 +135,7 @@ export const Financiacion: React.FC = () => (
         <div>
           <span className="section-index">Hablemos</span>
           <h2 className="mt-4 max-w-2xl font-display text-4xl font-extrabold uppercase italic leading-[0.88] text-white sm:text-6xl">
-            La financiación se consulta <span className="text-jay-red">con nosotros.</span>
+            La financiación se consulta <span className="text-jay-red">con nosotros</span>
           </h2>
           <p className="mt-4 max-w-md text-sm text-gray-400">
             Ubicación: {BUSINESS.address}. Escribinos y te contamos qué opciones están disponibles.

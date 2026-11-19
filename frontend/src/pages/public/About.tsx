@@ -62,7 +62,7 @@ export const About: React.FC = () => (
       <div className="container-jay grid gap-8 py-16 sm:py-24 lg:grid-cols-12">
         <div className="lg:col-span-4">
           <span className="section-index">Nuestra mirada</span>
-          <p className="mt-5 font-display text-5xl font-extrabold italic uppercase leading-[0.85] text-jay-red sm:text-6xl">Más que motos.</p>
+          <p className="mt-5 font-display text-5xl font-extrabold italic uppercase leading-[0.85] text-jay-red sm:text-6xl">Más que motos</p>
         </div>
         <div className="lg:col-span-7 lg:col-start-6">
           <p className="text-2xl leading-relaxed text-black/75 sm:text-3xl">
@@ -86,7 +86,7 @@ export const About: React.FC = () => (
         <div>
           <span className="font-display text-xs font-extrabold tracking-[0.2em] text-jay-red">02</span>
           <h2 className="mt-3 font-display text-5xl font-extrabold uppercase italic leading-[0.88] text-white sm:text-7xl">
-            Cómo <span className="text-jay-red">trabajamos.</span>
+            Cómo <span className="text-jay-red">trabajamos</span>
           </h2>
         </div>
         <p className="max-w-sm text-sm text-gray-400">La especialidad no es un eslogan: está en cada elección del catálogo.</p>
@@ -115,7 +115,7 @@ export const About: React.FC = () => (
         <div className="relative max-w-lg">
           <span className="section-index">Especialidad</span>
           <h2 className="mt-4 font-display text-5xl font-extrabold uppercase leading-[0.85] text-white sm:text-7xl">
-            Enduro<br /><span className="text-jay-red">& off-road.</span>
+            Enduro<br /><span className="text-jay-red">& off-road</span>
           </h2>
           <p className="mt-5 text-base leading-relaxed text-gray-200">
             Concesionaria multimarca con especial identidad en las motos enduro y off-road: las motos que amamos, las que conocemos y las que recomendamos.
@@ -130,7 +130,7 @@ export const About: React.FC = () => (
         <div>
           <span className="section-index">Tu próxima aventura</span>
           <p className="mt-4 font-display text-4xl font-extrabold uppercase italic leading-[0.88] text-white sm:text-6xl">
-            Empieza <span className="text-jay-red">acá.</span>
+            Empieza <span className="text-jay-red">acá</span>
           </p>
           <p className="mt-3 max-w-md text-sm text-gray-400">{BUSINESS.specialty} · {BUSINESS.shippingLabel}</p>
         </div>

@@ -122,7 +122,7 @@ export const BikeDetail: React.FC = () => {
         <EmptyState
           icon={<BikeIcon size={30} />}
           code="404"
-          title={<>Moto no encontrada<span className="text-jay-red">.</span></>}
+          title={<>Moto no encontrada</>}
           description="La publicación buscada no existe o ya no está disponible."
           actions={
             <Link to="/motos" className="btn btn-red px-6 py-3 text-xs">
@@ -400,7 +400,7 @@ export const BikeDetail: React.FC = () => {
             <SectionHeading
               index="05"
               eyebrow="También te puede interesar"
-              title={<>Similares<span className="text-jay-red">.</span></>}
+              title={<>Similares</>}
               actionLabel="Ver catálogo"
               actionTo="/motos"
               tone="light"

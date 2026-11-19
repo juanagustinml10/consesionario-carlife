@@ -39,7 +39,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
           JAY MOTOS
         </p>
         <h1 className="mt-3 font-display text-4xl font-extrabold uppercase italic leading-[0.9] sm:text-6xl">
-          Algo salió <span className="text-jay-red">mal.</span>
+          Algo salió <span className="text-jay-red">mal</span>
         </h1>
         <p className="mt-4 max-w-md text-sm leading-relaxed text-gray-400">
           No pudimos mostrar esta página. Recargá para intentarlo de nuevo o volvé al inicio del sitio.
