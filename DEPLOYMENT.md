@@ -3,7 +3,9 @@
 Arquitectura: **Cloudflare Pages** (SPA) → **Vercel Functions** (API Express) → **Neon** (PostgreSQL).
 Repo: `https://github.com/juanagustinml10/jay-motos` · rama `main`.
 
-> Los valores entre `<...>` son placeholders. No hay dominios ni secretos reales en este archivo.
+> Producción verificada: API `https://jay-motos.vercel.app` · SPA `https://jay-motos.pages.dev` ·
+> PostgreSQL en Neon. Los `<...>` que aparecen más abajo son plantillas para otro proyecto;
+> este archivo no contiene secretos.
 
 ---
 
@@ -38,8 +40,8 @@ los tipos generados por Prisma no existen hasta que corre `prisma generate`).
 | `DATABASE_URL_UNPOOLED` | Cadena **directa** de Neon (sin `-pooler`); la exige `directUrl` en `schema.prisma` |
 | `JWT_ACCESS_SECRET` | Aleatorio, propio de producción |
 | `JWT_REFRESH_SECRET` | Aleatorio, distinto del anterior |
-| `PUBLIC_BASE_URL` | `https://<proyecto-backend>.vercel.app` |
-| `CORS_ORIGIN` | `https://<proyecto-frontend>.pages.dev` (y el dominio custom, separado por coma) |
+| `PUBLIC_BASE_URL` | `https://jay-motos.vercel.app` |
+| `CORS_ORIGIN` | `https://jay-motos.pages.dev` (y el dominio custom, separado por coma) |
 | `STORAGE_DRIVER` | `db` (bytes de las fotos en Neon) |
 
 Opcionales: `JWT_ACCESS_TTL=900`, `JWT_REFRESH_TTL=604800`, `MAX_FILE_SIZE=4194304`.
@@ -64,10 +66,10 @@ permite migrarlas manualmente (dry-run por defecto, `--apply` bajo responsabilid
 Con Services, backend y frontend comparten un único dominio de proyecto. Verificar:
 
 ```text
-GET https://<proyecto>.vercel.app/health           -> 200 { "ok": true, "db": "ok" }
-GET https://<proyecto>.vercel.app/api/bikes        -> 200 JSON
-GET https://<proyecto>.vercel.app/api/bikes/brands -> 200 (9 marcas)
-GET https://<proyecto>.vercel.app/                 -> SPA del frontend
+GET https://jay-motos.vercel.app/health           -> 200 { "ok": true, "db": "ok" }
+GET https://jay-motos.vercel.app/api/bikes        -> 200 JSON
+GET https://jay-motos.vercel.app/api/bikes/brands -> 200 JSON
+GET https://jay-motos.vercel.app/                 -> SPA del frontend
 ```
 
 El límite de body de Vercel Functions es ~4.5 MB; por eso `MAX_FILE_SIZE=4194304`.
@@ -107,13 +109,13 @@ dos servicios y los rewrites) dejaría de aplicarse.
 Variable de entorno de **build** (no de runtime):
 
 ```text
-VITE_API_BASE_URL=https://<proyecto-backend>.vercel.app
+VITE_API_BASE_URL=https://jay-motos.vercel.app
 ```
 
 El código agrega `/api` automáticamente si falta, así que el frontend llama a:
 
 ```text
-https://<proyecto-backend>.vercel.app/api/...
+https://jay-motos.vercel.app/api/...
 ```
 
 No hace falta configurar un proxy: el backend responde CORS para el origen de Pages.
@@ -150,3 +152,22 @@ npx prisma migrate deploy   # usa DATABASE_URL_UNPOOLED
 ```
 
 Nunca `db push` ni reinicio del historial de migraciones.
+
+---
+
+## 4. Estado verificado (19/11/2026)
+
+| Capa | Ubicación | Comprobación |
+| --- | --- | --- |
+| SPA | `https://jay-motos.pages.dev` | Build con `VITE_API_BASE_URL=https://jay-motos.vercel.app`; rutas `/motos` y `/admin/dashboard` recargan |
+| API | `https://jay-motos.vercel.app` | `/health`, `/api/bikes` y `/api/bikes/brands` → 200 contra Neon; CORS habilitado para Pages |
+| Datos | Neon (`branch production`) | 3 migraciones aplicadas; `prisma migrate status` sin pendientes |
+
+`VITE_API_BASE_URL` es una variable de **build**: cambiarla en Cloudflare exige un deploy nuevo.
+Si un bundle servido por Pages contiene `https://jay-motos.pages.dev` en lugar de la URL de Vercel,
+el catch-all devuelve `index.html` para `/api/*` y el frontend muestra estados vacíos.
+Para comprobarlo:
+
+```text
+https://jay-motos.pages.dev/assets/<bundle>.js  -> debe contener "jay-motos.vercel.app"
+```
