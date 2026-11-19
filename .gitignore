@@ -32,3 +32,6 @@ Thumbs.db
 # TypeScript
 tsconfig.tsbuildinfo
 *.tsbuildinfo
+
+# Vercel (metadata local del proyecto, no versionar)
+.vercel
