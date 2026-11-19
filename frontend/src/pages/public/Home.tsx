@@ -48,18 +48,14 @@ export const Home: React.FC = () => {
       bikesService.list({ limit: 4 }),
     ]).then(([featuredRes, latestRes]) => {
       if (cancelled) return;
-      if (featuredRes.status === 'fulfilled') {
-        setFeatured(featuredRes.value.data);
-      } else {
-        setFeatured([]);
-        setFeaturedError(true);
-      }
-      if (latestRes.status === 'fulfilled') {
-        setLatest(latestRes.value.data);
-      } else {
-        setLatest([]);
-        setLatestError(true);
-      }
+      // `Array.isArray` es la última línea de defensa: ninguna lista puede
+      // llegar a undefined y romper el render con `featured.length`.
+      const featuredList = featuredRes.status === 'fulfilled' ? featuredRes.value.data : null;
+      const latestList = latestRes.status === 'fulfilled' ? latestRes.value.data : null;
+      setFeatured(Array.isArray(featuredList) ? featuredList : []);
+      setLatest(Array.isArray(latestList) ? latestList : []);
+      setFeaturedError(!Array.isArray(featuredList));
+      setLatestError(!Array.isArray(latestList));
       setLoading(false);
     });
     return () => {

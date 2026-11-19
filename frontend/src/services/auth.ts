@@ -1,4 +1,5 @@
 import api from '@/lib/api';
+import { requireObject } from '@/lib/api-response';
 import type { AdminUser, AuthTokens } from '@/types';
 
 export interface LoginInput {
@@ -8,13 +9,21 @@ export interface LoginInput {
 
 export const authService = {
   login: async (input: LoginInput) => {
-    const { data } = await api.post<AuthTokens>('/auth/login', input);
-    return data;
+    const { data } = await api.post('/auth/login', input);
+    const tokens = requireObject<AuthTokens>(data, 'respuesta de autenticación');
+    if (typeof tokens.accessToken !== 'string') {
+      throw new Error('La respuesta de autenticación no incluyó un token válido.');
+    }
+    return tokens;
   },
 
   refresh: async (refreshToken: string) => {
-    const { data } = await api.post<AuthTokens>('/auth/refresh', { refreshToken });
-    return data;
+    const { data } = await api.post('/auth/refresh', { refreshToken });
+    const tokens = requireObject<AuthTokens>(data, 'respuesta de autenticación');
+    if (typeof tokens.accessToken !== 'string') {
+      throw new Error('La respuesta de autenticación no incluyó un token válido.');
+    }
+    return tokens;
   },
 
   logout: async () => {

@@ -1,13 +1,17 @@
 import axios from 'axios';
 import type { AxiosError, InternalAxiosRequestConfig } from 'axios';
+import { ApiResponseError } from '@/lib/api-response';
 
-// En producción VITE_API_BASE_URL apunta al dominio de Vercel. El default
+// En producción VITE_API_BASE_URL apunta al dominio del backend. El default
 // relativo /api evita dejar un localhost hardcodeado en el bundle.
+// ⚠️ No apuntar al dominio de Cloudflare Pages: el catch-all `/* /index.html`
+// respondería con HTML para /api/* y parecería que la API "responde".
 const configuredBase = (import.meta.env.VITE_API_BASE_URL ?? '/api').replace(/\/+$/, '');
 const API_BASE_URL = configuredBase.endsWith('/api') ? configuredBase : `${configuredBase}/api`;
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
+  responseType: 'json',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -44,7 +48,20 @@ api.interceptors.request.use(
 
 // Manejo de respuestas: renueva token automáticamente ante 401
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Un 200 con text/html casi siempre significa que la petición llegó al
+    // SPA (URL de API mal configurada). Se rechaza para que cada página
+    // muestre su estado de error en vez de guardar HTML como si fueran datos.
+    const contentType = String(response.headers?.['content-type'] ?? '');
+    if (contentType.includes('text/html')) {
+      return Promise.reject(
+        new ApiResponseError(
+          'El servidor respondió HTML en lugar de JSON. Revisá la configuración de la API.'
+        )
+      );
+    }
+    return response;
+  },
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & {
       _retry?: boolean;

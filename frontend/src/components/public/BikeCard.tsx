@@ -25,7 +25,8 @@ export const BikeCard: React.FC<BikeCardProps> = ({ bike, className, tone = 'dar
   const addToCompare = useCompareStore((state) => state.add);
   const inCompare = useCompareStore((state) => state.isInCompare(bike.id));
   const canCompare = useCompareStore((state) => state.canAdd());
-  const primaryImage = bike.images.find((img) => img.isPrimary) ?? bike.images[0];
+  const images = bike.images ?? [];
+  const primaryImage = images.find((img) => img.isPrimary) ?? images[0];
   const whatsappLink = buildBikeWhatsAppLink(bike);
   const light = tone === 'light';
 

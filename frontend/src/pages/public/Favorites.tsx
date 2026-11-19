@@ -28,7 +28,7 @@ export const Favorites: React.FC = () => {
       .list({ limit: 100 })
       .then(({ data }) => {
         if (cancelled) return;
-        setBikes(data.filter((bike) => ids.includes(bike.id)));
+        setBikes(Array.isArray(data) ? data.filter((bike) => ids.includes(bike.id)) : []);
       })
       .catch(() => {
         if (cancelled) return;

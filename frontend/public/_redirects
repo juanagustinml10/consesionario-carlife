@@ -1,1 +1,4 @@
+# Las rutas de la API no pertenecen al SPA: responder 404 en vez de index.html.
+# Así una URL de API mal configurada falla de forma explícita y no entrega HTML.
+/api/*	404
 /*	/index.html	200

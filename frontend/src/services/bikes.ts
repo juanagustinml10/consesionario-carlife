@@ -1,8 +1,8 @@
 import api from '@/lib/api';
+import { requireArray, requireObject, requirePaginated } from '@/lib/api-response';
 import type {
   Bike,
   BikeImage,
-  PaginatedResponse,
   BikeCondition,
   BikeStatus,
 } from '@/types';
@@ -45,41 +45,53 @@ export interface UpdateBikeInput extends Partial<CreateBikeInput> {}
 
 const BASE = '/bikes';
 
+/** Las listas opcionales se normalizan para que ningún componente iterate `undefined`. */
+const normalizeBike = (value: unknown): Bike => {
+  const bike = requireObject<Bike>(value, 'moto');
+  return {
+    ...bike,
+    images: Array.isArray(bike.images) ? bike.images : [],
+    features: Array.isArray(bike.features) ? bike.features : [],
+  };
+};
+
 export const bikesService = {
   /** Catálogo público con filtros y paginación */
   list: async (filters: BikeFilters = {}) => {
-    const { data } = await api.get<PaginatedResponse<Bike>>(BASE, { params: filters });
-    return data;
+    const { data } = await api.get(BASE, { params: filters });
+    const page = requirePaginated<Bike>(data);
+    return { ...page, data: page.data.map(normalizeBike) };
   },
 
   /** Listado del panel: incluye borradores (el catálogo público los oculta) */
   listAdmin: async (filters: BikeFilters = {}) => {
-    const { data } = await api.get<PaginatedResponse<Bike>>(`${BASE}/admin`, { params: filters });
-    return data;
+    const { data } = await api.get(`${BASE}/admin`, { params: filters });
+    const page = requirePaginated<Bike>(data);
+    return { ...page, data: page.data.map(normalizeBike) };
   },
 
   /** Ficha individual por slug */
   getBySlug: async (slug: string) => {
-    const { data } = await api.get<Bike>(`${BASE}/slug/${slug}`);
-    return data;
+    const { data } = await api.get(`${BASE}/slug/${slug}`);
+    return normalizeBike(data);
   },
 
   /** Detalle por ID (panel/admin) */
   getById: async (id: string) => {
-    const { data } = await api.get<Bike>(`${BASE}/${id}`);
-    return data;
+    const { data } = await api.get(`${BASE}/${id}`);
+    return normalizeBike(data);
   },
 
   /** Crear publicación (admin) */
   create: async (input: CreateBikeInput) => {
-    const { data } = await api.post<Bike>(BASE, input);
-    return data;
+    const { data } = await api.post(BASE, input);
+    return normalizeBike(data);
   },
 
   /** Editar publicación (admin) */
   update: async (id: string, input: UpdateBikeInput) => {
-    const { data } = await api.patch<Bike>(`${BASE}/${id}`, input);
-    return data;
+    const { data } = await api.patch(`${BASE}/${id}`, input);
+    return normalizeBike(data);
   },
 
   /** Eliminar publicación (admin) */
@@ -93,29 +105,27 @@ export const bikesService = {
     const formData = new FormData();
     const fileArray = Array.isArray(files) ? files : Array.from(files);
     fileArray.forEach((file) => formData.append('images', file));
-    const { data } = await api.post<{ images: BikeImage[] }>(
+    const { data } = await api.post(
       `${BASE}/${bikeId}/images`,
       formData,
       { headers: { 'Content-Type': 'multipart/form-data' } }
     );
-    return data;
+    const body = requireObject<{ images?: unknown }>(data, 'respuesta');
+    return { images: requireArray<BikeImage>(body.images, 'galería') };
   },
 
   /** Establecer imagen principal */
   setPrimaryImage: async (bikeId: string, imageId: string) => {
-    const { data } = await api.patch<{ images: BikeImage[] }>(
-      `${BASE}/${bikeId}/images/${imageId}/primary`
-    );
-    return data;
+    const { data } = await api.patch(`${BASE}/${bikeId}/images/${imageId}/primary`);
+    const body = requireObject<{ images?: unknown }>(data, 'respuesta');
+    return { images: requireArray<BikeImage>(body.images, 'galería') };
   },
 
   /** Reordenar las fotografías existentes (se envía el listado completo de IDs) */
   reorderImages: async (bikeId: string, ids: string[]) => {
-    const { data } = await api.patch<{ images: BikeImage[] }>(
-      `${BASE}/${bikeId}/images/order`,
-      { ids }
-    );
-    return data;
+    const { data } = await api.patch(`${BASE}/${bikeId}/images/order`, { ids });
+    const body = requireObject<{ images?: unknown }>(data, 'respuesta');
+    return { images: requireArray<BikeImage>(body.images, 'galería') };
   },
 
   /** Eliminar una imagen */
@@ -133,9 +143,7 @@ export const bikesService = {
 
   /** Marcas disponibles */
   listBrands: async () => {
-    const { data } = await api.get<Array<{ id: string; name: string; slug: string }>>(
-      '/bikes/brands'
-    );
-    return data;
+    const { data } = await api.get('/bikes/brands');
+    return requireArray<{ id: string; name: string; slug: string }>(data, 'lista de marcas');
   },
 };

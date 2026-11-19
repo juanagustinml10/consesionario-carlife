@@ -70,7 +70,8 @@ export const BikeDetail: React.FC = () => {
 
       try {
         const all = await bikesService.list({ limit: 8 });
-        setRelated(all.data.filter((item) => item.id !== data.id).slice(0, 4));
+        const relatedList = Array.isArray(all.data) ? all.data : [];
+        setRelated(relatedList.filter((item) => item.id !== data.id).slice(0, 4));
       } catch {
         setRelated([]);
       }
@@ -134,7 +135,8 @@ export const BikeDetail: React.FC = () => {
     );
   }
 
-  const images = bike.images;
+  const images = bike.images ?? [];
+  const features = bike.features ?? [];
   const currentImage = images[activeImage] ?? images[0];
   const whatsappLink = buildBikeWhatsAppLink(bike);
   const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
@@ -343,7 +345,7 @@ export const BikeDetail: React.FC = () => {
             </div>
 
             {/* Características técnicas */}
-            {bike.features.length > 0 && (
+            {features.length > 0 && (
               <div className="mt-10">
                 <div className="mb-4 flex items-center gap-3">
                   <span className="font-display text-xs font-extrabold tracking-[0.2em] text-jay-red">03</span>
@@ -351,7 +353,7 @@ export const BikeDetail: React.FC = () => {
                   <span className="font-display text-[10px] font-bold uppercase tracking-[0.35em] text-gray-500">Características técnicas</span>
                 </div>
                 <dl className="border border-white/8">
-                  {bike.features.map((feature, index) => (
+                  {features.map((feature, index) => (
                     <div key={feature.id} className={cn('flex items-center justify-between gap-4 px-4 py-3', index % 2 === 1 && 'bg-white/[0.02]')}>
                       <dt className="text-xs text-gray-400">{featureLabel(feature.key)}</dt>
                       <dd className="text-right font-display text-sm font-bold uppercase text-white">{feature.value}</dd>

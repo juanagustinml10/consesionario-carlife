@@ -147,7 +147,7 @@ export const Catalog: React.FC = () => {
       .list({ ...filters, page: 1, limit: FETCH_LIMIT })
       .then(({ data }) => {
         if (cancelled) return;
-        const sorted = sortBikes(data, sort);
+        const sorted = sortBikes(Array.isArray(data) ? data : [], sort);
         const pages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
         if (page > pages) {
           updateParams((params) => params.set('page', String(pages)), false);
