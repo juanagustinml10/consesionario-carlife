@@ -1,9 +1,8 @@
 import * as React from 'react';
-import { Heart, ArrowUpRight, Scale, MessageCircle } from 'lucide-react';
+import { Heart, ArrowUpRight, MessageCircle } from 'lucide-react';
 import { Link } from '@/components/shared/Link';
 import { ImagePlaceholder } from '@/components/shared/ImagePlaceholder';
 import { useFavoritesStore } from '@/stores/favorites';
-import { useCompareStore } from '@/stores/compare';
 import { cn } from '@/lib/utils';
 import { buildBikeWhatsAppLink } from '@/lib/constants';
 import { formatDisplacement, formatMileage, formatPrice } from '@/lib/format';
@@ -22,9 +21,6 @@ interface BikeCardProps {
 export const BikeCard: React.FC<BikeCardProps> = ({ bike, className, tone = 'dark', feature = false }) => {
   const isFavorite = useFavoritesStore((state) => state.isFavorite(bike.id));
   const toggleFavorite = useFavoritesStore((state) => state.toggle);
-  const addToCompare = useCompareStore((state) => state.add);
-  const inCompare = useCompareStore((state) => state.isInCompare(bike.id));
-  const canCompare = useCompareStore((state) => state.canAdd());
   const images = bike.images ?? [];
   const primaryImage = images.find((img) => img.isPrimary) ?? images[0];
   const whatsappLink = buildBikeWhatsAppLink(bike);
@@ -104,23 +100,6 @@ export const BikeCard: React.FC<BikeCardProps> = ({ bike, className, tone = 'dar
             </p>
           </div>
           <div className="flex shrink-0 items-center gap-1.5">
-            <button
-              type="button"
-              onClick={() => addToCompare(bike)}
-              disabled={inCompare || !canCompare}
-              title={inCompare ? 'Ya está en el comparador' : 'Agregar al comparador'}
-              aria-label={inCompare ? 'Ya está en el comparador' : 'Agregar al comparador'}
-              className={cn(
-                'flex h-9 w-9 items-center justify-center border transition-colors',
-                inCompare
-                  ? 'border-jay-red bg-jay-red text-white'
-                  : light
-                    ? 'border-black/15 text-black/60 hover:border-jay-red hover:text-jay-red disabled:opacity-30'
-                    : 'border-white/12 text-gray-300 hover:border-jay-red hover:text-white disabled:opacity-30'
-              )}
-            >
-              <Scale size={16} />
-            </button>
             <a
               href={whatsappLink}
               target="_blank"

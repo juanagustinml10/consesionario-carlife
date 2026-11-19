@@ -323,40 +323,7 @@ export const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* ============ 04 / COMPARADOR ============ */}
-      <section className="relative overflow-hidden border-y border-white/5 bg-jay-panel">
-        <span className="pointer-events-none absolute -right-6 -top-20 select-none font-display text-[15rem] font-extrabold italic leading-none text-outline sm:text-[24rem]" aria-hidden="true">VS</span>
-        <div className="container-jay relative grid gap-8 py-14 sm:py-20 lg:grid-cols-12 lg:items-center">
-          <div className="lg:col-span-5">
-            <div className="flex items-center gap-3">
-              <span className="font-display text-xs font-extrabold tracking-[0.2em] text-jay-red">04</span>
-              <span className="h-px w-10 bg-jay-red" />
-              <span className="font-display text-[10px] font-bold uppercase tracking-[0.35em] text-gray-500">Decisión informada</span>
-            </div>
-            <h2 className="mt-3 font-display text-7xl font-extrabold italic leading-[0.8] text-white sm:text-9xl">
-              VS
-            </h2>
-          </div>
-          <div className="lg:col-span-5 lg:col-start-8">
-            <p className="font-display text-2xl font-extrabold uppercase leading-none text-white sm:text-3xl">
-              Compará antes de decidir
-            </p>
-            <p className="mt-3 max-w-md text-sm leading-relaxed text-gray-400">
-              Guardá hasta dos motos del catálogo y mirá sus datos lado a lado: año, cilindrada, kilometraje y precio.
-            </p>
-            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-              <Link to="/comparador" className="btn btn-red px-7 py-4 text-xs">
-                Ir al comparador <ArrowRight size={16} />
-              </Link>
-              <Link to="/favoritos" className="btn btn-ghost px-7 py-4 text-xs">
-                Ver favoritos
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ============ 05 / ESPECIALIDAD — FOTOGRAFÍA PROTAGONISTA ============ */}
+      {/* ============ 04 / ESPECIALIDAD — FOTOGRAFÍA PROTAGONISTA ============ */}
       <section className="bg-black">
         <div className="container-jay grid gap-0 py-16 sm:py-24 lg:grid-cols-12 lg:items-stretch">
           <div className="relative lg:col-span-7">
@@ -371,7 +338,7 @@ export const Home: React.FC = () => {
           </div>
           <div className="relative bg-jay-black p-7 sm:p-10 lg:col-span-5 lg:col-start-8 lg:self-center lg:border-l-2 lg:border-jay-red lg:py-14">
             <div className="flex items-center gap-3">
-              <span className="font-display text-xs font-extrabold tracking-[0.2em] text-jay-red">05</span>
+              <span className="font-display text-xs font-extrabold tracking-[0.2em] text-jay-red">04</span>
               <span className="h-px w-10 bg-jay-red" />
               <span className="font-display text-[10px] font-bold uppercase tracking-[0.35em] text-gray-500">Especialidad</span>
             </div>
@@ -402,14 +369,14 @@ export const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* ============ 06 / FINANCIACIÓN — BLOQUE CLARO ============ */}
+      {/* ============ 05 / FINANCIACIÓN — BLOQUE CLARO ============ */}
       <section className="bg-white text-jay-black">
         <div className="container-jay relative py-16 sm:py-24">
           <span className="absolute -left-4 top-10 h-2 w-32 -rotate-6 bg-jay-red" aria-hidden="true" />
           <div className="grid gap-10 lg:grid-cols-12 lg:items-end">
             <div className="lg:col-span-8">
               <div className="flex items-center gap-3">
-                <span className="font-display text-xs font-extrabold tracking-[0.2em] text-jay-red">06</span>
+                <span className="font-display text-xs font-extrabold tracking-[0.2em] text-jay-red">05</span>
                 <span className="h-px w-10 bg-jay-red" />
                 <span className="font-display text-[10px] font-bold uppercase tracking-[0.35em] text-black/50">JAY MOTOS · Comercial</span>
               </div>
@@ -467,12 +434,12 @@ export const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* ============ 07 / UBICACIÓN Y CONTACTO — BLOQUE CLARO ============ */}
+      {/* ============ 06 / UBICACIÓN Y CONTACTO — BLOQUE CLARO ============ */}
       <section className="bg-[#f3f3f3] text-jay-black">
         <div className="container-jay grid gap-10 py-16 sm:py-24 lg:grid-cols-12 lg:items-center">
           <div className="lg:col-span-6">
             <div className="flex items-center gap-3">
-              <span className="font-display text-xs font-extrabold tracking-[0.2em] text-jay-red">07</span>
+              <span className="font-display text-xs font-extrabold tracking-[0.2em] text-jay-red">06</span>
               <span className="h-px w-10 bg-jay-red" />
               <span className="font-display text-[10px] font-bold uppercase tracking-[0.35em] text-black/50">Ubicación y contacto</span>
             </div>

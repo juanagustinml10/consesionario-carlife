@@ -52,7 +52,7 @@ export const Favorites: React.FC = () => {
           icon={<Heart size={30} />}
           code="00"
           title={<>Aún no hay <span className="text-jay-red">favoritos</span></>}
-          description="Tocá el corazón en las motos que te gusten y guardalas aquí para compararlas o consultarlas después."
+          description="Tocá el corazón en las motos que te gusten y guardalas aquí para consultarlas después."
           actions={
             <Link to="/motos" className="btn btn-red px-7 py-4 text-xs">
               Explorar catálogo <ChevronRight size={16} />
@@ -75,7 +75,7 @@ export const Favorites: React.FC = () => {
         description={
           <p>
             {ids.length} moto{ids.length !== 1 ? 's' : ''} guardada{ids.length !== 1 ? 's' : ''} en este dispositivo.
-            Vas a poder compararlas o consultarlas cuando quieras.
+            Vas a poder consultarlas cuando quieras.
           </p>
         }
         actions={

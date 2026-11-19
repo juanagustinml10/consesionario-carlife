@@ -7,7 +7,6 @@ import {
   Phone,
   Share2,
   Heart,
-  Scale,
   Fuel,
   Gauge,
   Calendar,
@@ -25,7 +24,6 @@ import { ImagePlaceholder } from '@/components/shared/ImagePlaceholder';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { useFavoritesStore } from '@/stores/favorites';
-import { useCompareStore } from '@/stores/compare';
 import { bikesService } from '@/services/bikes';
 import type { Bike } from '@/types';
 import { buildBikeWhatsAppLink, BUSINESS } from '@/lib/constants';
@@ -52,9 +50,6 @@ export const BikeDetail: React.FC = () => {
   const bikeId = bike?.id ?? slug ?? '';
   const isFavorite = useFavoritesStore((state) => state.isFavorite(bikeId));
   const toggleFavorite = useFavoritesStore((state) => state.toggle);
-  const addToCompare = useCompareStore((state) => state.add);
-  const inCompare = useCompareStore((state) => state.isInCompare(bikeId));
-  const canCompare = useCompareStore((state) => state.canAdd());
 
   const loadBike = useCallback(async () => {
     if (!slug) return;
@@ -260,18 +255,6 @@ export const BikeDetail: React.FC = () => {
               >
                 <Heart size={16} className={isFavorite ? 'fill-jay-red text-jay-red' : ''} />
                 {isFavorite ? 'En favoritos' : 'Guardar'}
-              </button>
-              <button
-                type="button"
-                onClick={() => addToCompare(bike)}
-                disabled={inCompare || !canCompare}
-                className={cn(
-                  'inline-flex items-center gap-2 border px-4 py-3 font-display text-[11px] font-bold uppercase tracking-widest transition-colors disabled:opacity-40',
-                  inCompare ? 'border-jay-red bg-jay-red text-white' : 'border-white/15 text-gray-300 hover:border-jay-red hover:text-white'
-                )}
-              >
-                <Scale size={16} />
-                {inCompare ? 'En comparador' : 'Comparar'}
               </button>
               <button
                 type="button"

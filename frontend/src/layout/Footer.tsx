@@ -12,7 +12,6 @@ const LINKS = [
   { label: 'Financiación', to: '/financiacion' },
   { label: 'Sobre nosotros', to: '/nosotros' },
   { label: 'Contacto', to: '/contacto' },
-  { label: 'Comparador', to: '/comparador' },
   { label: 'Favoritos', to: '/favoritos' },
 ];
 
