@@ -56,7 +56,14 @@ export const createSession = async (
  * Valida un refresh token: firma JWT, sesión activa y no expirada.
  */
 export const validateRefresh = async (refreshToken: string) => {
-  const payload = jwt.verify(refreshToken, env.JWT_REFRESH_SECRET) as JwtPayload;
+  let payload: JwtPayload;
+  try {
+    payload = jwt.verify(refreshToken, env.JWT_REFRESH_SECRET) as JwtPayload;
+  } catch {
+    // Token malformado, con firma inválida o expirado: es una sesión inválida,
+    // no un error del servidor. Evita filtrar el motivo de jwt.verify al cliente.
+    return null;
+  }
 
   const session = await prisma.session.findFirst({
     where: {

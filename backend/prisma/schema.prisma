@@ -72,6 +72,16 @@ model BikeImage {
   order     Int      @default(0)
   createdAt DateTime @default(now())
 
+  /// Binario en Neon (BYTEA). Solo lo lee la ruta pública de imágenes.
+  data       Bytes?
+  mimeType   String?
+  sizeBytes  Int?
+  checksum   String?
+  /// Clave opaca de /api/images/:key. NULL en imágenes legacy (URL externa).
+  storageKey String? @unique
+  /// URL original, conservada al migrar una imagen legacy a BYTEA.
+  legacyUrl  String?
+
   @@index([bikeId])
   @@index([bikeId, isPrimary])
 }

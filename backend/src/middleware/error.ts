@@ -1,9 +1,11 @@
 import type { ErrorRequestHandler, Request, Response, NextFunction } from 'express';
 import { ZodError } from 'zod';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { isProduction } from '../config/env.js';
 
 interface AppError extends Error {
   statusCode?: number;
+  code?: string;
   errors?: Record<string, string[]>;
 }
 
@@ -13,12 +15,17 @@ interface AppError extends Error {
  */
 export const errorHandler: ErrorRequestHandler = (
   err: AppError,
-  _req: Request,
+  req: Request,
   res: Response,
   _next: NextFunction,
 ) => {
-  const statusCode = err.statusCode ?? 500;
-  const message = err.message || 'Error interno del servidor';
+  // Multer lanza su propio error antes de que storage.service pueda validar el tamaño.
+  if (err.name === 'MulterError' && err.code === 'LIMIT_FILE_SIZE') {
+    return res.status(413).json({
+      message: 'La imagen supera el tamaño máximo permitido',
+      statusCode: 413,
+    });
+  }
 
   if (err instanceof ZodError) {
     const errors: Record<string, string[]> = {};
@@ -41,6 +48,24 @@ export const errorHandler: ErrorRequestHandler = (
     }
   }
 
-  console.error(err);
-  res.status(statusCode).json({ message, statusCode });
+  const requestedStatus = err.statusCode ?? 500;
+  const statusCode = requestedStatus >= 400 && requestedStatus <= 599 ? requestedStatus : 500;
+  const isClientError = statusCode < 500;
+
+  // En producción los errores 5xx se registran con todo su detalle en Runtime Logs,
+  // pero el cliente solo recibe un mensaje genérico (puede contener hosts o SQL).
+  const message =
+    isClientError || !isProduction
+      ? err.message || (isClientError ? 'Solicitud inválida' : 'Error interno del servidor')
+      : 'Error interno del servidor';
+
+  if (!isClientError) {
+    console.error(`[error] ${req.method} ${req.originalUrl} -> ${statusCode}`, err);
+  }
+
+  return res.status(statusCode).json({
+    message,
+    statusCode,
+    ...(isClientError && err.errors ? { errors: err.errors } : {}),
+  });
 };

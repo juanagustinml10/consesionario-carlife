@@ -19,6 +19,7 @@ import {
 } from '../controllers/bikes.controller.js';
 import { authenticateAccess } from '../middleware/auth.js';
 import { env } from '../config/env.js';
+import { getImageMimeType, isAllowedImageMimeType } from '../services/storage.service.js';
 
 const router = Router();
 
@@ -76,10 +77,13 @@ const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: Number(env.MAX_FILE_SIZE) },
   fileFilter: (_req, file, cb) => {
-    if (file.mimetype.startsWith('image/')) {
+    // Se acepta el mime del navegador o una extensión raster conocida.
+    if (isAllowedImageMimeType(file.mimetype) || getImageMimeType(file.originalname)) {
       cb(null, true);
     } else {
-      cb(new Error('Solo se permiten archivos de imagen'));
+      const err: any = new Error('Solo se permiten imágenes JPG, PNG, WebP, GIF o AVIF');
+      err.statusCode = 400;
+      cb(err);
     }
   },
 });

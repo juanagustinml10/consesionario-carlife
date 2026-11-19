@@ -93,11 +93,11 @@ export const uploadImages = asyncHandler(async (req: AuthenticatedRequest, res: 
     throw err;
   }
 
-  const urls = await Promise.all(
+  const stored = await Promise.all(
     files.map((file) => saveUploadedFile(file.buffer, file.originalname, file.mimetype)),
   );
 
-  const images = urls.map((url, i) => ({ url, isPrimary: i === 0 }));
+  const images = stored.map((upload, i) => ({ ...upload, isPrimary: i === 0 }));
   await addBikeImages(id, images);
 
   const bike = await getBikeById(id);
@@ -122,7 +122,10 @@ export const setPrimary = asyncHandler(async (req: AuthenticatedRequest, res: Re
 
 export const deleteImage = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
   const { id, imageId } = req.params as { id: string; imageId: string };
-  const image = await prisma.bikeImage.findFirst({ where: { id: imageId, bikeId: id } });
+  const image = await prisma.bikeImage.findFirst({
+    where: { id: imageId, bikeId: id },
+    select: { id: true, url: true },
+  });
   if (!image) {
     const err: any = new Error('Imagen no encontrada');
     err.statusCode = 404;

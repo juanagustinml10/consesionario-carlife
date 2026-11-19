@@ -5,8 +5,9 @@ import { DeleteObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client
 import { env } from '../config/env.js';
 
 /**
- * Las fotos se guardan en disco solo en desarrollo. En Vercel el filesystem es
- * efímero, así que STORAGE_DRIVER=s3 obliga a usar un bucket S3-compatible.
+ * `local` es solo para desarrollo. En Vercel el filesystem es efímero:
+ * - `db` guarda los bytes en Neon (BYTEA) y los sirve /api/images/:key.
+ * - `s3` conserva el driver anterior con un bucket S3-compatible.
  */
 const s3 =
   env.STORAGE_DRIVER === 's3'
@@ -30,19 +31,65 @@ const CONTENT_TYPES: Record<string, string> = {
   '.avif': 'image/avif',
 };
 
+/** Solo formatos raster: no servimos SVG con scripts desde el origin del API. */
+export const isAllowedImageMimeType = (mimeType: string): boolean =>
+  Object.values(CONTENT_TYPES).includes(mimeType);
+
+export const getImageMimeType = (filename: string): string | null =>
+  CONTENT_TYPES[path.extname(filename).toLowerCase()] ?? null;
+
+export const buildStorageKey = (): string => crypto.randomBytes(16).toString('hex');
+
 const buildFilename = (originalName: string) => {
   const extension = path.extname(originalName).toLowerCase();
   return `${Date.now()}-${crypto.randomBytes(4).toString('hex')}${extension}`;
 };
 
-/** Devuelve la URL pública con la que se guardará la imagen en la BD. */
+/** Resultado de guardar un upload. En `db` incluye los bytes y sus metadatos. */
+export interface StoredUpload {
+  url: string;
+  data?: Buffer;
+  storageKey?: string;
+  mimeType?: string;
+  sizeBytes?: number;
+  checksum?: string;
+}
+
+/** Guarda el archivo y devuelve la URL pública con la que se guardará en la BD. */
 export const saveUploadedFile = async (
   buffer: Buffer,
   originalName: string,
   contentType?: string,
-): Promise<string> => {
+): Promise<StoredUpload> => {
+  const maxSize = Number(env.MAX_FILE_SIZE);
+  if (buffer.length > maxSize) {
+    const err: any = new Error('La imagen supera el tamaño máximo permitido');
+    err.statusCode = 413;
+    throw err;
+  }
+
   const filename = buildFilename(originalName);
-  const mimeType = contentType ?? CONTENT_TYPES[path.extname(filename).toLowerCase()] ?? 'application/octet-stream';
+  // El mimetype del navegador es orientativo; la extensión manda si no es raster.
+  const mimeType =
+    (contentType && isAllowedImageMimeType(contentType) ? contentType : null) ??
+    getImageMimeType(filename);
+  if (!mimeType) {
+    const err: any = new Error('Formato de imagen no soportado');
+    err.statusCode = 400;
+    throw err;
+  }
+
+  if (env.STORAGE_DRIVER === 'db') {
+    const storageKey = buildStorageKey();
+    return {
+      url: `${env.PUBLIC_BASE_URL.replace(/\/+$/, '')}/api/images/${storageKey}`,
+      data: buffer,
+      storageKey,
+      mimeType,
+      sizeBytes: buffer.length,
+      checksum: crypto.createHash('sha256').update(buffer).digest('hex'),
+    };
+  }
 
   if (s3) {
     await s3.send(
@@ -54,16 +101,19 @@ export const saveUploadedFile = async (
         CacheControl: 'public, max-age=31536000, immutable',
       }),
     );
-    return `${env.STORAGE_PUBLIC_BASE_URL!.replace(/\/+$/, '')}/${filename}`;
+    return { url: `${env.STORAGE_PUBLIC_BASE_URL!.replace(/\/+$/, '')}/${filename}` };
   }
 
   await fs.mkdir(env.UPLOAD_DIR, { recursive: true });
   await fs.writeFile(path.join(env.UPLOAD_DIR, filename), buffer);
-  return `${env.PUBLIC_BASE_URL.replace(/\/+$/, '')}/uploads/${filename}`;
+  return { url: `${env.PUBLIC_BASE_URL.replace(/\/+$/, '')}/uploads/${filename}` };
 };
 
 /** Borra el objeto asociado a una URL guardada. Nunca falla si ya no existe. */
 export const deleteUploadedFile = async (url: string): Promise<void> => {
+  // Con `db` el binario se elimina con la fila de BikeImage; no hay archivo externo.
+  if (env.STORAGE_DRIVER === 'db' || /\/api\/images\//.test(url)) return;
+
   const filename = url.split('?')[0].split('/').filter(Boolean).pop();
   if (!filename) return;
 

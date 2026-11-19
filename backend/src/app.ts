@@ -2,7 +2,7 @@ import express from 'express';
 import { default as helmet } from 'helmet';
 import cors, { type CorsOptions } from 'cors';
 import cookieParser from 'cookie-parser';
-import { env } from './config/env.js';
+import { env, isProduction } from './config/env.js';
 import prisma from './lib/prisma.js';
 import { errorHandler } from './middleware/error.js';
 import router from './routes/index.js';
@@ -51,8 +51,14 @@ app.get('/health', async (_req, res) => {
   }
 });
 
-// En Vercel no hay disco persistente: las fotos se sirven desde el bucket S3.
+// En Vercel no hay disco persistente: las fotos se sirven desde Neon (db) o S3.
 if (env.STORAGE_DRIVER === 'local') {
+  if (isProduction) {
+    console.warn(
+      '[warn] STORAGE_DRIVER=local en producción: Vercel no conserva el disco y express.static() no sirve archivos. ' +
+        'Configurá STORAGE_DRIVER=db (imágenes en Neon) o STORAGE_DRIVER=s3 con sus variables para habilitar las subidas.',
+    );
+  }
   app.use('/uploads', express.static(env.UPLOAD_DIR));
 }
 

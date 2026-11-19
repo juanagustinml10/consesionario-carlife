@@ -3,6 +3,7 @@ import { Prisma } from '@prisma/client';
 import prisma from '../lib/prisma.js';
 
 export { saveUploadedFile, deleteUploadedFile } from './storage.service.js';
+export type { StoredUpload } from './storage.service.js';
 
 type BikeStatusValue = 'BORRADOR' | 'DISPONIBLE' | 'RESERVADA' | 'VENDIDA';
 
@@ -42,9 +43,34 @@ export interface CreateBikeInput {
 
 export interface UpdateBikeInput extends Partial<Omit<CreateBikeInput, 'slug'>> {}
 
-const bikeInclude: Prisma.BikeInclude = {
+/**
+ * Listados y detalle nunca traen `BikeImage.data`: los bytes solo se leen en
+ * /api/images/:key. `select` explícito evita que Prisma incluya la columna BYTEA.
+ */
+const bikeSelect: Prisma.BikeSelect = {
+  id: true,
+  slug: true,
+  title: true,
+  brandId: true,
   brand: true,
-  images: { orderBy: [{ isPrimary: 'desc' }, { order: 'asc' }] },
+  model: true,
+  year: true,
+  condition: true,
+  displacementCc: true,
+  mileageKm: true,
+  usageHours: true,
+  price: true,
+  currency: true,
+  description: true,
+  status: true,
+  featured: true,
+  views: true,
+  createdAt: true,
+  updatedAt: true,
+  images: {
+    select: { id: true, url: true, isPrimary: true, order: true, createdAt: true },
+    orderBy: [{ isPrimary: 'desc' }, { order: 'asc' }],
+  },
   features: { orderBy: { key: 'asc' } },
 };
 
@@ -106,7 +132,7 @@ export const listBikes = async (filters: ListBikesFilters, includeDrafts = false
       skip,
       take: limit,
       orderBy: [{ featured: 'desc' }, { createdAt: 'desc' }],
-      include: bikeInclude,
+      select: bikeSelect,
     }),
     prisma.bike.count({ where }),
   ]);
@@ -124,14 +150,14 @@ export const listAdminBikes = async (filters: ListBikesFilters) =>
 export const getBikeBySlug = async (slug: string) => {
   return prisma.bike.findFirst({
     where: { slug, status: { not: 'BORRADOR' } },
-    include: bikeInclude,
+    select: bikeSelect,
   });
 };
 
 export const getBikeById = async (id: string) => {
   return prisma.bike.findUnique({
     where: { id },
-    include: bikeInclude,
+    select: bikeSelect,
   });
 };
 
@@ -177,7 +203,7 @@ export const createBike = async (input: CreateBikeInput) => {
             }
           : undefined,
     },
-    include: bikeInclude,
+    select: bikeSelect,
   });
 };
 
@@ -230,7 +256,7 @@ export const updateBike = async (id: string, input: UpdateBikeInput) => {
       return tx.bike.update({
         where: { id },
         data: hasScalarChanges ? data : {},
-        include: bikeInclude,
+        select: bikeSelect,
       });
     });
   }
@@ -238,7 +264,7 @@ export const updateBike = async (id: string, input: UpdateBikeInput) => {
   return prisma.bike.update({
     where: { id },
     data,
-    include: bikeInclude,
+    select: bikeSelect,
   });
 };
 
@@ -246,12 +272,23 @@ export const deleteBike = async (id: string) => {
   return prisma.bike.delete({ where: { id } });
 };
 
+export interface BikeImageUpload {
+  url: string;
+  isPrimary?: boolean;
+  /** Presente solo con STORAGE_DRIVER=db. */
+  data?: Buffer;
+  storageKey?: string;
+  mimeType?: string;
+  sizeBytes?: number;
+  checksum?: string;
+}
+
 export const addBikeImages = async (
   bikeId: string,
-  urls: Array<{ url: string; isPrimary?: boolean }>,
+  images: BikeImageUpload[],
 ) => {
   // Si se marca una como principal, desmarcar las demás de la moto
-  const hasPrimary = urls.some((u) => u.isPrimary);
+  const hasPrimary = images.some((image) => image.isPrimary);
   if (hasPrimary) {
     await prisma.bikeImage.updateMany({
       where: { bikeId },
@@ -262,21 +299,34 @@ export const addBikeImages = async (
   const lastOrder = await prisma.bikeImage.findFirst({
     where: { bikeId },
     orderBy: { order: 'desc' },
+    select: { order: true },
   });
   const baseOrder = (lastOrder?.order ?? -1) + 1;
 
   return prisma.bikeImage.createMany({
-    data: urls.map((u, i) => ({
+    data: images.map((image, i) => ({
       bikeId,
-      url: u.url,
-      isPrimary: u.isPrimary ?? false,
+      url: image.url,
+      isPrimary: image.isPrimary ?? false,
       order: baseOrder + i,
+      ...(image.data
+        ? {
+            data: new Uint8Array(image.data),
+            storageKey: image.storageKey,
+            mimeType: image.mimeType,
+            sizeBytes: image.sizeBytes,
+            checksum: image.checksum,
+          }
+        : {}),
     })),
   });
 };
 
 export const setPrimaryImage = async (bikeId: string, imageId: string) => {
-  const image = await prisma.bikeImage.findFirst({ where: { id: imageId, bikeId } });
+  const image = await prisma.bikeImage.findFirst({
+    where: { id: imageId, bikeId },
+    select: { id: true },
+  });
   if (!image) {
     const err: any = new Error('Imagen no encontrada');
     err.statusCode = 404;
@@ -290,7 +340,10 @@ export const setPrimaryImage = async (bikeId: string, imageId: string) => {
 };
 
 export const removeBikeImage = async (bikeId: string, imageId: string) => {
-  const image = await prisma.bikeImage.findFirst({ where: { id: imageId, bikeId } });
+  const image = await prisma.bikeImage.findFirst({
+    where: { id: imageId, bikeId },
+    select: { id: true },
+  });
   if (!image) {
     const err: any = new Error('Imagen no encontrada');
     err.statusCode = 404;
