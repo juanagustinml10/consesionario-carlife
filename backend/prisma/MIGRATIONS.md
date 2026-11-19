@@ -2,9 +2,14 @@
 
 ## Estado actual: aplicadas ✅
 
-Las dos migraciones están aplicadas y verificadas en la base de datos de Neon
+Las tres migraciones están aplicadas y verificadas en la base de datos de Neon
 (proyecto `jay-motos`, branch `production`, base `neondb`). `prisma migrate status`
 informa `Database schema is up to date!`.
+
+La tercera, `20261119000000_add_image_blobs`, es aditiva: agrega `data` (BYTEA),
+`mimeType`, `sizeBytes`, `checksum`, `storageKey` (único) y `legacyUrl` a `BikeImage`.
+Antes de aplicarla se respaldaron las 2 filas existentes y se verificó que sus datos
+quedaran idénticos después de la migración.
 
 Orden de aplicación:
 

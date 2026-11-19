@@ -15,14 +15,15 @@ Repo: `https://github.com/juanagustinml10/jay-motos` · rama `main`.
 | Framework Preset | Other |
 | Install Command | `npm install` |
 | Build Command | `npm run build` (ya declarado en `backend/vercel.json`) |
-| Node.js | 22.x (`engines: >=20`) |
-| Output Directory | no aplica: Vercel detecta Express automáticamente |
+| Node.js | 22.x (`engines: 22.x`) |
+| Output Directory | no aplica: Vercel detecta Express automáticamente desde `src/index.ts` |
 
 Vercel detecta la app Express en `src/app.ts` / `src/index.ts` (ambos exportan el app por default)
 y la empaqueta como una única Function. No hacen falta rewrites: todas las rutas llegan a Express,
 así que `/api/auth/login`, `/api/bikes` y `/health` funcionan sin cambios.
 
-`npm run build` ejecuta `tsc --noEmit` y `prisma generate`.
+`npm run build` ejecuta `prisma generate && tsc --noEmit` (en ese orden: con una instalación limpia,
+los tipos generados por Prisma no existen hasta que corre `prisma generate`).
 
 ### Variables de entorno obligatorias en Vercel
 
@@ -34,13 +35,7 @@ así que `/api/auth/login`, `/api/bikes` y `/health` funcionan sin cambios.
 | `JWT_REFRESH_SECRET` | Aleatorio, distinto del anterior |
 | `PUBLIC_BASE_URL` | `https://<proyecto-backend>.vercel.app` |
 | `CORS_ORIGIN` | `https://<proyecto-frontend>.pages.dev` (y el dominio custom, separado por coma) |
-| `STORAGE_DRIVER` | `s3` |
-| `STORAGE_S3_BUCKET` | Nombre del bucket |
-| `STORAGE_PUBLIC_BASE_URL` | URL pública del bucket/CDN |
-| `AWS_ACCESS_KEY_ID` | Credencial del bucket |
-| `AWS_SECRET_ACCESS_KEY` | Credencial del bucket |
-| `AWS_ENDPOINT_URL_S3` | Endpoint S3 (R2: `https://<account>.r2.cloudflarestorage.com`) |
-| `AWS_REGION` | `auto` para R2; la región real para AWS |
+| `STORAGE_DRIVER` | `db` (bytes de las fotos en Neon) |
 
 Opcionales: `JWT_ACCESS_TTL=900`, `JWT_REFRESH_TTL=604800`, `MAX_FILE_SIZE=4194304`.
 **No configurar** `SEED_ADMIN_*` en Vercel: el administrador ya existe en Neon y el seed no se ejecuta en deploy.
@@ -48,14 +43,16 @@ Opcionales: `JWT_ACCESS_TTL=900`, `JWT_REFRESH_TTL=604800`, `MAX_FILE_SIZE=41943
 ### Almacenamiento de fotos
 
 Vercel no tiene disco persistente: `STORAGE_DRIVER=local` solo sirve para desarrollo.
-Usar un bucket S3-compatible con lectura pública (por ejemplo Cloudflare R2). El bucket debe:
+Con `STORAGE_DRIVER=db` los bytes se guardan en Neon (`BikeImage.data`, BYTEA) y se sirven
+por la ruta pública `GET /api/images/:key`. No hacen falta credenciales S3.
 
-- permitir `PUT`/`DELETE` con la credencial configurada;
-- servir objetos públicamente en `STORAGE_PUBLIC_BASE_URL/<archivo>`;
-- tener CORS que permita `GET` desde `https://<proyecto-frontend>.pages.dev`.
+`PUBLIC_BASE_URL` debe ser la URL HTTPS pública del backend: se usa para construir
+`BikeImage.url = https://<backend>/api/images/<clave>`. La validación de entorno rechaza
+`localhost` cuando se usa este driver.
 
-Las URLs de las imágenes se guardan completas en `BikeImage.url`, así que no hace falta migrar datos.
-Neon Object Storage **no está disponible** en la región actual del proyecto (`sa-east-1`).
+La migración `20261119000000_add_image_blobs` ya está aplicada en Neon. Las imágenes
+legacy conservan su URL original en `legacyUrl`; `backend/scripts/migrate-images-to-db.ts`
+permite migrarlas manualmente (dry-run por defecto, `--apply` bajo responsabilidad).
 
 ### Verificación posterior al deploy
 
@@ -125,14 +122,17 @@ Si se agrega un dominio propio, sumarlo también a `CORS_ORIGIN` en Vercel.
 - Las sesiones usan JWT access + refresh con rotación y filas en `Session`.
   Los tokens viven en `localStorage`: conviene migrarlos a cookies `HttpOnly`/`Secure` en una etapa posterior.
 - No hay rate limiting en `/api/auth/login`: recomendable antes de exponer el panel a Internet.
-- `npm audit` reporta avisos altos en `prisma`/`@prisma/config`→`deepmerge-ts` y en `zod` 3.
-  El fix de `zod` es un cambio major; no se aplicó en esta preparación.
+- `npm audit --omit=dev` reporta **0 vulnerabilidades**: se actualizaron `multer` a 2.x,
+  `@types/multer` a 2.x y `zod` a 4.x, y se fijó `deepmerge-ts` 8.x mediante `overrides`
+  (lo usa `@prisma/config` 6.19.3). Helmet, TypeScript y Prisma están fijados a las versiones
+  verificadas en el build de Vercel.
 
 ### Migraciones
 
-Las dos migraciones (`20261116000000_init` y `20261117000000_add_usage_hours_draft`)
-ya están aplicadas en la branch `production` de Neon y versionadas en el repo.
-El deploy no ejecuta migraciones ni seed. Si se apuntara a otra DB:
+Las tres migraciones (`20261116000000_init`, `20261117000000_add_usage_hours_draft`
+y `20261119000000_add_image_blobs`) ya están aplicadas en la branch `production` de Neon
+y versionadas en el repo. La tercera es aditiva: agrega columnas nullable a `BikeImage`
+sin borrar ni reescribir filas. El deploy no ejecuta migraciones ni seed. Si se apuntara a otra DB:
 
 ```bash
 cd backend
