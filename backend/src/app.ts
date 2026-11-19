@@ -1,5 +1,6 @@
-import express from 'express';
-import helmet from 'helmet';
+import express, { type NextFunction, type Request, type Response } from 'express';
+import * as helmetModule from 'helmet';
+import type { HelmetOptions } from 'helmet';
 import cors, { type CorsOptions } from 'cors';
 import cookieParser from 'cookie-parser';
 import { env, isProduction } from './config/env.js';
@@ -8,6 +9,19 @@ import { errorHandler } from './middleware/error.js';
 import router from './routes/index.js';
 
 const app = express();
+
+/**
+ * Helmet 8 publica el middleware como `default`, pero según cómo el compilador
+ * resuelva ESM/CJS ese default puede verse como el namespace del módulo. Extraer
+ * el callable explícitamente evita el TS2349 en Vercel sin desactivar Helmet.
+ */
+type HelmetMiddleware = (
+  options?: Readonly<HelmetOptions>,
+) => (req: Request, res: Response, next: NextFunction) => void;
+const helmetNamespace = helmetModule as unknown as HelmetMiddleware & {
+  default?: HelmetMiddleware;
+};
+const helmet = helmetNamespace.default ?? helmetNamespace;
 
 // Las fotos se sirven desde otro origen (Cloudflare Pages / vite en dev).
 // CORP "same-origin" de Helmet las bloquearía en el <img>; los uploads son públicos.

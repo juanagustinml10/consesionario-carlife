@@ -11,16 +11,21 @@ Repo: `https://github.com/juanagustinml10/jay-motos` · rama `main`.
 
 | Ajuste | Valor |
 | --- | --- |
-| Root Directory | `backend` |
-| Framework Preset | Other |
-| Install Command | `npm install` |
-| Build Command | `npm run build` (ya declarado en `backend/vercel.json`) |
+| Root Directory | `.` (raíz del repo: el proyecto usa **Vercel Services**) |
+| Framework Preset | Other (Vercel detecta `backend` = Express y `frontend` = Vite) |
+| Install Command | `npm install` (por servicio, declarado en `vercel.json` raíz) |
+| Build Command | `npm run build` (por servicio, declarado en `vercel.json` raíz) |
 | Node.js | 22.x (`engines: 22.x`) |
-| Output Directory | no aplica: Vercel detecta Express automáticamente desde `src/index.ts` |
+| Output Directory | vacío |
 
-Vercel detecta la app Express en `src/app.ts` / `src/index.ts` (ambos exportan el app por default)
-y la empaqueta como una única Function. No hacen falta rewrites: todas las rutas llegan a Express,
-así que `/api/auth/login`, `/api/bikes` y `/health` funcionan sin cambios.
+El `vercel.json` raíz define dos servicios: `backend` (Express, raíz `backend`) y
+`frontend` (Vite, raíz `frontend`). Vercel empaqueta el backend desde `src/index.ts`,
+que exporta el app por default y evita `app.listen()` cuando `VERCEL=1`.
+
+Los rewrites enrutan el tráfico público: `/health` y `/api/(.*)` → backend;
+`/(.*)` → frontend. El rewrite de `/health` va antes del catch-all para que el
+health check no sea interceptado por la SPA. `backend/vercel.json` queda subordinado
+al config raíz; la fuente de verdad es `vercel.json`.
 
 `npm run build` ejecuta `prisma generate && tsc --noEmit` (en ese orden: con una instalación limpia,
 los tipos generados por Prisma no existen hasta que corre `prisma generate`).
@@ -56,9 +61,13 @@ permite migrarlas manualmente (dry-run por defecto, `--apply` bajo responsabilid
 
 ### Verificación posterior al deploy
 
+Con Services, backend y frontend comparten un único dominio de proyecto. Verificar:
+
 ```text
-GET https://<proyecto-backend>.vercel.app/health          -> 200 { "ok": true, "db": "ok" }
-GET https://<proyecto-backend>.vercel.app/api/bikes/brands -> 200 (9 marcas)
+GET https://<proyecto>.vercel.app/health           -> 200 { "ok": true, "db": "ok" }
+GET https://<proyecto>.vercel.app/api/bikes        -> 200 JSON
+GET https://<proyecto>.vercel.app/api/bikes/brands -> 200 (9 marcas)
+GET https://<proyecto>.vercel.app/                 -> SPA del frontend
 ```
 
 El límite de body de Vercel Functions es ~4.5 MB; por eso `MAX_FILE_SIZE=4194304`.
@@ -76,9 +85,10 @@ Estado actual: **corregido**. Todos los imports relativos usan extensión `.js`
 `module`/`moduleResolution: NodeNext` para que el typecheck detecte regresiones.
 `tsx` sigue resolviendo esos specifiers a los `.ts` en desarrollo.
 
-La ruta `/var/task/backend/...` del error también indica que Vercel puede estar usando
-el repo como Root Directory. Confirmar en el dashboard que **Root Directory = `backend`**;
-`backend/vercel.json` solo se aplica con esa configuración.
+La ruta `/var/task/backend/...` del error es coherente con el modo Services: Vercel
+compila el servicio `backend` desde la subcarpeta `backend`, con Root Directory = `.`.
+No cambiar el Root Directory a `backend`, porque el `vercel.json` raíz (que define los
+dos servicios y los rewrites) dejaría de aplicarse.
 
 ---
 
