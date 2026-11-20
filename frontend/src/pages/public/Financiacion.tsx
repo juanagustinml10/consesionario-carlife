@@ -35,7 +35,7 @@ export const Financiacion: React.FC = () => (
     <PageIntro
       index="01"
       eyebrow="JAY MOTOS · Comercial"
-      title={<>FINAN<span className="text-jay-red">CIA</span><br />CIÓN</>}
+      title={<span className="whitespace-nowrap">FINAN<span className="text-jay-red">CIA</span>CIÓN</span>}
       outline="FIN"
       align="center"
       size="large"
