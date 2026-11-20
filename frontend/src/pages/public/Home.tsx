@@ -234,8 +234,8 @@ export const Home: React.FC = () => {
             actionTo="/motos?featured=true"
           />
           {loading ? (
-            <div className="grid gap-4 lg:grid-cols-2">
-              {[0, 1, 2].map((i) => <SkeletonCard key={i} className={i === 0 ? 'lg:col-span-2' : ''} />)}
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {[0, 1, 2].map((i) => <SkeletonCard key={i} />)}
             </div>
           ) : featuredError ? (
             <ErrorState compact onRetry={retry} />
@@ -247,14 +247,9 @@ export const Home: React.FC = () => {
               description="Todavía no hay motos destacadas publicadas."
             />
           ) : (
-            <div className="grid gap-4 lg:grid-cols-2">
-              {featured.map((bike, index) => (
-                <BikeCard
-                  key={bike.id}
-                  bike={bike}
-                  feature={index === 0}
-                  className={index === 0 ? 'lg:col-span-2' : ''}
-                />
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {featured.map((bike) => (
+                <BikeCard key={bike.id} bike={bike} />
               ))}
             </div>
           )}
