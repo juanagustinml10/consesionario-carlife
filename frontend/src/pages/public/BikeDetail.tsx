@@ -175,9 +175,9 @@ export const BikeDetail: React.FC = () => {
 
       {/* Ficha principal */}
       <section className="track-lines">
-        <div className="container-jay grid gap-10 py-10 lg:grid-cols-12 lg:gap-12 lg:py-16">
+        <div className="container-jay grid min-w-0 gap-10 py-10 lg:grid-cols-12 lg:gap-12 lg:py-16">
           {/* Galería */}
-          <div className="lg:col-span-7">
+          <div className="min-w-0 lg:col-span-7">
             <div className="mb-4 flex items-center gap-3">
               <span className="font-display text-xs font-extrabold tracking-[0.2em] text-jay-red">01</span>
               <span className="h-px w-10 bg-jay-red" />
@@ -224,7 +224,7 @@ export const BikeDetail: React.FC = () => {
             </div>
 
             {images.length > 1 && (
-              <div className="scrollbar-none mt-3 flex gap-2 overflow-x-auto pb-1">
+              <div className="scrollbar-none mt-3 flex w-full min-w-0 max-w-full gap-2 overflow-x-auto pb-1">
                 {images.map((img, i) => (
                   <button
                     key={img.id}
@@ -268,7 +268,7 @@ export const BikeDetail: React.FC = () => {
           </div>
 
           {/* Información */}
-          <div className="lg:col-span-5">
+          <div className="min-w-0 lg:col-span-5">
             <div className="flex flex-wrap items-center gap-2">
               <ConditionTag condition={bike.condition} />
               <StatusTag status={bike.status} />
@@ -278,7 +278,7 @@ export const BikeDetail: React.FC = () => {
             <p className="mt-6 font-display text-xs font-extrabold uppercase tracking-[0.3em] text-jay-red">
               {bike.brand?.name ?? 'JAY MOTOS'}
             </p>
-            <h1 className="mt-2 font-display text-5xl font-extrabold uppercase italic leading-[0.85] text-white sm:text-7xl">
+            <h1 className="mt-2 break-words font-display text-5xl font-extrabold uppercase italic leading-[0.85] text-white sm:text-7xl">
               {bike.model || bike.title}
             </h1>
             <p className="mt-3 text-sm text-gray-400">{bike.title}</p>
@@ -287,7 +287,7 @@ export const BikeDetail: React.FC = () => {
             <div className="relative mt-7 border-y border-white/10 bg-jay-surface/60 py-6 pl-5 pr-5">
               <div className="absolute inset-y-0 left-0 w-[3px] bg-jay-red" aria-hidden="true" />
               <p className="field-label">Precio publicado</p>
-              <p className="mt-1 font-display text-5xl font-extrabold leading-none text-white sm:text-6xl">
+              <p className="mt-1 break-words font-display text-5xl font-extrabold leading-none text-white sm:text-6xl">
                 {formatPrice(bike.price, bike.currency)}
               </p>
               <p className="mt-2 text-[11px] leading-relaxed text-gray-500">
@@ -318,7 +318,7 @@ export const BikeDetail: React.FC = () => {
                 usageHours ? 'sm:grid-cols-5' : 'sm:grid-cols-4'
               )}>
                 {specs.map((spec) => (
-                  <div key={spec.label} className="bg-jay-surface p-4">
+                  <div key={spec.label} className="min-w-0 bg-jay-surface p-4">
                     <div className="text-jay-red-soft">{spec.icon}</div>
                     <p className="field-label mt-3 !text-[9px]">{spec.label}</p>
                     <p className="mt-1 font-display text-lg font-bold text-white">{spec.value}</p>
