@@ -40,11 +40,12 @@ No existe `tsc` en el root; siempre invocarlo con `--prefix` o dentro de cada ca
 
 ## Estado real (verificado) — no suponer
 
-- **La DB no está operativa.** `backend/.env` local tiene `DATABASE_URL` placeholder → `prisma db execute` devuelve **P1010**; `/api/bikes` y `/api/bikes/brands` devuelven **500**. `prisma/migrations/` **no existe** → nunca se ejecutó `prisma migrate dev`. No asumas que los endpoints de datos funcionan.
-- **`/health` (200) ≠ API funcionando** — solo verifica que Express está vivo.
-- **El panel admin nunca fue probado en vivo** (sin DB, sin seed); está completo en código pero no validado end-to-end.
+- **Producción funcionando (20/11/2026):** backend en Vercel (`https://sf-motos-livid.vercel.app`), frontend en Cloudflare Pages (`https://sf-motos.pages.dev`), base de datos en Neon con migraciones aplicadas. Detalle completo en `DEPLOYMENT.md`.
+- **DB de producción operativa:** `/health`, `/api/bikes`, `/api/bikes/brands` y `/api/auth/login` devuelven 200. El catálogo está vacío porque todavía no se cargaron motocicletas; eso es estado de datos, no error de API.
+- **`backend/.env` local sigue siendo placeholder:** los endpoints en `localhost:4000` no conectan a la DB real. No confundir el entorno local con producción.
+- **Panel admin validado en vivo:** existe un usuario `ADMIN` en Neon y el login funciona contra la API de Vercel. Credenciales entregadas fuera del repo (nunca versionar).
 - **Frontend público muestra estados vacíos** por `catch → []` cuando la API falla — por diseño, no es un bug.
-- **Procesos dev huérfanos** en puertos 4000/5173 pueden persistir entre sesiones y bloquear `prisma generate` — si `EPERM` en backend, matar el tsx watch primero.
+- **Procesos dev huérfanos** en puertos 4000/5173 pueden persistir entre sesiones y bloquear `prisma generate` — si `EPERM` en backend, matar el tsx watch y borrar los `*.tmp` de `backend/node_modules/.prisma/client`.
 
 ## Datos oficiales (no cambiar)
 
@@ -59,7 +60,7 @@ Nombre: **SF MOTOS** · Eslogan: **POTENCIA EN CADA ARRANQUE.** · Dirección: *
 - **Logo oficial:** fuente original `LOGO SF MOTOS - copia.jpeg` (raíz, intacta). El web usa `frontend/public/logo/sf-motos-black.png` y `sf-motos-white.png` (variantes sobre fondo claro/oscuro), generadas con `py tools/sf-logo-assets.py` sin redibujar el trazo. **No redibujar, no recolorear, no inventar una variante SVG.** Si se quiere nueva versión, partir del JPEG original.
 - **Créditos fotográficos a conservar** en footer: Beta RR Freenduro (CC BY 4.0, Jimmy Boakes / Jix31) y KTM forest (CC BY 3.0, Tim Gotzkowsky).
 - **Rutas públicas deben quedar dentro de `<PublicLayout>`** (wrapper de `App.tsx` con Navbar + Outlet + Footer). No agregar `<Navbar>` manualmente en páginas públicas.
-- **Panel admin:** `ProtectedRoute` lee `localStorage` (`sf_motos_access_token`); sin backend real el panel no puede autenticar.
+- **Panel admin:** `ProtectedRoute` lee `localStorage` (`sf_motos_access_token`); con el backend de Vercel autentica correctamente.
 - **`.gitignore` excluye `backend/.env`**; solo `.env.example` (valores placeholder). **Nunca commitear `backend/.env`** ni credenciales.
 - **Backend usa `tsx` en runtime** (no compila a `dist/` para ejecución); `tsc --noEmit` es solo validación de tipos. No esperes `dist/backend/serve.js`.
 - **Windows paths con espacios** — siempre con comillas cuando toque fuera de los scripts; `dev.mjs` se resuelve relativa al repo, no al CWD.
@@ -70,8 +71,12 @@ Nombre: **SF MOTOS** · Eslogan: **POTENCIA EN CADA ARRANQUE.** · Dirección: *
 2. `cd frontend && npx tsc --noEmit -p tsconfig.app.json` — sin errores.
 3. `cd frontend && npm run lint` — sin errores (warnings permitido).
 4. Si tocaste backend data flow: verificar contra DB real u documentar que no fue verificado.
-5. Rutas públicas siguen mostrando datos/vacío sin romper (no asumir DB disponible).
+5. Rutas públicas siguen mostrando datos/vacío sin romper; en producción verificar `/health`, `/api/bikes`, `/api/bikes/brands` y login del admin.
 
 ## Repositorio remoto
 
 `origin` apunta a `https://github.com/juanagustinml10/sf-motos.git` (repo público propio de SF MOTOS). El repositorio heredado de JAY MOTOS ya no está configurado. Formato de commits: `tipo(alcance): resumen en español`.
+
+## Producción
+
+Detalle y credenciales de operación en `DEPLOYMENT.md` (sin secretos en el repo). Frontend: Cloudflare Pages `sf-motos` → https://sf-motos.pages.dev. Backend: Vercel `sf-motos` → https://sf-motos-livid.vercel.app. DB: Neon con cadenas guardadas como Secret en Vercel. Ambos hosts despliegan automáticamente desde `main`. El endpoint temporal `/__sql` y su variable `MIGRATE_KEY` ya no existen: no reintroducirlos.
