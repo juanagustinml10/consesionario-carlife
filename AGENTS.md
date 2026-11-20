@@ -74,4 +74,4 @@ Nombre: **SF MOTOS** · Eslogan: **POTENCIA EN CADA ARRANQUE.** · Dirección: *
 
 ## Repositorio remoto
 
-`origin` todavía apunta al repositorio heredado de JAY MOTOS. **Pendiente:** crear el remoto propio de SF MOTOS y reemplazarlo antes de cualquier push. Formato de commits: `tipo(alcance): resumen en español`.
+`origin` apunta a `https://github.com/juanagustinml10/sf-motos.git` (repo público propio de SF MOTOS). El repositorio heredado de JAY MOTOS ya no está configurado. Formato de commits: `tipo(alcance): resumen en español`.
