@@ -17,6 +17,9 @@ export const BUSINESS = {
   shippingLabel: 'Envíos a todo el país',
 } as const;
 
+/** Año modelo máximo ofrecido (incluye la temporada siguiente). */
+export const MAX_MODEL_YEAR = 2027;
+
 export const buildWhatsAppLink = (message: string) =>
   `https://wa.me/${BUSINESS.whatsappNumber}?text=${encodeURIComponent(message)}`;
 

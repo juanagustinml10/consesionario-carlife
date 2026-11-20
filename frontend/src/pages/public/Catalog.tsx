@@ -20,6 +20,7 @@ import { SkeletonCard } from '@/components/shared/SkeletonCard';
 import { bikesService, type BikeFilters } from '@/services/bikes';
 import type { Bike, BikeCondition, BikeStatus } from '@/types';
 import { cn } from '@/lib/utils';
+import { MAX_MODEL_YEAR } from '@/lib/constants';
 
 const CONDITIONS: { value: BikeCondition; label: string }[] = [
   { value: 'NUEVA', label: '0 km' },
@@ -237,7 +238,7 @@ export const Catalog: React.FC = () => {
           <label className="field-label" htmlFor={`${prefix}-anio`}>Año</label>
           <select id={`${prefix}-anio`} value={filters.year ?? ''} onChange={(e) => setFilter('year', e.target.value || undefined)} className="field">
             <option value="">Cualquiera</option>
-            {Array.from({ length: 15 }, (_, i) => new Date().getFullYear() - i).map((year) => (
+            {Array.from({ length: 15 }, (_, i) => MAX_MODEL_YEAR - i).map((year) => (
               <option key={year} value={year}>{year}</option>
             ))}
           </select>

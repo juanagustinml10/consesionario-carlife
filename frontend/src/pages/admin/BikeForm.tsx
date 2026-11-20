@@ -26,9 +26,9 @@ import { Link } from '@/components/shared/Link';
 import { bikesService, type CreateBikeInput } from '@/services/bikes';
 import type { Bike, BikeCondition, BikeImage, BikeStatus } from '@/types';
 import { cn } from '@/lib/utils';
+import { MAX_MODEL_YEAR } from '@/lib/constants';
 
-const CURRENT_YEAR = new Date().getFullYear();
-const YEARS = Array.from({ length: 12 }, (_, index) => CURRENT_YEAR - index);
+const YEARS = Array.from({ length: 12 }, (_, index) => MAX_MODEL_YEAR - index);
 const CONDITIONS: BikeCondition[] = ['NUEVA', 'USADA'];
 const STEPS = [
   { id: 1, label: 'Datos', hint: 'Identificá la moto' },
@@ -75,7 +75,7 @@ const emptyForm: FormValues = {
   title: '',
   brandId: '',
   model: '',
-  year: CURRENT_YEAR,
+  year: MAX_MODEL_YEAR,
   price: '',
   currency: 'ARS',
   condition: 'USADA',
