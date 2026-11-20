@@ -44,6 +44,7 @@ No existe `tsc` en el root; siempre invocarlo con `--prefix` o dentro de cada ca
 - **DB de producción operativa:** `/health`, `/api/bikes`, `/api/bikes/brands` y `/api/auth/login` devuelven 200. El catálogo está vacío porque todavía no se cargaron motocicletas; eso es estado de datos, no error de API.
 - **`backend/.env` local sigue siendo placeholder:** los endpoints en `localhost:4000` no conectan a la DB real. No confundir el entorno local con producción.
 - **Panel admin validado en vivo:** existe un usuario `ADMIN` en Neon y el login funciona contra la API de Vercel. Credenciales entregadas fuera del repo (nunca versionar).
+- **Marcas cargadas:** la tabla `Brand` de Neon tiene las 9 marcas de la franja del home (`KTM`, `HUSQVARNA`, `GASGAS`, `BETA`, `SHERCO`, `HONDA`, `YAMAHA`, `KAWASAKI`, `SUZUKI`) con IDs `cuid` válidos para el formulario. No hay endpoint para crear marcas: se insertan directamente en `Brand`.
 - **Frontend público muestra estados vacíos** por `catch → []` cuando la API falla — por diseño, no es un bug.
 - **Procesos dev huérfanos** en puertos 4000/5173 pueden persistir entre sesiones y bloquear `prisma generate` — si `EPERM` en backend, matar el tsx watch y borrar los `*.tmp` de `backend/node_modules/.prisma/client`.
 

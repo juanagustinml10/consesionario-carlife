@@ -98,6 +98,10 @@ Nunca `db push` ni reiniciar el historial de migraciones.
 
 Existe un usuario `ADMIN` creado en Neon. Sus credenciales **no se versionan**; se entregaron fuera del repositorio. El panel está en `https://sf-motos.pages.dev/admin`. El registro público de administradores no existe (el alta es solo por seed/insercion controlada). Si se pierden las credenciales, crear otro admin con `backend/prisma/seed.ts` definiendo `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` localmente y ejecutando `npm run prisma:seed` **una sola vez**.
 
+### Marcas
+
+El desplegable "Marca" del formulario de publicaciones se pobló con las 9 marcas que ya aparecen en la franja del home: `KTM`, `HUSQVARNA`, `GASGAS`, `BETA`, `SHERCO`, `HONDA`, `YAMAHA`, `KAWASAKI` y `SUZUKI`. Están en la tabla `Brand` de Neon con IDs `cuid` válidos para la validación del formulario. Para agregar otra marca hace falta insertarla en `Brand` (no hay alta pública ni endpoint de administración de marcas).
+
 ---
 
 ## 5. Seguridad y operación

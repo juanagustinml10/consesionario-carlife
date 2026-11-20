@@ -19,7 +19,7 @@ import { SkeletonCard } from '@/components/shared/SkeletonCard';
 import { bikesService } from '@/services/bikes';
 import { BUSINESS, buildWhatsAppLink } from '@/lib/constants';
 import heroDefinitiva from '@/assets/hero-definitiva.jpg';
-import section04Mountain from '@/assets/seccion-04-mountain.jpg';
+import section04Hero2 from '@/assets/seccion-04-hero2.jpg';
 import type { Bike } from '@/types';
 
 const BRANDS = [
@@ -354,8 +354,8 @@ export const Home: React.FC = () => {
 
             <div className="relative order-1 mb-9 lg:order-2 lg:col-span-6 lg:mb-0">
               <img
-                src={section04Mountain}
-                alt="Motocicleta de enduro en un camino de montaña"
+                src={section04Hero2}
+                alt="Motocicleta en acción"
                 loading="lazy"
                 className="h-full min-h-[320px] w-full object-cover object-center sm:min-h-[460px]"
               />
