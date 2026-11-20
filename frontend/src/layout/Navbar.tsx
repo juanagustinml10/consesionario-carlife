@@ -54,16 +54,14 @@ export const Navbar: React.FC = () => {
   }, [open]);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/5 bg-jay-black/95 backdrop-blur-md">
-      <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-jay-red to-transparent opacity-60" aria-hidden="true" />
-      <div className="container-jay">
+    <header className="sticky top-0 z-50 border-b border-white/5 bg-sf-black/95 backdrop-blur-md">
+      <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-sf-red to-transparent opacity-60" aria-hidden="true" />
+      <div className="container-sf">
         <div className="flex h-16 items-center justify-between gap-4 lg:h-[72px]">
-          {/* Logo */}
-          <Link to="/" aria-label="JAY MOTOS — Inicio" className="shrink-0">
-            <Logo className="h-11 sm:h-12 lg:h-[52px]" />
+          <Link to="/" aria-label="SF MOTOS — Inicio" className="shrink-0">
+            <Logo onDark className="h-11 sm:h-12 lg:h-[52px]" />
           </Link>
 
-          {/* Navegación desktop */}
           <nav className="hidden items-center gap-4 min-[1440px]:gap-6 lg:flex" aria-label="Navegación principal">
             {NAV_LINKS.map((link) => (
               <Link
@@ -71,14 +69,14 @@ export const Navbar: React.FC = () => {
                 to={link.to}
                 className={() =>
                   `group relative whitespace-nowrap py-2 font-display text-[11px] font-semibold uppercase tracking-[0.12em] transition-colors min-[1440px]:text-xs ${
-                    isLinkActive(link.to) ? 'text-jay-red-soft' : 'text-gray-400 hover:text-white'
+                    isLinkActive(link.to) ? 'text-sf-red-soft' : 'text-gray-400 hover:text-white'
                   }`
                 }
                 aria-current={isLinkActive(link.to) ? 'page' : undefined}
               >
                 {link.label}
                 <span
-                  className={`absolute -bottom-0.5 left-0 h-[2px] bg-jay-red transition-all duration-300 ${
+                  className={`absolute -bottom-0.5 left-0 h-[2px] bg-sf-red transition-all duration-300 ${
                     isLinkActive(link.to) ? 'w-full' : 'w-0 group-hover:w-full'
                   }`}
                 />
@@ -86,7 +84,6 @@ export const Navbar: React.FC = () => {
             ))}
           </nav>
 
-          {/* Acciones */}
           <div className="flex items-center gap-2">
             <a
               href={buildWhatsAppLink(BUSINESS.whatsappGeneralMessage)}
@@ -111,19 +108,23 @@ export const Navbar: React.FC = () => {
         </div>
       </div>
 
-      {/* Menú móvil */}
       {open && (
         <div className="fixed inset-0 z-50 lg:hidden">
-          <div className="absolute inset-0 bg-black/60" onClick={() => setOpen(false)} aria-hidden="true" />
+          <button
+            type="button"
+            className="absolute inset-0 bg-black/60"
+            onClick={() => setOpen(false)}
+            aria-label="Cerrar menú"
+          />
           <div
             id="menu-movil"
             role="dialog"
             aria-modal="true"
             aria-label="Menú de navegación"
-            className="absolute right-0 top-0 flex h-full w-full max-w-sm flex-col border-l border-white/10 bg-jay-black shadow-2xl"
+            className="absolute right-0 top-0 flex h-full w-full max-w-sm flex-col border-l border-white/10 bg-sf-black shadow-2xl"
           >
             <div className="flex h-16 shrink-0 items-center justify-between border-b border-white/5 px-5">
-              <Logo className="h-10" />
+              <Logo onDark className="h-10" />
               <button
                 ref={closeRef}
                 onClick={() => setOpen(false)}
@@ -143,7 +144,7 @@ export const Navbar: React.FC = () => {
                     className={() =>
                       `rounded-xl px-4 py-3.5 font-display text-base font-semibold uppercase tracking-[0.12em] transition-colors ${
                         isLinkActive(link.to)
-                          ? 'bg-jay-red/10 text-jay-red-soft'
+                          ? 'bg-sf-red/10 text-sf-red-soft'
                           : 'text-gray-300 hover:bg-white/5 hover:text-white'
                       }`
                     }

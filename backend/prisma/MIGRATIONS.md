@@ -1,15 +1,14 @@
-# Migraciones de JAY MOTOS
+# Migraciones de SF MOTOS
 
-## Estado actual: aplicadas ✅
+## Estado actual: pendientes en la base de SF MOTOS
 
-Las tres migraciones están aplicadas y verificadas en la base de datos de Neon
-(proyecto `jay-motos`, branch `production`, base `neondb`). `prisma migrate status`
-informa `Database schema is up to date!`.
+Las tres migraciones están versionadas en el repo, pero **no fueron aplicadas a ninguna
+base propia de SF MOTOS**. No existe una URL de base de datos configurada para este
+proyecto. Ejecutar `prisma migrate deploy` contra la nueva base antes de usar la API.
 
 La tercera, `20261119000000_add_image_blobs`, es aditiva: agrega `data` (BYTEA),
 `mimeType`, `sizeBytes`, `checksum`, `storageKey` (único) y `legacyUrl` a `BikeImage`.
-Antes de aplicarla se respaldaron las 2 filas existentes y se verificó que sus datos
-quedaran idénticos después de la migración.
+No modifica ni borra filas existentes.
 
 Orden de aplicación:
 

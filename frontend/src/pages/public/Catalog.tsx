@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import {
   Search,
   SlidersHorizontal,
@@ -188,14 +187,14 @@ export const Catalog: React.FC = () => {
 
   const renderFilterPanel = (prefix: string) => (
     <div className="panel relative p-5 sm:p-6">
-      <div className="absolute inset-x-0 top-0 h-[3px] bg-jay-red" aria-hidden="true" />
+      <div className="absolute inset-x-0 top-0 h-[3px] bg-sf-red" aria-hidden="true" />
       <div className="mb-5 flex items-center justify-between border-b border-white/8 pb-4">
         <span className="flex items-center gap-2 font-display text-xs font-extrabold uppercase tracking-[0.22em] text-white">
-          <SlidersHorizontal size={15} className="text-jay-red" />
+          <SlidersHorizontal size={15} className="text-sf-red" />
           Filtros
         </span>
         {hasActiveFilters && (
-          <button type="button" onClick={clearFilters} className="flex items-center gap-1 font-display text-[11px] font-bold uppercase tracking-widest text-jay-red-soft transition-colors hover:text-white">
+          <button type="button" onClick={clearFilters} className="flex items-center gap-1 font-display text-[11px] font-bold uppercase tracking-widest text-sf-red-soft transition-colors hover:text-white">
             <X size={13} /> Limpiar
           </button>
         )}
@@ -252,8 +251,8 @@ export const Catalog: React.FC = () => {
             className={cn(
               'flex h-12 w-full items-center justify-center gap-2 border font-display text-xs font-extrabold uppercase tracking-[0.2em] transition-colors',
               filters.featured
-                ? 'border-jay-red bg-jay-red text-white'
-                : 'border-white/15 text-gray-300 hover:border-jay-red hover:text-white'
+                ? 'border-sf-red bg-sf-red text-white'
+                : 'border-white/15 text-gray-300 hover:border-sf-red hover:text-white'
             )}
           >
             <BadgeCheck size={16} />
@@ -265,11 +264,11 @@ export const Catalog: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-jay-black text-jay-white">
+    <div className="min-h-screen bg-sf-black text-sf-white">
       <PageIntro
         index="01"
-        eyebrow="Inventario JAY MOTOS"
-        title={<>Encontrá tu <span className="text-jay-red">próxima moto</span></>}
+        eyebrow="Inventario SF MOTOS"
+        title={<>Encontrá tu <span className="text-sf-red">próxima moto</span></>}
         outline="MOTOS"
         size="compact"
         description={
@@ -285,7 +284,7 @@ export const Catalog: React.FC = () => {
         {/* Buscador */}
         <div className="mt-5 flex flex-col gap-3 sm:flex-row">
           <div className="relative flex-1">
-            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-jay-red" aria-hidden="true" />
+            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-sf-red" aria-hidden="true" />
             <input
               type="search"
               placeholder="Marca, modelo, año, cilindrada..."
@@ -311,23 +310,19 @@ export const Catalog: React.FC = () => {
         {/* Panel de filtros */}
         <div id="filtros-catalogo" className="mt-3">
           <div className="hidden md:block">{renderFilterPanel('desktop')}</div>
-          <motion.div
-            initial={false}
-            animate={openFilters ? { height: 'auto', opacity: 1 } : { height: 0, opacity: 0 }}
-            className="overflow-hidden md:hidden"
-          >
+          <div className={cn('md:hidden', openFilters ? 'block' : 'hidden')}>
             <div className="pt-1">{renderFilterPanel('movil')}</div>
-          </motion.div>
+          </div>
         </div>
       </PageIntro>
 
       {/* Resultados */}
-      <section id="resultados" className="scroll-mt-24 bg-[#f3f3f3] text-jay-black">
-        <div className="container-jay py-8 sm:py-10">
-          <div className="mb-6 flex flex-col gap-5 border-t border-jay-red/60 pt-5 sm:flex-row sm:items-end sm:justify-between">
+      <section id="resultados" className="scroll-mt-24 bg-sf-paper text-sf-black">
+        <div className="container-sf py-8 sm:py-10">
+          <div className="mb-6 flex flex-col gap-5 border-t-2 border-sf-red pt-5 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <span className="section-index">Resultados</span>
-              <p className="mt-3 font-display text-3xl font-extrabold uppercase italic leading-none sm:text-4xl">
+              <span className="section-index !text-sf-red">Resultados</span>
+              <p className="mt-3 font-display text-3xl font-extrabold uppercase leading-none sm:text-4xl">
                 {error ? 'Sin conexión' : `Mostrando ${bikes.length} de ${total}`}
               </p>
             </div>
@@ -337,7 +332,7 @@ export const Catalog: React.FC = () => {
                 id="ordenar"
                 value={sort}
                 onChange={(e) => setFilter('sort', e.target.value)}
-                className="h-11 border border-black/15 bg-white px-4 font-display text-xs font-bold uppercase tracking-wider text-jay-black outline-none transition-colors focus:border-jay-red sm:min-w-[190px]"
+                className="h-11 border border-black/15 bg-white px-4 font-display text-xs font-bold uppercase tracking-wider text-sf-black outline-none transition-colors focus:border-sf-red sm:min-w-[190px]"
               >
                 {SORT_OPTIONS.map((option) => (
                   <option key={option.value} value={option.value}>{option.label}</option>
@@ -389,7 +384,7 @@ export const Catalog: React.FC = () => {
                   onClick={() => goToPage(page - 1)}
                   disabled={page === 1}
                   aria-label="Página anterior"
-                  className="flex h-11 w-11 items-center justify-center border border-black/15 text-black/60 transition-colors hover:border-jay-red hover:text-jay-red disabled:opacity-30"
+                  className="flex h-11 w-11 items-center justify-center border border-black/15 text-black/60 transition-colors hover:border-sf-red hover:text-sf-red disabled:opacity-30"
                 >
                   <ChevronLeft size={18} />
                 </button>
@@ -402,8 +397,8 @@ export const Catalog: React.FC = () => {
                     className={cn(
                       'h-11 w-11 font-display text-sm font-extrabold transition-colors',
                       number === page
-                        ? 'bg-jay-red text-white'
-                        : 'border border-black/15 text-black/60 hover:border-jay-red hover:text-jay-red'
+                        ? 'bg-sf-red text-white'
+                        : 'border border-black/15 text-black/60 hover:border-sf-red hover:text-sf-red'
                     )}
                   >
                     {number}
@@ -414,7 +409,7 @@ export const Catalog: React.FC = () => {
                   onClick={() => goToPage(page + 1)}
                   disabled={page === totalPages}
                   aria-label="Página siguiente"
-                  className="flex h-11 w-11 items-center justify-center border border-black/15 text-black/60 transition-colors hover:border-jay-red hover:text-jay-red disabled:opacity-30"
+                  className="flex h-11 w-11 items-center justify-center border border-black/15 text-black/60 transition-colors hover:border-sf-red hover:text-sf-red disabled:opacity-30"
                 >
                   <ChevronRight size={18} />
                 </button>

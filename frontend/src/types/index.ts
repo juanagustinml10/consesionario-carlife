@@ -1,5 +1,5 @@
 /**
- * Tipos del dominio de JAY MOTOS.
+ * Tipos del dominio de SF MOTOS.
  * Estos tipos reflejan el contrato de la API del backend.
  */
 

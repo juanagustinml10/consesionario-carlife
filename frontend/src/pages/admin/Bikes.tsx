@@ -1,15 +1,14 @@
-import * as React from 'react';
-import { useEffect, useState, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { useCallback, useEffect, useState } from 'react';
 import {
+  Edit2,
+  ImageOff,
+  Motorbike,
   Plus,
   Search,
-  Edit2,
   Trash2,
-  Motorbike,
+  X,
 } from 'lucide-react';
 import { Link } from '@/components/shared/Link';
-import Button from '@/components/ui/button';
 import { bikesService } from '@/services/bikes';
 import type { Bike, BikeStatus } from '@/types';
 
@@ -21,23 +20,24 @@ const STATUS_LABELS: Record<BikeStatus, string> = {
 };
 
 const statusBadgeClass = (status: BikeStatus) => {
-  if (status === 'BORRADOR') return 'bg-white/5 text-gray-400 border-white/15';
-  if (status === 'DISPONIBLE') return 'bg-green-500/10 text-green-700 border-green-500/30';
-  if (status === 'RESERVADA') return 'bg-amber-500/10 text-amber-700 border-amber-500/30';
-  return 'bg-jay-red/10 text-jay-red border-jay-red/30';
+  if (status === 'BORRADOR') return 'border-sf-border-strong bg-sf-elevated text-sf-ink-300';
+  if (status === 'DISPONIBLE') return 'border-emerald-500/40 bg-emerald-500/10 text-emerald-300';
+  if (status === 'RESERVADA') return 'border-amber-500/40 bg-amber-500/10 text-amber-300';
+  return 'border-sf-red/40 bg-sf-red/10 text-sf-red-soft';
 };
 
-export const Bikes: React.FC = () => {
+const getThumb = (bike: Bike) =>
+  bike.images?.find((image) => image.isPrimary)?.url ?? bike.images?.[0]?.url;
+
+export const Bikes = () => {
   const [bikes, setBikes] = useState<Bike[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<BikeStatus | 'TODOS'>('TODOS');
   const [query, setQuery] = useState('');
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [confirmOpen, setConfirmOpen] = useState(false);
   const [bikeToDelete, setBikeToDelete] = useState<Bike | null>(null);
 
   const load = useCallback(async () => {
-    setLoading(true);
     try {
       const response = await bikesService.listAdmin({
         limit: 100,
@@ -52,251 +52,316 @@ export const Bikes: React.FC = () => {
   }, [statusFilter]);
 
   useEffect(() => {
-    load();
+    void load();
   }, [load]);
-
-  const handleDelete = (bike: Bike) => {
-    setBikeToDelete(bike);
-    setConfirmOpen(true);
-  };
 
   const handleConfirmDelete = async () => {
     if (!bikeToDelete) return;
     setDeletingId(bikeToDelete.id);
     try {
       await bikesService.remove(bikeToDelete.id);
-      setConfirmOpen(false);
       setBikeToDelete(null);
-      setDeletingId(null);
-      load();
+      setLoading(true);
+      void load();
     } catch {
+      // El modal permanece abierto para que el usuario pueda reintentar.
+    } finally {
       setDeletingId(null);
     }
   };
 
   const normalizedQuery = query.trim().toLowerCase();
-  const filtered = bikes.filter((b) => {
-    if (statusFilter !== 'TODOS' && b.status !== statusFilter) return false;
+  const filtered = bikes.filter((bike) => {
+    if (statusFilter !== 'TODOS' && bike.status !== statusFilter) return false;
     if (!normalizedQuery) return true;
-    const haystack = [b.title, b.model, b.brand?.name ?? '', String(b.year)]
+    const haystack = [bike.title, bike.model, bike.brand?.name ?? '', String(bike.year)]
       .join(' ')
       .toLowerCase();
     return haystack.includes(normalizedQuery);
   });
 
   return (
-    <div className="bg-transparent">
-      <div className="container-jay">
-        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="font-display text-2xl font-bold">Motocicletas</h1>
-            <p className="text-sm text-gray-400">
-              Administración de publicaciones del catálogo.
-            </p>
+    <div>
+      <div className="mb-7 flex flex-col gap-5 border-b border-sf-border pb-6 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <span className="micro-label text-sf-red">Inventario</span>
+          <h1 className="mt-2 font-display text-3xl uppercase tracking-wide text-white sm:text-4xl">
+            Motocicletas
+          </h1>
+          <p className="mt-2 text-sm text-sf-ink-400">
+            Administración de publicaciones del catálogo.
+          </p>
+        </div>
+        <Link to="/admin/motos/nuevo" className="btn btn-red self-start sm:self-auto">
+          <Plus size={16} /> Nueva publicación
+        </Link>
+      </div>
+
+      <div className="border border-sf-border bg-sf-surface">
+        <div className="border-b border-sf-border p-4 sm:p-5">
+          <div className="flex flex-col gap-3 md:flex-row">
+            <div className="relative flex-1">
+              <Search
+                size={16}
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-sf-ink-500"
+              />
+              <input
+                type="search"
+                placeholder="Buscar por marca, modelo o título…"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                aria-label="Buscar publicaciones"
+                className="h-11 w-full border border-sf-border-strong bg-sf-black pl-11 pr-4 text-sm text-white outline-none transition-colors placeholder:text-sf-ink-600 focus:border-sf-red"
+              />
+            </div>
+            <select
+              value={statusFilter}
+              onChange={(event) => {
+                setLoading(true);
+                setStatusFilter(event.target.value as BikeStatus | 'TODOS');
+              }}
+              aria-label="Filtrar por estado"
+              className="h-11 border border-sf-border-strong bg-sf-black px-4 text-sm text-white outline-none transition-colors focus:border-sf-red md:min-w-52"
+            >
+              <option value="TODOS">Todos los estados</option>
+              <option value="BORRADOR">Borradores</option>
+              <option value="DISPONIBLE">Disponibles</option>
+              <option value="RESERVADA">Reservadas</option>
+              <option value="VENDIDA">Vendidas</option>
+            </select>
           </div>
-          <Link
-            to="/admin/motos/nuevo"
-            className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-jay-red px-5 py-3 font-medium text-white transition-colors hover:bg-black sm:w-auto"
-          >
-            <Plus size={18} /> Nueva publicación
-          </Link>
+          <div className="mt-4 flex items-center gap-2 text-[11px] uppercase tracking-wider text-sf-ink-500">
+            <Motorbike size={13} className="text-sf-red" />
+            {filtered.length} publicación{filtered.length !== 1 ? 'es' : ''}
+          </div>
         </div>
 
-        <div className="rounded-2xl border border-white/8 bg-jay-surface shadow-card overflow-hidden">
-          <div className="border-b border-white/5 bg-transparent p-5">
-            <div className="flex flex-col md:flex-row md:items-center gap-4 mb-5">
-              <div className="relative flex-1">
-                <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
-                <input
-                  type="search"
-                  placeholder="Buscar por marca, modelo o título..."
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 rounded-lg border border-white/10 bg-jay-elevated text-white focus:outline-none focus:ring-2 focus:ring-jay-red/40 transition-colors"
-                />
-              </div>
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value as BikeStatus | 'TODOS')}
-                className="py-3 rounded-lg border border-white/10 bg-jay-elevated text-white text-sm focus:outline-none focus:ring-2 focus:ring-jay-red/40"
-              >
-                <option value="TODOS">Todos los estados</option>
-                <option value="BORRADOR">Borradores</option>
-                <option value="DISPONIBLE">Disponibles</option>
-                <option value="RESERVADA">Reservadas</option>
-                <option value="VENDIDA">Vendidas</option>
-              </select>
-            </div>
-            <div className="flex items-center gap-2 text-xs text-gray-500">
-              <Motorbike size={14} />
-              <span>{filtered.length} publicación{filtered.length !== 1 ? 'es' : ''}</span>
-            </div>
-          </div>
-
-          {/* Vista móvil: tarjetas */}
-          <div className="divide-y divide-white/5 md:hidden">
-            {loading ? (
-              <div className="h-40 flex items-center justify-center text-sm text-gray-500">
-                Cargando publicaciones...
-              </div>
-            ) : filtered.length === 0 ? (
-              <div className="h-40 flex items-center justify-center text-sm text-gray-500">
-                No se encontraron publicaciones.
-              </div>
-            ) : (
-              filtered.map((bike) => (
-                <div key={bike.id} className="p-5">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex min-w-0 items-center gap-3">
-                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-transparent">
-                        <Motorbike size={18} className="text-gray-500" />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="truncate font-medium text-white">{bike.title}</p>
-                        <p className="truncate text-xs text-gray-500">
-                          {bike.brand?.name ?? ''} {bike.model} · {bike.year}
-                        </p>
-                      </div>
+        <div className="divide-y divide-sf-border md:hidden">
+          {loading ? (
+            <p className="py-14 text-center text-sm text-sf-ink-500">
+              Cargando publicaciones…
+            </p>
+          ) : filtered.length === 0 ? (
+            <p className="py-14 text-center text-sm text-sf-ink-500">
+              No se encontraron publicaciones.
+            </p>
+          ) : (
+            filtered.map((bike) => {
+              const thumb = getThumb(bike);
+              return (
+                <div key={bike.id} className="p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-14 w-16 shrink-0 items-center justify-center overflow-hidden border border-sf-border bg-sf-black">
+                      {thumb ? (
+                        <img
+                          src={thumb}
+                          alt=""
+                          loading="lazy"
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <ImageOff size={18} className="text-sf-ink-600" />
+                      )}
                     </div>
-                    <span
-                      className={`inline-flex shrink-0 items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border ${statusBadgeClass(bike.status)}`}
-                    >
-                      {STATUS_LABELS[bike.status]}
-                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-semibold text-white">
+                        {bike.title}
+                      </p>
+                      <p className="mt-1 truncate text-[11px] text-sf-ink-500">
+                        {bike.brand?.name ?? ''} {bike.model} · {bike.year}
+                      </p>
+                      <span
+                        className={`mt-2 inline-flex border px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${statusBadgeClass(bike.status)}`}
+                      >
+                        {STATUS_LABELS[bike.status]}
+                      </span>
+                    </div>
                   </div>
-                  <div className="mt-4 flex items-center justify-between gap-3">
-                    <span className="font-bold text-white">
+                  <div className="mt-4 flex items-center justify-between gap-3 border-t border-sf-border pt-3">
+                    <span className="font-display text-lg text-white">
                       {bike.price.toLocaleString('es-AR')} {bike.currency}
                     </span>
-                    <div className="flex items-center gap-2">
+                    <div className="flex gap-2">
                       <Link
                         to={`/admin/motos/${bike.id}/editar`}
-                        className="rounded-lg p-2.5 text-gray-400 transition-colors hover:bg-transparent hover:text-jay-red"
+                        className="flex h-9 w-9 items-center justify-center border border-sf-border-strong text-sf-ink-300 transition-colors hover:border-sf-red hover:text-white"
                         title="Editar"
                         aria-label="Editar publicación"
                       >
-                        <Edit2 size={18} />
+                        <Edit2 size={16} />
                       </Link>
                       <button
-                        onClick={() => handleDelete(bike)}
-                        className="rounded-lg p-2.5 text-gray-400 transition-colors hover:bg-jay-red hover:text-white"
+                        type="button"
+                        onClick={() => setBikeToDelete(bike)}
+                        className="flex h-9 w-9 items-center justify-center border border-sf-border-strong text-sf-ink-300 transition-colors hover:border-sf-red hover:bg-sf-red hover:text-white"
                         title="Eliminar"
                         aria-label="Eliminar publicación"
                       >
-                        <Trash2 size={18} />
+                        <Trash2 size={16} />
                       </button>
                     </div>
                   </div>
                 </div>
-              ))
-            )}
-          </div>
+              );
+            })
+          )}
+        </div>
 
-          {/* Vista desktop: tabla */}
-          <div className="hidden overflow-x-auto md:block">
-            <table className="w-full text-left text-sm">
-              <thead>
-                <tr className="border-b border-white/5 bg-white/[0.02]">
-                  <th className="py-4 px-6 font-medium text-gray-400">Moto</th>
-                  <th className="py-4 px-6 font-medium text-gray-400">Año</th>
-                  <th className="py-4 px-6 font-medium text-gray-400">Precio</th>
-                  <th className="py-4 px-6 font-medium text-gray-400">Estado</th>
-                  <th className="py-4 px-6 font-medium text-gray-400 text-center">Acciones</th>
+        <div className="hidden overflow-x-auto md:block">
+          <table className="w-full text-left text-sm">
+            <thead>
+              <tr className="border-b border-sf-border bg-sf-black/40 text-[10px] uppercase tracking-wider text-sf-ink-500">
+                <th className="px-5 py-3.5 font-bold">Moto</th>
+                <th className="px-4 py-3.5 font-bold">Año</th>
+                <th className="px-4 py-3.5 font-bold">Precio</th>
+                <th className="px-4 py-3.5 font-bold">Estado</th>
+                <th className="px-5 py-3.5 text-right font-bold">Acciones</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-sf-border">
+              {loading ? (
+                <tr>
+                  <td colSpan={5} className="py-14 text-center text-sm text-sf-ink-500">
+                    Cargando publicaciones…
+                  </td>
                 </tr>
-              </thead>
-              <tbody className="divide-y divide-white/5">
-                {loading ? (
-                  <tr>
-                    <td colSpan={5} className="h-40 text-center text-gray-500">
-                      Cargando publicaciones...
-                    </td>
-                  </tr>
-                ) : filtered.length === 0 ? (
-                  <tr>
-                    <td colSpan={5} className="h-40 text-center text-gray-500">
-                      No se encontraron publicaciones.
-                    </td>
-                  </tr>
-                ) : (
-                  filtered.map((bike) => (
-                    <tr key={bike.id} className="hover:bg-white/[0.02] transition-colors">
-                      <td className="py-5 px-6">
-                        <div className="flex items-center gap-4">
-                          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-transparent">
-                            <Motorbike size={18} className="text-gray-500" />
+              ) : filtered.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="py-14 text-center text-sm text-sf-ink-500">
+                    No se encontraron publicaciones.
+                  </td>
+                </tr>
+              ) : (
+                filtered.map((bike) => {
+                  const thumb = getThumb(bike);
+                  return (
+                    <tr
+                      key={bike.id}
+                      className="transition-colors hover:bg-sf-elevated/40"
+                    >
+                      <td className="px-5 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-11 w-14 shrink-0 items-center justify-center overflow-hidden border border-sf-border bg-sf-black">
+                            {thumb ? (
+                              <img
+                                src={thumb}
+                                alt=""
+                                loading="lazy"
+                                className="h-full w-full object-cover"
+                              />
+                            ) : (
+                              <ImageOff size={16} className="text-sf-ink-600" />
+                            )}
                           </div>
-                          <div>
-                            <p className="font-medium text-white">{bike.title}</p>
-                            <p className="text-xs text-gray-500">
-                              {bike.brand?.name ?? ''} {bike.model} · {bike.year}
+                          <div className="min-w-0">
+                            <p className="truncate font-semibold text-white">
+                              {bike.title}
+                            </p>
+                            <p className="mt-0.5 truncate text-[11px] text-sf-ink-500">
+                              {bike.brand?.name ?? ''} {bike.model}
                             </p>
                           </div>
                         </div>
                       </td>
-                      <td className="py-5 px-6 text-gray-400">{bike.year}</td>
-                      <td className="py-5 px-6">
-                        <span className="font-medium text-white">
+                      <td className="px-4 py-4 font-mono text-xs text-sf-ink-300">
+                        {bike.year}
+                      </td>
+                      <td className="px-4 py-4">
+                        <span className="font-display text-base text-white">
                           {bike.price.toLocaleString('es-AR')} {bike.currency}
                         </span>
                       </td>
-                      <td className="py-5 px-6">
+                      <td className="px-4 py-4">
                         <span
-                          className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border ${statusBadgeClass(bike.status)}`}
+                          className={`inline-flex border px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${statusBadgeClass(bike.status)}`}
                         >
                           {STATUS_LABELS[bike.status]}
                         </span>
                       </td>
-                      <td className="py-5 px-6 text-center">
-                        <div className="flex items-center justify-center gap-2">
+                      <td className="px-5 py-4">
+                        <div className="flex items-center justify-end gap-2">
                           <Link
                             to={`/admin/motos/${bike.id}/editar`}
-                            className="p-2 rounded-lg text-gray-400 hover:bg-transparent hover:text-jay-red transition-colors"
+                            className="flex h-9 w-9 items-center justify-center border border-sf-border-strong text-sf-ink-300 transition-colors hover:border-sf-red hover:text-white"
                             title="Editar"
+                            aria-label="Editar publicación"
                           >
-                            <Edit2 size={18} />
+                            <Edit2 size={16} />
                           </Link>
                           <button
-                            onClick={() => handleDelete(bike)}
-                            className="p-2 rounded-lg text-gray-400 hover:bg-jay-red hover:text-white transition-colors"
+                            type="button"
+                            onClick={() => setBikeToDelete(bike)}
+                            className="flex h-9 w-9 items-center justify-center border border-sf-border-strong text-sf-ink-300 transition-colors hover:border-sf-red hover:bg-sf-red hover:text-white"
                             title="Eliminar"
+                            aria-label="Eliminar publicación"
                           >
-                            <Trash2 size={18} />
+                            <Trash2 size={16} />
                           </button>
                         </div>
                       </td>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
 
-      {/* Modal de confirmación de eliminación */}
-      {confirmOpen && bikeToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="relative w-full max-w-md rounded-2xl border border-white/10 bg-jay-surface p-6 shadow-2xl"
+      {bikeToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-dialog-title"
+            className="w-full max-w-md border border-sf-border-strong bg-sf-surface shadow-2xl"
           >
-            <div className="mb-4">
-              <Motorbike size={24} className="text-jay-red" />
-              <h3 className="ml-3 font-display text-xl font-bold">Eliminar publicación</h3>
+            <div className="flex items-start justify-between gap-4 border-b border-sf-border p-6">
+              <div>
+                <Motorbike size={22} className="text-sf-red" />
+                <h2
+                  id="delete-dialog-title"
+                  className="mt-3 font-display text-xl uppercase text-white"
+                >
+                  Eliminar publicación
+                </h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => setBikeToDelete(null)}
+                className="text-sf-ink-500 transition-colors hover:text-white"
+                aria-label="Cerrar"
+              >
+                <X size={20} />
+              </button>
             </div>
-            <p className="text-sm text-gray-400 mb-6">
-              ¿Estás seguro de que querés eliminar <strong>"{bikeToDelete.title}"</strong>? Esta acción no se puede deshacer.
-            </p>
-            <div className="flex justify-end gap-3">
-              <Button variant="outline" onClick={() => setConfirmOpen(false)} className="flex-1">
-                Cancelar
-              </Button>
-              <Button variant="red" onClick={handleConfirmDelete} disabled={deletingId !== null} className="flex-1">
-                {deletingId === bikeToDelete.id ? 'Eliminando...' : 'Eliminar publicación'}
-              </Button>
+            <div className="p-6">
+              <p className="text-sm leading-relaxed text-sf-ink-300">
+                ¿Estás seguro de que querés eliminar{' '}
+                <strong className="text-white">“{bikeToDelete.title}”</strong>? Esta
+                acción no se puede deshacer.
+              </p>
+              <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:justify-end">
+                <button
+                  type="button"
+                  onClick={() => setBikeToDelete(null)}
+                  className="btn border border-sf-border-strong text-sf-ink-200 hover:border-white hover:text-white"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="button"
+                  onClick={handleConfirmDelete}
+                  disabled={deletingId !== null}
+                  className="btn btn-red"
+                >
+                  {deletingId === bikeToDelete.id
+                    ? 'Eliminando…'
+                    : 'Eliminar publicación'}
+                </button>
+              </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       )}
     </div>

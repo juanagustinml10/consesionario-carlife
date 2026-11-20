@@ -17,8 +17,8 @@ export const ConditionTag: React.FC<BadgeProps & { condition: BikeCondition }> =
       className={cn(
         'tag',
         overlay
-          ? nueva ? 'bg-jay-red text-white' : 'bg-white text-black'
-          : nueva ? 'bg-jay-red text-white' : tone === 'light' ? 'bg-jay-black text-white' : 'bg-white text-black'
+          ? nueva ? 'bg-sf-red text-white' : 'bg-white text-black'
+          : nueva ? 'bg-sf-red text-white' : tone === 'light' ? 'bg-sf-black text-white' : 'bg-white text-black'
       )}
     >
       {conditionLabel(condition)}
@@ -34,7 +34,7 @@ export const StatusTag: React.FC<BadgeProps & { status: BikeStatus }> = ({ statu
         ? 'bg-amber-400'
         : status === 'BORRADOR'
           ? 'bg-gray-400'
-          : 'bg-jay-red';
+          : 'bg-sf-red';
   return (
     <span
       className={cn(
@@ -46,7 +46,7 @@ export const StatusTag: React.FC<BadgeProps & { status: BikeStatus }> = ({ statu
             : 'border border-white/15 text-gray-300'
       )}
     >
-      <span className={cn('h-1.5 w-1.5 shrink-0 rounded-full', dot)} />
+      <span className={cn('h-1.5 w-1.5 shrink-0', dot)} />
       {statusLabel(status)}
     </span>
   );
@@ -57,10 +57,10 @@ export const FeaturedTag: React.FC<BadgeProps> = ({ overlay = false, tone = 'dar
     className={cn(
       'tag',
       overlay
-        ? 'border border-jay-red/60 bg-black/70 text-jay-red-soft backdrop-blur'
+        ? 'border border-sf-red/60 bg-black/70 text-sf-red-soft backdrop-blur'
         : tone === 'light'
-          ? 'border border-jay-red/50 text-jay-red'
-          : 'border border-jay-red/40 bg-jay-red/10 text-jay-red-soft'
+          ? 'border border-sf-red/50 text-sf-red'
+          : 'border border-sf-red/40 bg-sf-red/10 text-sf-red-soft'
     )}
   >
     Destacada

@@ -1,173 +1,124 @@
-# JAY MOTOS — Guía de despliegue
+# SF MOTOS — Guía de despliegue
 
-Arquitectura: **Cloudflare Pages** (SPA) → **Vercel Functions** (API Express) → **Neon** (PostgreSQL).
-Repo: `https://github.com/juanagustinml10/jay-motos` · rama `main`.
+Arquitectura prevista: **SPA (Vite/React)** → **API Express** → **PostgreSQL (Neon)**.
+El repositorio conserva la configuración de Vercel Services y Cloudflare Pages del
+proyecto original; **debe vincularse a proyectos/cuentas propias de SF MOTOS** antes de
+cualquier deploy. Este archivo no contiene secretos.
 
-> Producción verificada: API `https://jay-motos.vercel.app` · SPA `https://jay-motos.pages.dev` ·
-> PostgreSQL en Neon. Los `<...>` que aparecen más abajo son plantillas para otro proyecto;
-> este archivo no contiene secretos.
+> Estado actual: **sin infraestructura de SF MOTOS configurada**. No hay base de datos,
+> dominios ni secretos propios. Las URLs de abajo son plantillas, no producciones verificadas.
 
 ---
 
-## 1. Backend en Vercel
+## 1. Pendiente de configuración externa
 
-| Ajuste | Valor |
+| Ítem | Acción |
 | --- | --- |
-| Root Directory | `.` (raíz del repo: el proyecto usa **Vercel Services**) |
-| Framework Preset | Other (Vercel detecta `backend` = Express y `frontend` = Vite) |
-| Install Command | `npm install` (por servicio, declarado en `vercel.json` raíz) |
-| Build Command | `npm run build` (por servicio, declarado en `vercel.json` raíz) |
-| Node.js | 22.x (`engines: 22.x`) |
-| Output Directory | vacío |
+| Repositorio remoto | Crear el repo GitHub de SF MOTOS y reemplazar `origin` (hoy apunta al proyecto heredado). |
+| PostgreSQL / Neon | Crear proyecto y branch propios. Obtener cadenas pooled (`DATABASE_URL`) y directa (`DATABASE_URL_UNPOOLED`). |
+| Secretos JWT | Generar `JWT_ACCESS_SECRET` y `JWT_REFRESH_SECRET` aleatorios y distintos. |
+| Usuario admin | Definir `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` propios y ejecutar el seed **una sola vez**. |
+| Backend | Crear proyecto de Vercel (u otro host Node) e inyectar las variables de entorno. |
+| Frontend | Crear proyecto de Cloudflare Pages (u otro host estático) con `VITE_API_BASE_URL` apuntando a la API de SF MOTOS. |
+| CORS | Sumar el dominio público del frontend a `CORS_ORIGIN`. |
+| Dominio propio | Configurar DNS y sumarlo a CORS; no reutilizar dominios del proyecto anterior. |
 
-El `vercel.json` raíz define dos servicios: `backend` (Express, raíz `backend`) y
-`frontend` (Vite, raíz `frontend`). Vercel empaqueta el backend desde `src/index.ts`,
-que exporta el app por default y evita `app.listen()` cuando `VERCEL=1`.
+---
 
-Los rewrites enrutan el tráfico público: `/health` y `/api/(.*)` → backend;
-`/(.*)` → frontend. El rewrite de `/health` va antes del catch-all para que el
-health check no sea interceptado por la SPA. `backend/vercel.json` queda subordinado
-al config raíz; la fuente de verdad es `vercel.json`.
+## 2. Backend
 
-`npm run build` ejecuta `prisma generate && tsc --noEmit` (en ese orden: con una instalación limpia,
-los tipos generados por Prisma no existen hasta que corre `prisma generate`).
+`vercel.json` en la raíz define dos servicios (`backend` y `frontend`) y rewrites para
+`/health`, `/api/(.*)` y el catch-all. `backend/src/index.ts` exporta el app y evita
+`app.listen()` cuando `VERCEL=1`.
 
-### Variables de entorno obligatorias en Vercel
+Build: `npm run build` en `backend` → `prisma generate && tsc --noEmit`.
+
+### Variables de entorno
 
 | Variable | Valor |
 | --- | --- |
+| `PORT` | `4000` (solo local) |
+| `PUBLIC_BASE_URL` | URL HTTPS pública de la API SF MOTOS; requerida si `STORAGE_DRIVER=db` |
 | `DATABASE_URL` | Cadena **pooled** de Neon (hostname con `-pooler`) |
 | `DATABASE_URL_UNPOOLED` | Cadena **directa** de Neon (sin `-pooler`); la exige `directUrl` en `schema.prisma` |
-| `JWT_ACCESS_SECRET` | Aleatorio, propio de producción |
+| `JWT_ACCESS_SECRET` | Aleatorio, propio de SF MOTOS |
 | `JWT_REFRESH_SECRET` | Aleatorio, distinto del anterior |
-| `PUBLIC_BASE_URL` | `https://jay-motos.vercel.app` |
-| `CORS_ORIGIN` | `https://jay-motos.pages.dev` (y el dominio custom, separado por coma) |
-| `STORAGE_DRIVER` | `db` (bytes de las fotos en Neon) |
+| `JWT_ACCESS_TTL` | `900` |
+| `JWT_REFRESH_TTL` | `604800` |
+| `CORS_ORIGIN` | Origen(es) públicos del frontend de SF MOTOS, separados por coma |
+| `STORAGE_DRIVER` | `local` en desarrollo; `db` en producción sin disco persistente |
+| `UPLOAD_DIR` | `./uploads` (solo con `local`) |
+| `MAX_FILE_SIZE` | `4194304` |
+| `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` | Solo para el alta inicial del administrador |
 
-Opcionales: `JWT_ACCESS_TTL=900`, `JWT_REFRESH_TTL=604800`, `MAX_FILE_SIZE=4194304`.
-**No configurar** `SEED_ADMIN_*` en Vercel: el administrador ya existe en Neon y el seed no se ejecuta en deploy.
+**No configurar** `SEED_ADMIN_*` en un deploy si el usuario ya existe: el seed no se
+ejecuta automáticamente.
 
 ### Almacenamiento de fotos
 
-Vercel no tiene disco persistente: `STORAGE_DRIVER=local` solo sirve para desarrollo.
-Con `STORAGE_DRIVER=db` los bytes se guardan en Neon (`BikeImage.data`, BYTEA) y se sirven
-por la ruta pública `GET /api/images/:key`. No hacen falta credenciales S3.
-
-`PUBLIC_BASE_URL` debe ser la URL HTTPS pública del backend: se usa para construir
-`BikeImage.url = https://<backend>/api/images/<clave>`. La validación de entorno rechaza
-`localhost` cuando se usa este driver.
-
-La migración `20261119000000_add_image_blobs` ya está aplicada en Neon. Las imágenes
-legacy conservan su URL original en `legacyUrl`; `backend/scripts/migrate-images-to-db.ts`
-permite migrarlas manualmente (dry-run por defecto, `--apply` bajo responsabilidad).
+Con `STORAGE_DRIVER=db` los bytes se guardan en `BikeImage.data` (BYTEA) y se sirven por
+`GET /api/images/:key`. No requiere credenciales S3. `PUBLIC_BASE_URL` debe ser HTTPS y
+público: se usa para construir `BikeImage.url`. La validación de entorno rechaza
+`localhost` con este driver.
 
 ### Verificación posterior al deploy
 
-Con Services, backend y frontend comparten un único dominio de proyecto. Verificar:
+Reemplazar `<API_URL>` por la URL real de SF MOTOS:
 
 ```text
-GET https://jay-motos.vercel.app/health           -> 200 { "ok": true, "db": "ok" }
-GET https://jay-motos.vercel.app/api/bikes        -> 200 JSON
-GET https://jay-motos.vercel.app/api/bikes/brands -> 200 JSON
-GET https://jay-motos.vercel.app/                 -> SPA del frontend
+GET <API_URL>/health           -> 200 { "ok": true, "db": "ok" }
+GET <API_URL>/api/bikes        -> 200 JSON
+GET <API_URL>/api/bikes/brands -> 200 JSON
+GET <API_URL>/                 -> SPA del frontend (si comparten dominio)
 ```
 
-El límite de body de Vercel Functions es ~4.5 MB; por eso `MAX_FILE_SIZE=4194304`.
-
-### Si Vercel falla con `ERR_MODULE_NOT_FOUND`
-
-Síntoma: `Cannot find module '/var/task/.../src/config/env' imported from '.../src/app.js'`.
-
-Causa: el backend es ESM (`"type": "module"`) y Vercel transpila cada `.ts` a `.js` sin
-hacer bundling. Node ESM no resuelve imports relativos sin extensión, por lo que
-`./config/env` no existe: el archivo generado se llama `env.js`.
-
-Estado actual: **corregido**. Todos los imports relativos usan extensión `.js`
-(`./config/env.js`, `./routes/index.js`, etc.) y `tsconfig.json` usa
-`module`/`moduleResolution: NodeNext` para que el typecheck detecte regresiones.
-`tsx` sigue resolviendo esos specifiers a los `.ts` en desarrollo.
-
-La ruta `/var/task/backend/...` del error es coherente con el modo Services: Vercel
-compila el servicio `backend` desde la subcarpeta `backend`, con Root Directory = `.`.
-No cambiar el Root Directory a `backend`, porque el `vercel.json` raíz (que define los
-dos servicios y los rewrites) dejaría de aplicarse.
+`/health` solo confirma que Express responde: **no prueba que la API de datos funcione**.
+Si `/api/bikes` devuelve 500, revisar `DATABASE_URL`, migraciones y permisos de red.
 
 ---
 
-## 2. Frontend en Cloudflare Pages
+## 3. Frontend
 
-| Ajuste | Valor |
-| --- | --- |
-| Repositorio | `juanagustinml10/jay-motos` |
-| Rama de producción | `main` |
-| Root directory | `frontend` |
-| Framework preset | Vite |
-| Build command | `npm run build` |
-| Build output directory | `dist` |
-| Node.js | 20 o superior |
+Root directory: `frontend` · Framework: Vite · Build: `npm run build` · Output: `dist`.
 
-Variable de entorno de **build** (no de runtime):
+Variable de **build**:
 
 ```text
-VITE_API_BASE_URL=https://jay-motos.vercel.app
+VITE_API_BASE_URL=<API_URL>
 ```
 
-El código agrega `/api` automáticamente si falta, así que el frontend llama a:
-
-```text
-https://jay-motos.vercel.app/api/...
-```
-
-No hace falta configurar un proxy: el backend responde CORS para el origen de Pages.
-`frontend/public/_redirects` ya contiene `/* /index.html 200`, necesario para que rutas como
-`/motos/:slug` y `/admin/dashboard` recarguen sin 404.
-
-Si se agrega un dominio propio, sumarlo también a `CORS_ORIGIN` en Vercel.
+El agrega `/api` automáticamente si falta. `frontend/public/_redirects` contiene
+`/* /index.html 200` para que las rutas profundas recarguen sin 404.
 
 ---
 
-## 3. Seguridad y operación
+## 4. Migraciones
 
-- `.env`, `.env.*` (incluido `.env.production`) están ignorados; solo se versionan `.env.example`.
-- No hay credenciales en el frontend: `VITE_*` solo contiene la URL pública de la API.
-- El registro público de administradores fue eliminado; el alta es únicamente por seed local.
-- Las sesiones usan JWT access + refresh con rotación y filas en `Session`.
-  Los tokens viven en `localStorage`: conviene migrarlos a cookies `HttpOnly`/`Secure` en una etapa posterior.
-- No hay rate limiting en `/api/auth/login`: recomendable antes de exponer el panel a Internet.
-- `npm audit --omit=dev` reporta **0 vulnerabilidades**: se actualizaron `multer` a 2.x,
-  `@types/multer` a 2.x y `zod` a 4.x, y se fijó `deepmerge-ts` 8.x mediante `overrides`
-  (lo usa `@prisma/config` 6.19.3). Helmet, TypeScript y Prisma están fijados a las versiones
-  verificadas en el build de Vercel.
+Las migraciones versionadas en `backend/prisma/migrations` son:
 
-### Migraciones
+- `20261116000000_init`
+- `20261117000000_add_usage_hours_draft`
+- `20261119000000_add_image_blobs`
 
-Las tres migraciones (`20261116000000_init`, `20261117000000_add_usage_hours_draft`
-y `20261119000000_add_image_blobs`) ya están aplicadas en la branch `production` de Neon
-y versionadas en el repo. La tercera es aditiva: agrega columnas nullable a `BikeImage`
-sin borrar ni reescribir filas. El deploy no ejecuta migraciones ni seed. Si se apuntara a otra DB:
+**No están aplicadas en ninguna base de SF MOTOS.** contra la DB propia:
 
 ```bash
 cd backend
 npx prisma migrate deploy   # usa DATABASE_URL_UNPOOLED
 ```
 
-Nunca `db push` ni reinicio del historial de migraciones.
+Nunca `db push` ni reiniciar el historial de migraciones. El seed se ejecuta aparte
+según `backend/prisma/MIGRATIONS.md`.
 
 ---
 
-## 4. Estado verificado (19/11/2026)
+## 5. Seguridad y operación
 
-| Capa | Ubicación | Comprobación |
-| --- | --- | --- |
-| SPA | `https://jay-motos.pages.dev` | Build con `VITE_API_BASE_URL=https://jay-motos.vercel.app`; rutas `/motos` y `/admin/dashboard` recargan |
-| API | `https://jay-motos.vercel.app` | `/health`, `/api/bikes` y `/api/bikes/brands` → 200 contra Neon; CORS habilitado para Pages |
-| Datos | Neon (`branch production`) | 3 migraciones aplicadas; `prisma migrate status` sin pendientes |
-
-`VITE_API_BASE_URL` es una variable de **build**: cambiarla en Cloudflare exige un deploy nuevo.
-Si un bundle servido por Pages contiene `https://jay-motos.pages.dev` en lugar de la URL de Vercel,
-el catch-all devuelve `index.html` para `/api/*` y el frontend muestra estados vacíos.
-Para comprobarlo:
-
-```text
-https://jay-motos.pages.dev/assets/<bundle>.js  -> debe contener "jay-motos.vercel.app"
-```
+- `.env`, `.env.*` (incluido `.env.production`) están ignorados; solo se versionan `.env.example`.
+- No hay credenciales en el frontend: `VITE_*` solo contiene la URL pública de la API.
+- El registro público de administradores fue eliminado; el alta es únicamente por seed.
+- Las sesiones usan JWT access + refresh con rotación y filas en `Session`. Los tokens
+  viven en `localStorage`: migrarlos a cookies `HttpOnly`/`Secure` en una etapa posterior.
+- No hay rate limiting en `/api/auth/login`: recomendable antes de exponer el panel a Internet.
+- Antes de publicar, ejecutar `npm run build` en la raíz y verificar que no queden
+  referencias al proyecto anterior.

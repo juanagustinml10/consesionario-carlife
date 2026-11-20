@@ -46,7 +46,7 @@ export const PageIntro: React.FC<PageIntroProps> = ({
     <section
       className={cn(
         'relative overflow-hidden border-b',
-        light ? 'border-black/10 bg-[#f3f3f3] text-jay-black' : 'border-white/5 bg-jay-black text-white',
+        light ? 'border-black/10 bg-sf-paper text-sf-black' : 'border-white/5 bg-sf-black text-white',
         className
       )}
     >
@@ -55,7 +55,7 @@ export const PageIntro: React.FC<PageIntroProps> = ({
         <span
           aria-hidden="true"
           className={cn(
-            'pointer-events-none absolute bottom-[-0.3em] right-[-0.05em] hidden select-none font-display font-extrabold italic leading-none lg:block',
+            'pointer-events-none absolute bottom-[-0.3em] right-[-0.05em] hidden select-none font-display font-extrabold leading-none lg:block',
             compact ? 'text-[9rem] opacity-60 xl:text-[13rem]' : 'text-[15rem] xl:text-[20rem]',
             light ? 'text-outline-light' : 'text-outline'
           )}
@@ -63,17 +63,17 @@ export const PageIntro: React.FC<PageIntroProps> = ({
           {outline}
         </span>
       )}
-      <div className={cn('container-jay relative', compact ? 'py-6 sm:py-8' : 'py-14 sm:py-20', align === 'center' && 'text-center')}>
+      <div className={cn('container-sf relative', compact ? 'py-6 sm:py-8' : 'py-14 sm:py-20', align === 'center' && 'text-center')}>
         <div className={cn('flex flex-wrap items-center gap-3', align === 'center' && 'justify-center')}>
           {index && (
             <span className={cn(
               'font-display',
-              compact ? 'text-[10px] font-bold tracking-[0.18em] text-jay-red/90' : 'text-xs font-extrabold tracking-[0.2em] text-jay-red'
+              compact ? 'text-[10px] font-bold tracking-[0.18em] text-sf-red/90' : 'text-xs font-extrabold tracking-[0.2em] text-sf-red'
             )}>
               {index}
             </span>
           )}
-          <span className={cn('h-px bg-jay-red', compact ? 'w-6 opacity-70' : 'w-10')} />
+          <span className={cn('h-px bg-sf-red', compact ? 'w-6 opacity-70' : 'w-10')} />
           <span className={cn(
             'font-display font-bold uppercase',
             compact
@@ -87,7 +87,7 @@ export const PageIntro: React.FC<PageIntroProps> = ({
           className={cn(
             'font-display font-extrabold uppercase',
             titleSize,
-            light ? 'text-jay-black' : 'text-white'
+            light ? 'text-sf-black' : 'text-white'
           )}
         >
           {title}

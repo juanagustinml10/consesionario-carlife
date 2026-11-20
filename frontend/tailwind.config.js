@@ -5,7 +5,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        jay: {
+        sf: {
           white: '#FFFFFF',
           black: '#111111',
           red: '#E32636',

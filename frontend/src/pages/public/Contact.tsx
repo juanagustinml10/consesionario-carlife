@@ -15,7 +15,7 @@ const EMPTY_FORM: ConsultaForm = { nombre: '', email: '', telefono: '', mensaje:
 
 /** Arma el texto de la consulta sin enviarlo a ningún servidor. */
 const buildConsultaMessage = (form: ConsultaForm) => [
-  `Hola JAY MOTOS! Mi nombre es ${form.nombre.trim()}.`,
+  `Hola SF MOTOS! Mi nombre es ${form.nombre.trim()}.`,
   `Email: ${form.email.trim()}`,
   form.telefono.trim() ? `Teléfono: ${form.telefono.trim()}` : '',
   '',
@@ -24,7 +24,7 @@ const buildConsultaMessage = (form: ConsultaForm) => [
 ].filter((line, index) => index === 0 || line !== '').join('\n');
 
 // Mismo embed que ya usa la Home, para que el mapa se comporte igual en todo el sitio.
-const MAPS_EMBED = 'https://www.google.com/maps?q=Corrientes+1440+Tucuman+Argentina&output=embed';
+const MAPS_EMBED = 'https://www.google.com/maps?q=9+de+Julio+119+Juan+B.+Alberdi+Tucuman+Argentina&output=embed';
 
 export const Contact: React.FC = () => {
   const [form, setForm] = useState<ConsultaForm>(EMPTY_FORM);
@@ -45,18 +45,18 @@ export const Contact: React.FC = () => {
   };
 
   return (
-    <div className="bg-jay-black text-jay-white">
+    <div className="bg-sf-black text-sf-white">
       {/* 01 / Encabezado */}
       <PageIntro
         index="01"
-        eyebrow="Contacto · JAY MOTOS"
-        title={<>Hablemos<br /><span className="text-jay-red">en la calle</span></>}
+        eyebrow="Contacto · SF MOTOS"
+        title={<>Hablemos<br /><span className="text-sf-red">en la calle</span></>}
         outline="HOLA"
         description={
           <>
             <p>Escribinos, vení a la concesionaria o hablemos por WhatsApp. Estamos en {BUSINESS.address}.</p>
             <p className="mt-2 flex items-center gap-2 text-xs text-gray-500">
-              <MapPin size={14} className="text-jay-red" /> Tucumán, Argentina · {BUSINESS.shippingLabel}
+              <MapPin size={14} className="text-sf-red" /> Tucumán, Argentina · {BUSINESS.shippingLabel}
             </p>
           </>
         }
@@ -64,25 +64,25 @@ export const Contact: React.FC = () => {
 
       {/* 02 / Formulario + puntos de contacto */}
       <section className="track-lines">
-        <div className="container-jay grid gap-8 py-14 sm:py-20 lg:grid-cols-12 lg:gap-10">
+        <div className="container-sf grid gap-8 py-14 sm:py-20 lg:grid-cols-12 lg:gap-10">
           {/* Formulario */}
           <div className="lg:col-span-7">
             <div className="mb-5 flex items-center gap-3">
-              <span className="font-display text-xs font-extrabold tracking-[0.2em] text-jay-red">02</span>
-              <span className="h-px w-10 bg-jay-red" />
+              <span className="font-display text-xs font-extrabold tracking-[0.2em] text-sf-red">02</span>
+              <span className="h-px w-10 bg-sf-red" />
               <span className="font-display text-[10px] font-bold uppercase tracking-[0.35em] text-gray-500">Escribinos</span>
             </div>
 
             <div className="panel relative p-6 sm:p-8">
-              <div className="absolute inset-x-0 top-0 h-[3px] bg-jay-red" aria-hidden="true" />
+              <div className="absolute inset-x-0 top-0 h-[3px] bg-sf-red" aria-hidden="true" />
 
               {sent ? (
                 <div className="flex min-h-[24rem] flex-col items-center justify-center text-center">
                   <div className="flex h-16 w-16 items-center justify-center border border-green-400/40 bg-green-400/10 text-green-400">
                     <CheckCircle size={34} />
                   </div>
-                  <h2 className="mt-6 font-display text-4xl font-extrabold uppercase italic leading-[0.9] text-white sm:text-5xl">
-                    Consulta <span className="text-jay-red">preparada</span>
+                  <h2 className="mt-6 font-display text-4xl font-extrabold uppercase leading-[0.9] text-white sm:text-5xl">
+                    Consulta <span className="text-sf-red">preparada</span>
                   </h2>
                   <p className="mt-3 max-w-md text-sm leading-relaxed text-gray-400">
                     Abrimos WhatsApp con los datos que ingresaste. Revisá la ventana nueva y enviá el mensaje
@@ -103,8 +103,8 @@ export const Contact: React.FC = () => {
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="flex items-start gap-3 border border-white/10 bg-jay-elevated/60 p-4">
-                    <MessageCircle size={18} className="mt-0.5 shrink-0 text-jay-red" />
+                  <div className="flex items-start gap-3 border border-white/10 bg-sf-elevated/60 p-4">
+                    <MessageCircle size={18} className="mt-0.5 shrink-0 text-sf-red" />
                     <p className="text-xs leading-relaxed text-gray-400">
                       Este formulario prepara tu consulta en WhatsApp. No envía datos a un servidor: el mensaje se envía
                       cuando lo confirmás en la app.
@@ -131,7 +131,7 @@ export const Contact: React.FC = () => {
                       id="mensaje"
                       required
                       rows={5}
-                      placeholder="Quiero información sobre una moto enduro publicada..."
+                      placeholder="Quiero información sobre una moto publicada..."
                       value={form.mensaje}
                       onChange={update('mensaje')}
                       className="field h-auto resize-y py-4 leading-relaxed"
@@ -149,20 +149,20 @@ export const Contact: React.FC = () => {
           {/* Contacto directo + mapa */}
           <div className="space-y-5 lg:col-span-5">
             <div className="mb-5 flex items-center gap-3">
-              <span className="font-display text-xs font-extrabold tracking-[0.2em] text-jay-red">03</span>
-              <span className="h-px w-10 bg-jay-red" />
+              <span className="font-display text-xs font-extrabold tracking-[0.2em] text-sf-red">03</span>
+              <span className="h-px w-10 bg-sf-red" />
               <span className="font-display text-[10px] font-bold uppercase tracking-[0.35em] text-gray-500">Encontranos</span>
             </div>
 
             {/* WhatsApp destacado */}
-            <div className="relative overflow-hidden bg-jay-red p-6 sm:p-7">
-              <div className="pointer-events-none absolute -right-6 -top-8 select-none font-display text-[10rem] font-extrabold italic leading-none text-white/10" aria-hidden="true">
+            <div className="relative overflow-hidden bg-sf-red p-6 sm:p-7">
+              <div className="pointer-events-none absolute -right-6 -top-8 select-none font-display text-[10rem] font-extrabold leading-none text-white/10" aria-hidden="true">
                 WA
               </div>
               <div className="relative">
                 <MessageCircle size={30} className="text-white" />
                 <p className="mt-5 font-display text-[10px] font-bold uppercase tracking-[0.3em] text-white/70">Canal directo</p>
-                <p className="mt-1 font-display text-4xl font-extrabold uppercase italic leading-[0.9] text-white sm:text-5xl">
+                <p className="mt-1 font-display text-4xl font-extrabold uppercase leading-[0.9] text-white sm:text-5xl">
                   WhatsApp
                 </p>
                 <p className="mt-3 text-sm text-white/85">{BUSINESS.phoneDisplay}</p>
@@ -170,7 +170,7 @@ export const Contact: React.FC = () => {
                   href={waGeneral}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-6 inline-flex w-full items-center justify-center gap-2 border border-white bg-white px-6 py-4 font-display text-xs font-extrabold uppercase tracking-[0.2em] text-jay-red transition-colors hover:bg-transparent hover:text-white"
+                  className="mt-6 inline-flex w-full items-center justify-center gap-2 border border-white bg-white px-6 py-4 font-display text-xs font-extrabold uppercase tracking-[0.2em] text-sf-red transition-colors hover:bg-transparent hover:text-white"
                 >
                   Abrir WhatsApp ahora <ArrowUpRight size={16} />
                 </a>
@@ -180,14 +180,14 @@ export const Contact: React.FC = () => {
             {/* Dirección + mapa */}
             <div className="panel">
               <div className="flex items-start gap-3 border-b border-white/8 p-5">
-                <MapPin size={19} className="mt-0.5 shrink-0 text-jay-red" />
+                <MapPin size={19} className="mt-0.5 shrink-0 text-sf-red" />
                 <div>
                   <p className="field-label">Concesionaria</p>
                   <p className="mt-1 font-display text-xl font-bold uppercase leading-tight text-white">{BUSINESS.address}</p>
                 </div>
               </div>
               <iframe
-                title="Mapa de JAY MOTOS en Corrientes 1440, Tucumán"
+                title="Mapa de SF MOTOS en 9 de Julio 119, Juan B. Alberdi, Tucumán"
                 src={MAPS_EMBED}
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
@@ -200,22 +200,22 @@ export const Contact: React.FC = () => {
                 rel="noopener noreferrer"
                 className="flex items-center justify-between gap-2 border-t border-white/8 px-5 py-4 font-display text-[11px] font-bold uppercase tracking-[0.2em] text-gray-300 transition-colors hover:text-white"
               >
-                <span className="flex items-center gap-2"><Navigation size={15} className="text-jay-red" /> Abrir en Google Maps</span>
+                <span className="flex items-center gap-2"><Navigation size={15} className="text-sf-red" /> Abrir en Google Maps</span>
                 <ArrowUpRight size={15} />
               </a>
             </div>
 
             {/* Datos secundarios */}
             <div className="grid gap-px border border-white/8 bg-white/8 sm:grid-cols-2">
-              <div className="flex items-start gap-3 bg-jay-surface p-5">
-                <Truck size={19} className="shrink-0 text-jay-red" />
+              <div className="flex items-start gap-3 bg-sf-surface p-5">
+                <Truck size={19} className="shrink-0 text-sf-red" />
                 <div>
                   <p className="field-label">Envíos</p>
                   <p className="mt-1 text-xs leading-relaxed text-gray-300">{BUSINESS.shippingLabel}</p>
                 </div>
               </div>
-              <div className="flex items-start gap-3 bg-jay-surface p-5">
-                <Phone size={19} className="shrink-0 text-jay-red" />
+              <div className="flex items-start gap-3 bg-sf-surface p-5">
+                <Phone size={19} className="shrink-0 text-sf-red" />
                 <div>
                   <p className="field-label">Teléfono</p>
                   <p className="mt-1 text-xs leading-relaxed text-gray-300">{BUSINESS.phoneDisplay}</p>

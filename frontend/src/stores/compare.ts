@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import type { Bike } from '@/types';
 
-const STORAGE_KEY = 'jay_motors_compare';
+const STORAGE_KEY = 'sf_motos_compare';
 const MAX_COMPARE = 2;
 
 interface CompareState {

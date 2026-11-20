@@ -1,4 +1,4 @@
-# AGENTS.md — JAY MOTOS
+# AGENTS.md — SF MOTOS
 
 ## Stack y disposición del repo
 
@@ -48,18 +48,18 @@ No existe `tsc` en el root; siempre invocarlo con `--prefix` o dentro de cada ca
 
 ## Datos oficiales (no cambiar)
 
-Nombre: **JAY MOTOS** · Eslogan: **FOR RIDERS, BY RIDERS.** · Dirección: **Corrientes 1440, Tucumán, Argentina** · WhatsApp/Tel: **3812212048** → `wa.me/5493812212048` · Envíos a todo el país · Especialidad: multimarca, identidad enduro/off-road · 0 km y usadas seleccionadas.
+Nombre: **SF MOTOS** · Eslogan: **POTENCIA EN CADA ARRANQUE.** · Dirección: **9 de Julio 119, Juan B. Alberdi, Tucumán, Argentina** · WhatsApp/Tel: **3812011613** → `wa.me/5493812011613` · Actividad: venta de motocicletas 0 km y usadas.
 
-**No inventar años, clientes, garantías, financiación ni promociones.** Constantes centralizadas en `frontend/src/lib/constants.ts` (`BUSINESS`), no duplicar inline.
+**No inventar años, clientes, garantías, financiación, envíos, promociones ni especialidades no confirmadas.** Constantes centralizadas en `frontend/src/lib/constants.ts` (`BUSINESS`), no duplicar inline.
 
 ## Convenciones y trampas concretas
 
 - **Alias `@` → `frontend/src`** (tsconfig.app.json + vite.config.ts). Usar `@/...` en imports, no relativos `../../`.
-- **Tailwind v4:** los tokens/estilos viven en `src/index.css` (`@import "tailwindcss"` + `@theme { --color-jay-* }`). Edit `index.css`, no `tailwind.config.js` (ese archivo es legado de v3).
-- **Logo oficial:** `logo agencia.jpeg` (raíz, intacto). El web usa `frontend/public/logo/logo-jaymotos-transparent.png` (alfa + relleno negro `#111111`). **No redibujar, no recolorear, no inventar una variante SVG.** Si se quiere nueva versión, partir del JPEG.
+- **Tailwind v4:** los tokens/estilos viven en `src/index.css` (`@import "tailwindcss"` + `@theme { --color-sf-* }`). Edit `index.css`, no `tailwind.config.js` (ese archivo es legado de v3).
+- **Logo oficial:** fuente original `LOGO SF MOTOS - copia.jpeg` (raíz, intacta). El web usa `frontend/public/logo/sf-motos-black.png` y `sf-motos-white.png` (variantes sobre fondo claro/oscuro), generadas con `py tools/sf-logo-assets.py` sin redibujar el trazo. **No redibujar, no recolorear, no inventar una variante SVG.** Si se quiere nueva versión, partir del JPEG original.
 - **Créditos fotográficos a conservar** en footer: Beta RR Freenduro (CC BY 4.0, Jimmy Boakes / Jix31) y KTM forest (CC BY 3.0, Tim Gotzkowsky).
 - **Rutas públicas deben quedar dentro de `<PublicLayout>`** (wrapper de `App.tsx` con Navbar + Outlet + Footer). No agregar `<Navbar>` manualmente en páginas públicas.
-- **Panel admin:** `ProtectedRoute` lee `localStorage` (`jay_motors_access_token`); sin backend real el panel no puede autenticar.
+- **Panel admin:** `ProtectedRoute` lee `localStorage` (`sf_motos_access_token`); sin backend real el panel no puede autenticar.
 - **`.gitignore` excluye `backend/.env`**; solo `.env.example` (valores placeholder). **Nunca commitear `backend/.env`** ni credenciales.
 - **Backend usa `tsx` en runtime** (no compila a `dist/` para ejecución); `tsc --noEmit` es solo validación de tipos. No esperes `dist/backend/serve.js`.
 - **Windows paths con espacios** — siempre con comillas cuando toque fuera de los scripts; `dev.mjs` se resuelve relativa al repo, no al CWD.
@@ -74,4 +74,4 @@ Nombre: **JAY MOTOS** · Eslogan: **FOR RIDERS, BY RIDERS.** · Dirección: **Co
 
 ## Repositorio remoto
 
-`origin` = https://github.com/juanagustinml10/jay-motos (público). `main` 1 commit ahead de `origin/main` al momento de escribir (no pusheado automáticamente). Formato de commits: `tipo(alcance): resumen en español`.
+`origin` todavía apunta al repositorio heredado de JAY MOTOS. **Pendiente:** crear el remoto propio de SF MOTOS y reemplazarlo antes de cualquier push. Formato de commits: `tipo(alcance): resumen en español`.

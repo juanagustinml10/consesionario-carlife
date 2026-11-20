@@ -25,16 +25,16 @@ export const SectionHeading: React.FC<SectionHeadingProps> = ({
 }) => {
   const light = tone === 'light';
   return (
-    <div className="mb-8 flex flex-col gap-5 border-t border-jay-red/60 pt-5 sm:mb-12 sm:flex-row sm:items-end sm:justify-between">
+    <div className="mb-8 flex flex-col gap-5 border-t-2 border-sf-red pt-5 sm:mb-12 sm:flex-row sm:items-end sm:justify-between">
       <div>
         <div className="flex items-center gap-3">
-          {index && <span className="font-display text-xs font-extrabold tracking-[0.2em] text-jay-red">{index}</span>}
-          <span className={cn('eyebrow', light && '!text-jay-red')}>{eyebrow}</span>
+          {index && <span className="font-display text-xs font-extrabold tracking-[0.2em] text-sf-red">{index}</span>}
+          <span className={cn('eyebrow', light && '!text-sf-red')}>{eyebrow}</span>
         </div>
         <h2 className={cn(
-          'mt-2 font-display font-extrabold uppercase italic leading-[0.88]',
+          'mt-2 font-display font-extrabold uppercase leading-[0.88]',
           size === 'large' ? 'text-5xl sm:text-7xl lg:text-8xl' : 'text-4xl sm:text-6xl',
-          light ? 'text-jay-black' : 'text-white'
+          light ? 'text-sf-black' : 'text-white'
         )}>
           {title}
         </h2>
@@ -45,8 +45,8 @@ export const SectionHeading: React.FC<SectionHeadingProps> = ({
           className={cn(
             'inline-flex shrink-0 items-center gap-2 border-b pb-1 font-display text-xs font-extrabold uppercase tracking-[0.2em] transition-colors',
             light
-              ? 'border-black/20 text-black/70 hover:border-jay-red hover:text-jay-red'
-              : 'border-white/20 text-gray-300 hover:border-jay-red hover:text-white'
+              ? 'border-black/20 text-black/70 hover:border-sf-red hover:text-sf-red'
+              : 'border-white/20 text-gray-300 hover:border-sf-red hover:text-white'
           )}
         >
           {actionLabel} <ArrowUpRight size={16} />

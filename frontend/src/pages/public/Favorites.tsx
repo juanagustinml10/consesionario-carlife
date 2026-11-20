@@ -47,11 +47,11 @@ export const Favorites: React.FC = () => {
 
   if (ids.length === 0) {
     return (
-      <div className="container-jay flex min-h-[75vh] items-center py-12 sm:py-16">
+      <div className="container-sf flex min-h-[75vh] items-center py-12 sm:py-16">
         <EmptyState
           icon={<Heart size={30} />}
           code="00"
-          title={<>Aún no hay <span className="text-jay-red">favoritos</span></>}
+          title={<>Aún no hay <span className="text-sf-red">favoritos</span></>}
           description="Tocá el corazón en las motos que te gusten y guardalas aquí para consultarlas después."
           actions={
             <Link to="/motos" className="btn btn-red px-7 py-4 text-xs">
@@ -65,7 +65,7 @@ export const Favorites: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-jay-black pb-16 text-jay-white">
+    <div className="min-h-screen bg-sf-black pb-16 text-sf-white">
       {/* 01 / Encabezado */}
       <PageIntro
         index="01"
@@ -86,10 +86,10 @@ export const Favorites: React.FC = () => {
       />
 
       {/* 02 / Listado */}
-      <section className="container-jay py-12 sm:py-16">
+      <section className="container-sf py-12 sm:py-16">
         <div className="mb-6 flex items-center gap-3">
-          <span className="font-display text-xs font-extrabold tracking-[0.2em] text-jay-red">02</span>
-          <span className="h-px w-10 bg-jay-red" />
+          <span className="font-display text-xs font-extrabold tracking-[0.2em] text-sf-red">02</span>
+          <span className="h-px w-10 bg-sf-red" />
           <span className="font-display text-[10px] font-bold uppercase tracking-[0.35em] text-gray-500">Motos guardadas</span>
         </div>
 
@@ -107,7 +107,7 @@ export const Favorites: React.FC = () => {
           <EmptyState
             icon={<SearchX size={30} />}
             code="404"
-            title={<>Ya no están <span className="text-jay-red">publicadas</span></>}
+            title={<>Ya no están <span className="text-sf-red">publicadas</span></>}
             description="No encontramos las motos guardadas en el catálogo actual. Pueden haber dejado de estar publicadas."
             actions={
               <Link to="/motos" className="btn btn-red px-7 py-4 text-xs">

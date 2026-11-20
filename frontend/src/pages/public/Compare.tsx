@@ -46,16 +46,16 @@ export const Compare: React.FC = () => {
     const detalle = bikes
       .map((bike) => `${bike.title} (${bike.year}) — ${formatPrice(bike.price, bike.currency)}`)
       .join('\n');
-    return buildWhatsAppLink(`Hola JAY MOTOS! Me interesan estas motos:\n${detalle}`);
+    return buildWhatsAppLink(`Hola SF MOTOS! Me interesan estas motos:\n${detalle}`);
   }, [bikes]);
 
   if (bikes.length === 0) {
     return (
-      <div className="container-jay flex min-h-[75vh] items-center py-12 sm:py-16">
+      <div className="container-sf flex min-h-[75vh] items-center py-12 sm:py-16">
         <EmptyState
           icon={<Scale size={30} />}
           code="00"
-          title={<>Comparador <span className="text-jay-red">vacío</span></>}
+          title={<>Comparador <span className="text-sf-red">vacío</span></>}
           description="Agregá hasta dos motos desde el catálogo y compará año, cilindrada, kilometraje y precio lado a lado."
           actions={
             <Link to="/motos" className="btn btn-red px-7 py-4 text-xs">
@@ -69,7 +69,7 @@ export const Compare: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-jay-black pb-16 text-jay-white">
+    <div className="min-h-screen bg-sf-black pb-16 text-sf-white">
       {/* 01 / Encabezado */}
       <PageIntro
         index="01"
@@ -90,19 +90,19 @@ export const Compare: React.FC = () => {
       />
 
       {/* 02 / Tabla comparativa */}
-      <section className="container-jay py-12 sm:py-16">
+      <section className="container-sf py-12 sm:py-16">
         <div className="mb-5 flex items-center gap-3">
-          <span className="font-display text-xs font-extrabold tracking-[0.2em] text-jay-red">02</span>
-          <span className="h-px w-10 bg-jay-red" />
+          <span className="font-display text-xs font-extrabold tracking-[0.2em] text-sf-red">02</span>
+          <span className="h-px w-10 bg-sf-red" />
           <span className="font-display text-[10px] font-bold uppercase tracking-[0.35em] text-gray-500">Ficha comparativa</span>
         </div>
 
         <div className="panel relative overflow-x-auto">
-          <div className="absolute inset-x-0 top-0 h-[3px] bg-jay-red" aria-hidden="true" />
+          <div className="absolute inset-x-0 top-0 h-[3px] bg-sf-red" aria-hidden="true" />
           <table className="w-full min-w-[640px] border-collapse text-left">
             <thead>
               <tr className="border-b border-white/10">
-                <th scope="col" className="sticky left-0 z-10 bg-jay-surface px-5 py-4 text-[10px] font-bold uppercase tracking-[0.25em] text-gray-500">
+                <th scope="col" className="sticky left-0 z-10 bg-sf-surface px-5 py-4 text-[10px] font-bold uppercase tracking-[0.25em] text-gray-500">
                   Característica
                 </th>
                 {bikes.map((bike) => (
@@ -118,13 +118,13 @@ export const Compare: React.FC = () => {
                         </div>
                         <div className="min-w-0">
                           <p className="truncate font-display text-base font-bold uppercase leading-tight text-white">{bike.title}</p>
-                          <p className="text-[10px] font-semibold uppercase tracking-wider text-jay-red-soft">{bike.brand?.name ?? ''}</p>
+                          <p className="text-[10px] font-semibold uppercase tracking-wider text-sf-red-soft">{bike.brand?.name ?? ''}</p>
                         </div>
                       </div>
                       <button
                         type="button"
                         onClick={() => remove(bike.id)}
-                        className="flex h-8 w-8 shrink-0 items-center justify-center border border-white/10 text-gray-400 transition-colors hover:border-jay-red hover:bg-jay-red/10 hover:text-white"
+                        className="flex h-8 w-8 shrink-0 items-center justify-center border border-white/10 text-gray-400 transition-colors hover:border-sf-red hover:bg-sf-red/10 hover:text-white"
                         aria-label={`Quitar ${bike.title} del comparador`}
                       >
                         <X size={15} />
@@ -140,7 +140,7 @@ export const Compare: React.FC = () => {
                 const allEqual = values.every((value) => value === values[0]);
                 return (
                   <tr key={attr.label} className={cn('border-b border-white/5 last:border-0', index % 2 === 1 && 'bg-white/[0.02]')}>
-                    <th scope="row" className="sticky left-0 z-10 bg-jay-surface px-5 py-4 text-left text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500">
+                    <th scope="row" className="sticky left-0 z-10 bg-sf-surface px-5 py-4 text-left text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500">
                       {attr.label}
                     </th>
                     {values.map((value, valueIndex) => (
@@ -164,7 +164,7 @@ export const Compare: React.FC = () => {
             <article key={bike.id} className="panel group overflow-hidden">
               <div className="relative aspect-[16/10] bg-black">
                 {bike.images?.[0] ? (
-                  <img src={bike.images[0].url} alt={bike.title} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" loading="lazy" />
+                  <img src={bike.images[0].url} alt={bike.title} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" loading="lazy" />
                 ) : (
                   <ImagePlaceholder width={640} height={400} label="Foto no disponible" className="h-full w-full" />
                 )}
@@ -173,10 +173,10 @@ export const Compare: React.FC = () => {
                 </div>
               </div>
               <div className="border-t border-white/8 p-5">
-                <p className="font-display text-[10px] font-semibold uppercase tracking-[0.25em] text-jay-red-soft">{bike.brand?.name}</p>
+                <p className="font-display text-[10px] font-semibold uppercase tracking-[0.25em] text-sf-red-soft">{bike.brand?.name}</p>
                 <h3 className="mt-1 font-display text-2xl font-bold uppercase leading-tight text-white">{bike.title}</h3>
                 <p className="mt-2 font-display text-xl font-extrabold text-white">{formatPrice(bike.price, bike.currency)}</p>
-                <Link to={`/motos/${bike.slug}`} className="mt-4 inline-flex items-center gap-1.5 border-b border-white/20 pb-1 font-display text-xs font-bold uppercase tracking-[0.2em] text-gray-300 transition-colors hover:border-jay-red hover:text-white">
+                <Link to={`/motos/${bike.slug}`} className="mt-4 inline-flex items-center gap-1.5 border-b border-white/20 pb-1 font-display text-xs font-bold uppercase tracking-[0.2em] text-gray-300 transition-colors hover:border-sf-red hover:text-white">
                   Ver ficha completa <ChevronRight size={14} />
                 </Link>
               </div>
@@ -186,14 +186,14 @@ export const Compare: React.FC = () => {
       </section>
 
       {/* 03 / Cierre */}
-      <section className="container-jay">
-        <div className="relative overflow-hidden border border-jay-red/25 bg-jay-surface p-6 sm:p-9">
-          <div className="pointer-events-none absolute -right-4 -top-10 select-none font-display text-[10rem] font-extrabold italic leading-none text-outline sm:text-[14rem]" aria-hidden="true">JAY</div>
+      <section className="container-sf">
+        <div className="relative overflow-hidden border border-sf-red/25 bg-sf-surface p-6 sm:p-9">
+          <div className="pointer-events-none absolute -right-4 -top-10 select-none font-display text-[10rem] font-extrabold leading-none text-outline sm:text-[14rem]" aria-hidden="true">SF</div>
           <div className="relative flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-center">
             <div>
               <span className="section-index">Siguiente paso</span>
-              <p className="mt-4 font-display text-3xl font-extrabold uppercase italic leading-[0.9] text-white sm:text-5xl">
-                ¿Ya te <span className="text-jay-red">decidiste?</span>
+              <p className="mt-4 font-display text-3xl font-extrabold uppercase leading-[0.9] text-white sm:text-5xl">
+                ¿Ya te <span className="text-sf-red">decidiste?</span>
               </p>
               <p className="mt-2 text-sm text-gray-400">Consultanos disponibilidad de estas motos por WhatsApp.</p>
             </div>

@@ -1,142 +1,129 @@
-# JAY MOTOS — Concesionaria Digital
+# SF MOTOS — Plataforma web
 
-Plataforma web para la concesionaria de motocicletas **JAY MOTOS**: catálogo público de motos **0 km y usadas**, ficha individual, comparador, favoritos, consultas por WhatsApp y panel administrativo privado para gestionar las publicaciones.
+Sitio público y panel administrativo para **SF MOTOS**: catálogo de motocicletas 0 km y
+usadas, fichas de detalle, comparador, favoritos, consultas por WhatsApp y gestión
+privada de publicaciones e imágenes.
 
-## Stack tecnológico
+**Datos oficiales:** 9 de Julio 119, Juan B. Alberdi, Tucumán, Argentina · WhatsApp/Tel
+381 201-1613 · `POTENCIA EN CADA ARRANQUE.` No se inventan garantías, financiación,
+promociones, envíos ni especialidades no confirmadas.
+
+## Stack
 
 | Capa | Tecnología |
 | --- | --- |
-| Frontend | React 18 + Vite + TypeScript, Tailwind CSS v4, Framer Motion, Zustand, Axios, React Router, Lucide Icons |
-| Backend | Node.js + Express + TypeScript |
-| ORM / Base de datos | Prisma + PostgreSQL |
-| Autenticación | JWT (access + refresh) con sesiones en base de datos, bcryptjs |
+| Frontend | React 19 + Vite 8 + TypeScript, Tailwind CSS v4, Zustand, Axios, React Router 7, Lucide |
+| Backend | Node.js ≥ 18 + Express 4 + TypeScript (runtime con `tsx`) |
+| ORM / DB | Prisma 6 + PostgreSQL (Neon recomendado) |
+| Autenticación | JWT access + refresh con sesiones en DB y contraseñas hasheadas con bcryptjs |
 | Validación | Zod |
-| Subida de imágenes | Multer + disco local en desarrollo, bucket S3-compatible en producción |
+| Imágenes | Multer; `local` en desarrollo, `db` (BYTEA en Postgres) para producción |
 
-## Estructura del monorepo
+> El diseño visual es propio de SF MOTOS: paleta negro/rojo/blanco, tipografía
+> condensada y geometría recta. No se usa Framer Motion.
 
+## Estructura
+
+```text
+.
+├── frontend/                 # SPA pública + panel admin
+│   ├── public/logo/          # variantes SF generadas desde el JPEG oficial
+│   └── src/
+│       ├── components/       # ui/, shared/, public/, admin/
+│       ├── pages/            # public/, admin/
+│       ├── layout/           # PublicLayout, Navbar, Footer, admin/AdminLayout
+│       ├── services/         # clientes API (bikes, auth, stats)
+│       ├── stores/           # favoritos y comparador (localStorage)
+│       └── lib/constants.ts  # datos oficiales de SF MOTOS
+├── backend/                  # API REST
+│   ├── src/                  # app, config, middleware, routes, controllers, services
+│   ├── prisma/               # schema, migrations, seed
+│   └── .env.example
+├── scripts/dev.mjs           # levanta backend + frontend juntos
+└── vercel.json               # configuración de servicios/rewrites (si se usa Vercel)
 ```
-consesionaria motos/
-├── frontend/                 # Aplicación pública + panel admin (SPA)
-│   ├── src/
-│   │   ├── components/       # ui/ (Button, Card…), shared/, public/, admin/
-│   │   ├── pages/            # public/ (Home, Catalog, BikeDetail, Compare, Favorites, About, Contact)
-│   │   │                       admin/ (Login, Dashboard, Bikes, BikeForm)
-│   │   ├── layout/           # Navbar, Footer, admin/AdminLayout
-│   │   ├── services/         # Clientes API (bikes, auth, stats) con Axios
-│   │   ├── stores/           # Zustand (favoritos, comparador) con persistencia localStorage
-│   │   ├── hooks/, lib/, types/, assets/
-│   │   └── main.tsx, App.tsx
-│   ├── .env.example
-│   ├── tailwind.config.js, postcss.config.js
-│   └── vite.config.ts        # Alias "@" -> src, proxy /api -> localhost:4000
-│
-└── backend/                  # API REST
-    ├── src/
-    │   ├── config/env.ts     # Entorno validado con Zod
-    │   ├── lib/prisma.ts
-    │   ├── middleware/       # auth (JWT), asyncHandler, error handler
-    │   ├── routes/           # /api/auth, /api/bikes, /api/stats
-    │   ├── controllers/, services/
-    │   └── app.ts, index.ts
-    ├── prisma/
-    │   ├── schema.prisma     # Brand, Bike, BikeImage, BikeFeature, BikeVisit, AdminUser, Session
-    │   └── seed.ts           # Crea el admin inicial desde variables de entorno
-    └── .env.example
-```
-
-## Requisitos
-
-- Node.js ≥ 18 (probado con Node 24)
-- Una base de datos **PostgreSQL** accesible (local, Neon o cualquier proveedor compatible)
 
 ## Puesta en marcha
 
 ```bash
-# Levantar backend + frontend juntos (recomendado)
 npm install
-npm run dev   # backend en http://localhost:4000 y frontend en http://localhost:5173
+npm run dev
+# backend: http://localhost:4000 · frontend: http://localhost:5173
 ```
 
 Si preferís hacerlo por separado:
 
 ```bash
-# Backend
 cd backend
 cp .env.example .env
-# Editá .env con los datos reales de tu PostgreSQL y secretos propios
+# Editá .env con tu propia PostgreSQL y secretos
 npm install
-npx prisma migrate dev --name init   # crea las tablas en la base de datos
-npm run prisma:seed                  # crea el administrador inicial (usa SEED_ADMIN_*)
-npm run dev                          # http://localhost:4000
+npx prisma migrate deploy
+npm run prisma:seed
+npm run dev
 
-# Frontend
 cd ../frontend
 cp .env.example .env
 npm install
-npm run dev                        # http://localhost:5173
+npm run dev
 ```
 
-Endpoints principales:
+> En Windows con este harness, si hace falta lanzar manualmente:
+> `node node_modules/tsx/dist/cli.mjs watch src/index.ts` en `backend` y
+> `node node_modules/vite/bin/vite.js` en `frontend`.
 
-- `GET /health`
+## Compilación y chequeos
+
+```bash
+npm run build
+cd frontend && npx tsc --noEmit -p tsconfig.app.json
+cd frontend && npm run lint
+cd backend && npx tsc --noEmit
+```
+
+Si `prisma generate` falla con `EPERM` en Windows, detené el dev server del backend:
+el query engine queda bloqueado.
+
+## Endpoints principales
+
+- `GET /health` (solo verifica que Express esté vivo)
 - `POST /api/auth/login`, `POST /api/auth/refresh`, `POST /api/auth/logout`
-- `GET /api/bikes` (filtros: `q`, `brand`, `model`, `year`, `condition`, `priceMin`, `priceMax`, `status`, `featured`, `page`, `limit`)
-- `GET /api/bikes/slug/:slug`, `GET /api/bikes/:id`
-- `POST /api/bikes` (auth), `PATCH /api/bikes/:id` (auth), `DELETE /api/bikes/:id` (auth)
+- `GET /api/bikes` con filtros `q`, `brand`, `model`, `year`, `condition`, `priceMin`,
+  `priceMax`, `status`, `featured`, `page`, `limit`
+- `GET /api/bikes/slug/:slug`, `GET /api/bikes/:id`, `GET /api/bikes/brands`
+- `POST /api/bikes`, `PATCH /api/bikes/:id`, `DELETE /api/bikes/:id` (auth)
 - `POST /api/bikes/:id/images` (auth, multipart `images[]`)
-- `PATCH /api/bikes/:id/images/:imageId/primary` (auth), `DELETE /api/bikes/:id/images/:imageId` (auth)
-- `POST /api/bikes/:id/visits` (pública, contabiliza visita)
+- `PATCH /api/bikes/:id/images/:imageId/primary`, `DELETE /api/bikes/:id/images/:imageId` (auth)
+- `POST /api/bikes/:id/visits` (público)
 - `GET /api/stats/dashboard`, `GET /api/stats/recent-bikes` (auth)
-- `GET /api/bikes/brands`
 
-### 2. Frontend
+## Variables de entorno
 
-```bash
-cd frontend
-npm install
-cp .env.example .env
-npm run dev                        # http://localhost:5173
-```
-
-### 3. Compilar
-
-```bash
-npm run build                      # en la raíz compila frontend y backend
-```
-
-## Variables de entorno (backend `.env`)
+Ver `backend/.env.example` y `frontend/.env.example`. Nunca commitear `.env`.
 
 | Variable | Descripción |
 | --- | --- |
-| `PORT` | Puerto del servidor (default 4000) |
-| `PUBLIC_BASE_URL` | URL pública del backend (para URLs de archivos) |
-| `DATABASE_URL` | Conexión PostgreSQL |
-| `JWT_ACCESS_SECRET` / `JWT_REFRESH_SECRET` | Secretos de firma JWT (generar valores aleatorios) |
-| `JWT_ACCESS_TTL` / `JWT_REFRESH_TTL` | Duración en segundos (900 / 604800 por defecto) |
-| `CORS_ORIGIN` | Orígenes permitidos, separados por coma (admite `*`) |
-| `STORAGE_DRIVER` | `local` en desarrollo, `s3` en producción |
-| `STORAGE_S3_BUCKET`, `STORAGE_PUBLIC_BASE_URL`, `AWS_*` | Configuración del bucket cuando `STORAGE_DRIVER=s3` |
-| `UPLOAD_DIR` | Carpeta de subidas solo con `STORAGE_DRIVER=local` |
-| `MAX_FILE_SIZE` | Tamaño máximo por imagen en bytes (4 MB en producción) |
-| `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` | Credenciales del administrador inicial para el seed |
+| `DATABASE_URL` / `DATABASE_URL_UNPOOLED` | Cadenas pooled y directa de tu propia Neon/Postgres |
+| `JWT_ACCESS_SECRET` / `JWT_REFRESH_SECRET` | Secretos aleatorios y distintos |
+| `PUBLIC_BASE_URL` | URL HTTPS pública de la API, necesaria con `STORAGE_DRIVER=db` |
+| `CORS_ORIGIN` | Orígenes permitidos del frontend SF |
+| `STORAGE_DRIVER` | `local` (desarrollo) o `db` (producción) |
+| `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` | Credenciales iniciales del admin |
 
-**Importante:** `.env` nunca debe subirse a control de versiones. Los valores de ejemplo en `.env.example` son ficticios.
+## Estado actual
 
-## Aclaraciones de esta primera etapa
+- El rediseño visual y funcional está implementado en código.
+- **No hay base de datos de SF MOTOS configurada**: sin `DATABASE_URL` real, `/api/bikes`
+  y `/api/bikes/brands` devuelven error y el sitio público muestra estados vacíos.
+- El panel admin no fue validado end-to-end contra una DB real.
+- `origin` todavía apunta al repositorio heredado; ver `DEPLOYMENT.md` antes de publicar.
 
-- No hay datos ficticios cargados como publicaciones reales: el catálogo arranca vacío hasta que el panel admin publique motos. Las imágenes de marcador de posición están claramente etiquetadas como "Foto de prueba".
-- Favoritos y comparador persisten en `localStorage` del navegador (funcionalidad del lado del cliente; no requieren cuenta).
-- El panel administrativo requiere un usuario admin creado vía seed (`SEED_ADMIN_*`). No hay registro público de administradores.
-- La autenticación del frontend usa JWT access + refresh con rotación y persistencia en `localStorage`.
-- No se implementó calculadora de financiación ni de permuta (fuera de alcance).
-- Las visitas se contabilizan mediante `POST /api/bikes/:id/visits`.
+## Aclaraciones
 
-## Próximos pasos
+- No hay datos ficticios cargados como publicaciones reales; el catálogo arranca vacío.
+- Las imágenes sin foto muestran un marcador "Foto no disponible", nunca ejemplos
+  presentados como stock real.
+- Favoritos y comparador persisten solo en `localStorage` del navegador.
+- No se implementó calculadora de financiación ni de permuta.
 
-1. Diseño visual completo e integración con el backend real (datos de motos y fotos reales).
-2. CDN delante del bucket de fotografías.
-3. Dashboard admin completo: edición masiva, destacadas, estados, historial.
-4. Buscador avanzado con full-text search y autocompletado.
-5. Tests E2E (Playwright) y de integración (Vitest + Supertest).
-6. Despliegue: frontend en Cloudflare Pages, backend en Vercel Functions, base de datos Neon PostgreSQL. Ver `DEPLOYMENT.md`.
+El detalle de despliegue y las tareas externas pendientes están en `DEPLOYMENT.md`.

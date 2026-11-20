@@ -29,14 +29,14 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
       role="alert"
       className={cn(
         'flex flex-col items-center justify-center border border-dashed text-center',
-        light ? 'border-black/15 bg-white/60' : 'border-white/10 bg-jay-surface/40',
+        light ? 'border-black/15 bg-white/60' : 'border-white/10 bg-sf-surface/40',
         compact ? 'gap-3 px-5 py-8' : 'gap-4 px-6 py-16',
         className
       )}
     >
-      <CircleAlert size={compact ? 26 : 36} className={cn('shrink-0 text-jay-red', !light && 'text-jay-red-soft')} aria-hidden="true" />
+      <CircleAlert size={compact ? 26 : 36} className={cn('shrink-0 text-sf-red', !light && 'text-sf-red-soft')} aria-hidden="true" />
       <div>
-        <p className={cn('font-display font-bold uppercase', compact ? 'text-lg' : 'text-2xl', light ? 'text-jay-black' : 'text-white')}>
+        <p className={cn('font-display font-bold uppercase', compact ? 'text-lg' : 'text-2xl', light ? 'text-sf-black' : 'text-white')}>
           {title}
         </p>
         <p className={cn('mx-auto mt-1 max-w-md text-sm leading-relaxed', light ? 'text-black/55' : 'text-gray-400')}>{message}</p>
@@ -48,7 +48,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
           className={cn(
             'inline-flex items-center gap-2 border px-5 py-3 font-display text-xs font-bold uppercase tracking-widest transition-colors',
             light
-              ? 'border-jay-black/70 text-jay-black hover:border-jay-red hover:text-jay-red'
+              ? 'border-sf-black/70 text-sf-black hover:border-sf-red hover:text-sf-red'
               : 'btn btn-ghost'
           )}
         >

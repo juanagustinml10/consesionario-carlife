@@ -23,25 +23,25 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
   }
 
   componentDidCatch(error: Error, info: React.ErrorInfo): void {
-    console.error('JAY MOTOS — error de render:', error, info.componentStack);
+    console.error('SF MOTOS — error de render:', error, info.componentStack);
   }
 
   render(): React.ReactNode {
     if (!this.state.hasError) return this.props.children;
 
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-jay-black px-6 py-16 text-center text-jay-white">
-        <Logo className="h-12" />
-        <div className="mt-10 flex h-16 w-16 items-center justify-center border border-jay-red/40 bg-jay-red/5 text-jay-red-soft">
+      <div className="flex min-h-screen flex-col items-center justify-center bg-sf-black px-6 py-16 text-center text-sf-white">
+        <Logo onDark className="h-12" />
+        <div className="mt-10 flex h-16 w-16 items-center justify-center border border-sf-red/40 bg-sf-red/5 text-sf-red-soft">
           <CircleAlert size={32} />
         </div>
-        <p className="mt-6 font-display text-[10px] font-bold uppercase tracking-[0.35em] text-jay-red-soft">
-          JAY MOTOS
+        <p className="mt-6 font-display text-[10px] font-bold uppercase tracking-[0.35em] text-sf-red-soft">
+          SF MOTOS
         </p>
-        <h1 className="mt-3 font-display text-4xl font-extrabold uppercase italic leading-[0.9] sm:text-6xl">
-          Algo salió <span className="text-jay-red">mal</span>
+        <h1 className="mt-3 font-display text-4xl font-extrabold uppercase leading-[0.9] sm:text-6xl">
+          Algo salió <span className="text-sf-red">mal</span>
         </h1>
-        <p className="mt-4 max-w-md text-sm leading-relaxed text-gray-400">
+        <p className="mt-4 max-w-md text-sm leading-relaxed text-sf-ink-400">
           No pudimos mostrar esta página. Recargá para intentarlo de nuevo o volvé al inicio del sitio.
         </p>
         <div className="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">

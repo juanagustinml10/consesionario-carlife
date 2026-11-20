@@ -14,7 +14,7 @@ export const SkeletonCard: React.FC<SkeletonCardProps> = ({ className, tone = 'd
       aria-hidden="true"
       className={cn(
         'animate-pulse border',
-        light ? 'border-black/5 bg-white' : 'border-white/5 bg-jay-surface',
+        light ? 'border-black/5 bg-white' : 'border-white/5 bg-sf-surface',
         className
       )}
     >

@@ -37,7 +37,7 @@ const processQueue = (error: unknown, token: string | null = null) => {
 // Adjunta el token de acceso en cada petición
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const token = localStorage.getItem('jay_motors_access_token');
+    const token = localStorage.getItem('sf_motos_access_token');
     if (token) {
       config.headers.set('Authorization', `Bearer ${token}`);
     }
@@ -73,7 +73,7 @@ api.interceptors.response.use(
         originalRequest._retry = true;
 
         try {
-          const refreshToken = localStorage.getItem('jay_motors_refresh_token');
+          const refreshToken = localStorage.getItem('sf_motos_refresh_token');
           if (!refreshToken) {
             throw new Error('No hay token de actualización');
           }
@@ -84,14 +84,14 @@ api.interceptors.response.use(
           );
 
           const newToken = data.accessToken;
-          localStorage.setItem('jay_motors_access_token', newToken);
+          localStorage.setItem('sf_motos_access_token', newToken);
           processQueue(null, newToken);
           originalRequest.headers.set('Authorization', `Bearer ${newToken}`);
           return api(originalRequest);
         } catch (refreshError) {
           processQueue(refreshError, null);
-          localStorage.removeItem('jay_motors_access_token');
-          localStorage.removeItem('jay_motors_refresh_token');
+          localStorage.removeItem('sf_motos_access_token');
+          localStorage.removeItem('sf_motos_refresh_token');
           window.location.href = '/admin/login';
           return Promise.reject(refreshError);
         } finally {
@@ -111,8 +111,8 @@ api.interceptors.response.use(
 
     // Limpieza de sesión ante 401 persistente
     if (error.response?.status === 401) {
-      localStorage.removeItem('jay_motors_access_token');
-      localStorage.removeItem('jay_motors_refresh_token');
+      localStorage.removeItem('sf_motos_access_token');
+      localStorage.removeItem('sf_motos_refresh_token');
       if (window.location.pathname.startsWith('/admin')) {
         window.location.href = '/admin/login';
       }

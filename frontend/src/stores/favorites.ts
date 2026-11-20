@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
-const STORAGE_KEY = 'jay_motors_favorites';
+const STORAGE_KEY = 'sf_motos_favorites';
 
 interface FavoritesState {
   ids: string[];
