@@ -26,7 +26,8 @@ import { Link } from '@/components/shared/Link';
 import { bikesService, type CreateBikeInput } from '@/services/bikes';
 import type { Bike, BikeCondition, BikeImage, BikeStatus } from '@/types';
 import { cn } from '@/lib/utils';
-import { MAX_MODEL_YEAR } from '@/lib/constants';
+import { MAX_IMAGES_PER_BIKE, MAX_MODEL_YEAR } from '@/lib/constants';
+import { getThumbnailUrl } from '@/lib/images';
 
 const YEARS = Array.from({ length: 12 }, (_, index) => MAX_MODEL_YEAR - index);
 const CONDITIONS: BikeCondition[] = ['NUEVA', 'USADA'];
@@ -174,7 +175,15 @@ export const BikeForm: React.FC = () => {
 
   const handleNewImages = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files ?? []);
-    if (files.length > 0) setNewImages((prev) => [...prev, ...files]);
+    if (files.length > 0) {
+      setNewImages((prev) => {
+        const room = Math.max(
+          0,
+          MAX_IMAGES_PER_BIKE - existingImages.length - prev.length,
+        );
+        return [...prev, ...files.slice(0, room)];
+      });
+    }
     event.target.value = '';
   };
 
@@ -648,7 +657,7 @@ export const BikeForm: React.FC = () => {
                     {existingImages.map((image, index) => (
                       <div key={image.id} className="overflow-hidden rounded-none border border-sf-border bg-black">
                         <div className="relative aspect-square">
-                          <img src={image.url} alt="" className="h-full w-full object-cover" />
+                          <img src={getThumbnailUrl(image.url)} alt="" className="h-full w-full object-cover" />
                           {image.isPrimary && (
                             <span className="absolute left-2 top-2 rounded-none border border-sf-red/60 bg-black/75 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-sf-red-soft backdrop-blur">
                               Portada
@@ -750,7 +759,7 @@ export const BikeForm: React.FC = () => {
                   <Upload size={24} className="text-sf-red" />
                 </span>
                 <span className="text-sm font-semibold text-white">Tocá para agregar fotografías</span>
-                <span className="text-[11px] text-sf-ink-500">JPG, PNG o WebP · podés elegir varias</span>
+                <span className="text-[11px] text-sf-ink-500">JPG, PNG o WebP · hasta {MAX_IMAGES_PER_BIKE} fotos por publicación</span>
                 <input
                   type="file"
                   multiple

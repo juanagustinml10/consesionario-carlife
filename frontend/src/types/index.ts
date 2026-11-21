@@ -20,6 +20,10 @@ export interface Brand {
 export interface BikeImage {
   id: string;
   url: string;
+  /** Miniatura opcional; si no viene se deriva de `url` (ver getThumbnailUrl). */
+  thumbnailUrl?: string | null;
+  width?: number | null;
+  height?: number | null;
   isPrimary: boolean;
   order: number;
   createdAt: string;

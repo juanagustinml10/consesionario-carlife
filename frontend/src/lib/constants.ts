@@ -21,6 +21,9 @@ export const BUSINESS = {
 /** Año modelo máximo ofrecido (incluye la temporada siguiente). */
 export const MAX_MODEL_YEAR = 2027;
 
+/** Cantidad máxima de fotografías por publicación. */
+export const MAX_IMAGES_PER_BIKE = 4;
+
 export const buildWhatsAppLink = (message: string) =>
   `https://wa.me/${BUSINESS.whatsappNumber}?text=${encodeURIComponent(message)}`;
 

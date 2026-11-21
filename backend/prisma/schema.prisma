@@ -82,6 +82,17 @@ model BikeImage {
   /// URL original, conservada al migrar una imagen legacy a BYTEA.
   legacyUrl  String?
 
+  /// Miniatura WebP (~500 px) para listados. NULL en imágenes legacy: la ruta
+  /// pública cae a la imagen completa, así nada se rompe durante la migración.
+  thumbnailData       Bytes?
+  thumbnailMimeType   String?
+  thumbnailSizeBytes  Int?
+  thumbnailChecksum   String?
+
+  /// Dimensiones efectivas de la imagen optimizada (EXIF ya aplicado).
+  width  Int?
+  height Int?
+
   @@index([bikeId])
   @@index([bikeId, isPrimary])
 }

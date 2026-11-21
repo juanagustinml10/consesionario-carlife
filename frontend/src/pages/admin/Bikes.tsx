@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { Link } from '@/components/shared/Link';
 import { bikesService } from '@/services/bikes';
+import { getThumbnailUrl } from '@/lib/images';
 import type { Bike, BikeStatus } from '@/types';
 
 const STATUS_LABELS: Record<BikeStatus, string> = {
@@ -154,7 +155,7 @@ export const Bikes = () => {
                     <div className="flex h-14 w-16 shrink-0 items-center justify-center overflow-hidden border border-sf-border bg-sf-black">
                       {thumb ? (
                         <img
-                          src={thumb}
+                          src={getThumbnailUrl(thumb)}
                           alt=""
                           loading="lazy"
                           className="h-full w-full object-cover"
@@ -244,7 +245,7 @@ export const Bikes = () => {
                           <div className="flex h-11 w-14 shrink-0 items-center justify-center overflow-hidden border border-sf-border bg-sf-black">
                             {thumb ? (
                               <img
-                                src={thumb}
+                                src={getThumbnailUrl(thumb)}
                                 alt=""
                                 loading="lazy"
                                 className="h-full w-full object-cover"

@@ -80,6 +80,21 @@ export const update = asyncHandler(async (req: AuthenticatedRequest, res: Respon
 
 export const remove = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
   const { id } = req.params as { id: string };
+  const bike = await prisma.bike.findUnique({ where: { id }, select: { id: true } });
+  if (!bike) {
+    const err: any = new Error('Moto no encontrada');
+    err.statusCode = 404;
+    throw err;
+  }
+
+  // En `db` los bytes se van con la fila (ON DELETE CASCADE). En local/S3 hay
+  // que borrar también el full y la miniatura antes de eliminar la moto.
+  const images = await prisma.bikeImage.findMany({
+    where: { bikeId: id },
+    select: { url: true },
+  });
+  await Promise.all(images.map((image) => deleteUploadedFile(image.url)));
+
   await deleteBike(id);
   res.json({ ok: true });
 });
@@ -93,12 +108,10 @@ export const uploadImages = asyncHandler(async (req: AuthenticatedRequest, res: 
     throw err;
   }
 
-  const stored = await Promise.all(
-    files.map((file) => saveUploadedFile(file.buffer, file.originalname, file.mimetype)),
-  );
-
-  const images = stored.map((upload, i) => ({ ...upload, isPrimary: i === 0 }));
-  await addBikeImages(id, images);
+  // Un archivo por request: Vercel limita el body a ~4.5 MB y Sharp procesa
+  // cada imagen antes de guardarla. El servicio decide la portada y el orden.
+  const stored = await Promise.all(files.map((file) => saveUploadedFile(file.buffer)));
+  await addBikeImages(id, stored);
 
   const bike = await getBikeById(id);
   if (!bike) {

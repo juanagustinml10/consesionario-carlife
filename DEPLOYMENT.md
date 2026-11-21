@@ -65,6 +65,18 @@ vercel --prod --yes            # redeploy manual desde el working tree
 
 Con `STORAGE_DRIVER=db` los bytes se guardan en `BikeImage.data` (BYTEA) y se sirven por `GET /api/images/:key`. No requiere credenciales S3. `PUBLIC_BASE_URL` debe ser HTTPS y público: se usa para construir `BikeImage.url`.
 
+#### Optimización con Sharp (21/11/2026)
+
+- El original **nunca se guarda**: Multer lo recibe en memoria y Sharp lo convierte a WebP calidad 82 (`effort: 4`), con `.rotate()` para aplicar EXIF antes de redimensionar. El WebP resultante no conserva EXIF.
+- Salida full `≤1600x1600` y miniatura `≤500x500`, ambas con `fit: inside` y `withoutEnlargement` (no agrandan fotos chicas).
+- Se aceptan JPG, PNG y WebP de entrada; límite de 4 MB por archivo y guardia de 100 MP contra bombas de descompresión.
+- Columnas nuevas en `BikeImage`: `thumbnailData`, `thumbnailMimeType`, `thumbnailSizeBytes`, `thumbnailChecksum`, `width`, `height` (todas nullable; las fotos antiguas siguen funcionando con fallback a la imagen completa).
+- `GET /api/images/:key?variant=thumb` sirve la miniatura; si la fila es legacy, cae a la imagen full. Las respuestas siguen siendo `Cache-Control: public, max-age=31536000, immutable`.
+- Máximo **4 fotos por publicación**, deduplicadas por checksum SHA-256 de la imagen optimizada. Los duplicados dentro de un lote se descartan sin error.
+- La subida es **de a un archivo por request** (body limit de Vercel ~4.5 MB); el frontend itera en el servicio.
+- Al borrar una foto o una moto se eliminan los binarios. En `db` los bytes van con la fila por `ON DELETE CASCADE`; en local/S3 se borran el full y el `-thumb.webp`.
+- Nota: por el caché `immutable` del CDN, una URL ya visitada puede seguir respondiendo desde caché unos minutos tras borrar su fila. No afecta la BD ni a los listados.
+
 ---
 
 ## 3. Frontend (Cloudflare Pages)
@@ -84,6 +96,7 @@ Migraciones versionadas en `backend/prisma/migrations`, **ya aplicadas en Neon y
 - `20261116000000_init`
 - `20261117000000_add_usage_hours_draft`
 - `20261119000000_add_image_blobs`
+- `20261121000000_optimize_images`
 
 Para una base nueva, ejecutar una sola vez con las cadenas directas disponibles:
 

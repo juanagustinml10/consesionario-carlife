@@ -3,10 +3,11 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { DeleteObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { env } from '../config/env.js';
+import { processUploadedImage } from './image-processing.service.js';
 
 /**
  * `local` es solo para desarrollo. En Vercel el filesystem es efímero:
- * - `db` guarda los bytes en Neon (BYTEA) y los sirve /api/images/:key.
+ * - `db` guarda ambos WebP en Neon (BYTEA) y los sirve /api/images/:key.
  * - `s3` conserva el driver anterior con un bucket S3-compatible.
  */
 const s3 =
@@ -22,6 +23,9 @@ const s3 =
       })
     : null;
 
+/** Formatos que Sharp sabe convertir a WebP sin perder información útil. */
+const SUPPORTED_INPUT_MIME_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
+
 const CONTENT_TYPES: Record<string, string> = {
   '.jpg': 'image/jpeg',
   '.jpeg': 'image/jpeg',
@@ -33,34 +37,48 @@ const CONTENT_TYPES: Record<string, string> = {
 
 /** Solo formatos raster: no servimos SVG con scripts desde el origin del API. */
 export const isAllowedImageMimeType = (mimeType: string): boolean =>
-  Object.values(CONTENT_TYPES).includes(mimeType);
+  SUPPORTED_INPUT_MIME_TYPES.has(mimeType.toLowerCase());
+
+export const isAllowedImageFilename = (filename: string): boolean => {
+  const mimeType = getImageMimeType(filename);
+  return mimeType ? isAllowedImageMimeType(mimeType) : false;
+};
 
 export const getImageMimeType = (filename: string): string | null =>
   CONTENT_TYPES[path.extname(filename).toLowerCase()] ?? null;
 
 export const buildStorageKey = (): string => crypto.randomBytes(16).toString('hex');
 
-const buildFilename = (originalName: string) => {
-  const extension = path.extname(originalName).toLowerCase();
-  return `${Date.now()}-${crypto.randomBytes(4).toString('hex')}${extension}`;
-};
+const WEBP_EXTENSION = '.webp';
 
-/** Resultado de guardar un upload. En `db` incluye los bytes y sus metadatos. */
+const buildFilename = () =>
+  `${Date.now()}-${crypto.randomBytes(4).toString('hex')}${WEBP_EXTENSION}`;
+
+const thumbnailFilename = (filename: string) =>
+  `${filename.slice(0, -WEBP_EXTENSION.length)}-thumb${WEBP_EXTENSION}`;
+
+/** Resultado de guardar un upload. En `db` incluye ambos binarios y sus metadatos. */
 export interface StoredUpload {
   url: string;
+  thumbnailUrl?: string;
   data?: Buffer;
   storageKey?: string;
   mimeType?: string;
   sizeBytes?: number;
   checksum?: string;
+  thumbnailData?: Buffer;
+  thumbnailMimeType?: string;
+  thumbnailSizeBytes?: number;
+  thumbnailChecksum?: string;
+  width?: number;
+  height?: number;
 }
 
-/** Guarda el archivo y devuelve la URL pública con la que se guardará en la BD. */
-export const saveUploadedFile = async (
-  buffer: Buffer,
-  originalName: string,
-  contentType?: string,
-): Promise<StoredUpload> => {
+/**
+ * Valida y optimiza el archivo ANTES de guardarlo: el original nunca se
+ * persiste. Devuelve la imagen full y su miniatura ya en WebP.
+ */
+export const saveUploadedFile = async (buffer: Buffer): Promise<StoredUpload> => {
   const maxSize = Number(env.MAX_FILE_SIZE);
   if (buffer.length > maxSize) {
     const err: any = new Error('La imagen supera el tamaño máximo permitido');
@@ -68,63 +86,104 @@ export const saveUploadedFile = async (
     throw err;
   }
 
-  const filename = buildFilename(originalName);
-  // El mimetype del navegador es orientativo; la extensión manda si no es raster.
-  const mimeType =
-    (contentType && isAllowedImageMimeType(contentType) ? contentType : null) ??
-    getImageMimeType(filename);
-  if (!mimeType) {
-    const err: any = new Error('Formato de imagen no soportado');
-    err.statusCode = 400;
-    throw err;
-  }
+  // Sharp valida el formato real (no solo el mime declarado), aplica la
+  // orientación EXIF, redimensiona y elimina metadatos.
+  const processed = await processUploadedImage(buffer);
+  const publicBase = env.PUBLIC_BASE_URL.replace(/\/+$/, '');
 
   if (env.STORAGE_DRIVER === 'db') {
     const storageKey = buildStorageKey();
+    const url = `${publicBase}/api/images/${storageKey}`;
     return {
-      url: `${env.PUBLIC_BASE_URL.replace(/\/+$/, '')}/api/images/${storageKey}`,
-      data: buffer,
+      url,
+      thumbnailUrl: `${url}?variant=thumb`,
+      data: processed.data,
       storageKey,
-      mimeType,
-      sizeBytes: buffer.length,
-      checksum: crypto.createHash('sha256').update(buffer).digest('hex'),
+      mimeType: processed.mimeType,
+      sizeBytes: processed.sizeBytes,
+      checksum: processed.checksum,
+      thumbnailData: processed.thumbnail,
+      thumbnailMimeType: processed.mimeType,
+      thumbnailSizeBytes: processed.thumbnailSizeBytes,
+      thumbnailChecksum: processed.thumbnailChecksum,
+      width: processed.width,
+      height: processed.height,
     };
   }
 
+  const filename = buildFilename();
+  const thumbName = thumbnailFilename(filename);
+
   if (s3) {
-    await s3.send(
-      new PutObjectCommand({
-        Bucket: env.STORAGE_S3_BUCKET,
-        Key: filename,
-        Body: buffer,
-        ContentType: mimeType,
-        CacheControl: 'public, max-age=31536000, immutable',
-      }),
-    );
-    return { url: `${env.STORAGE_PUBLIC_BASE_URL!.replace(/\/+$/, '')}/${filename}` };
+    const base = env.STORAGE_PUBLIC_BASE_URL!.replace(/\/+$/, '');
+    await Promise.all([
+      s3.send(
+        new PutObjectCommand({
+          Bucket: env.STORAGE_S3_BUCKET,
+          Key: filename,
+          Body: processed.data,
+          ContentType: processed.mimeType,
+          CacheControl: 'public, max-age=31536000, immutable',
+        }),
+      ),
+      s3.send(
+        new PutObjectCommand({
+          Bucket: env.STORAGE_S3_BUCKET,
+          Key: thumbName,
+          Body: processed.thumbnail,
+          ContentType: processed.mimeType,
+          CacheControl: 'public, max-age=31536000, immutable',
+        }),
+      ),
+    ]);
+    return {
+      url: `${base}/${filename}`,
+      thumbnailUrl: `${base}/${thumbName}`,
+      mimeType: processed.mimeType,
+      sizeBytes: processed.sizeBytes,
+      checksum: processed.checksum,
+      width: processed.width,
+      height: processed.height,
+    };
   }
 
   await fs.mkdir(env.UPLOAD_DIR, { recursive: true });
-  await fs.writeFile(path.join(env.UPLOAD_DIR, filename), buffer);
-  return { url: `${env.PUBLIC_BASE_URL.replace(/\/+$/, '')}/uploads/${filename}` };
+  await Promise.all([
+    fs.writeFile(path.join(env.UPLOAD_DIR, filename), processed.data),
+    fs.writeFile(path.join(env.UPLOAD_DIR, thumbName), processed.thumbnail),
+  ]);
+  return {
+    url: `${publicBase}/uploads/${filename}`,
+    thumbnailUrl: `${publicBase}/uploads/${thumbName}`,
+    mimeType: processed.mimeType,
+    sizeBytes: processed.sizeBytes,
+    checksum: processed.checksum,
+    width: processed.width,
+    height: processed.height,
+  };
 };
 
 /** Borra el objeto asociado a una URL guardada. Nunca falla si ya no existe. */
 export const deleteUploadedFile = async (url: string): Promise<void> => {
-  // Con `db` el binario se elimina con la fila de BikeImage; no hay archivo externo.
+  // Con `db` los binarios se eliminan con la fila de BikeImage; no hay archivo externo.
   if (env.STORAGE_DRIVER === 'db' || /\/api\/images\//.test(url)) return;
 
   const filename = url.split('?')[0].split('/').filter(Boolean).pop();
   if (!filename) return;
 
-  if (s3) {
-    await s3.send(
-      new DeleteObjectCommand({ Bucket: env.STORAGE_S3_BUCKET, Key: filename }),
-    );
-    return;
-  }
+  const keys = new Set([filename]);
+  if (filename.endsWith(WEBP_EXTENSION)) keys.add(thumbnailFilename(filename));
 
-  await fs.unlink(path.join(env.UPLOAD_DIR, filename)).catch(() => {
-    // El archivo ya no está: no es un error para la baja de la publicación.
-  });
+  for (const key of keys) {
+    if (s3) {
+      await s3.send(
+        new DeleteObjectCommand({ Bucket: env.STORAGE_S3_BUCKET, Key: key }),
+      );
+      continue;
+    }
+
+    await fs.unlink(path.join(env.UPLOAD_DIR, key)).catch(() => {
+      // El archivo ya no está: no es un error para la baja de la publicación.
+    });
+  }
 };

@@ -19,7 +19,7 @@ import {
 } from '../controllers/bikes.controller.js';
 import { authenticateAccess } from '../middleware/auth.js';
 import { env } from '../config/env.js';
-import { getImageMimeType, isAllowedImageMimeType } from '../services/storage.service.js';
+import { isAllowedImageFilename, isAllowedImageMimeType } from '../services/storage.service.js';
 
 const router = Router();
 
@@ -77,11 +77,11 @@ const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: Number(env.MAX_FILE_SIZE) },
   fileFilter: (_req, file, cb) => {
-    // Se acepta el mime del navegador o una extensión raster conocida.
-    if (isAllowedImageMimeType(file.mimetype) || getImageMimeType(file.originalname)) {
+    // Filtro rápido en el borde; Sharp valida el contenido real después.
+    if (isAllowedImageMimeType(file.mimetype) || isAllowedImageFilename(file.originalname)) {
       cb(null, true);
     } else {
-      const err: any = new Error('Solo se permiten imágenes JPG, PNG, WebP, GIF o AVIF');
+      const err: any = new Error('Solo se permiten imágenes JPG, PNG o WebP');
       err.statusCode = 400;
       cb(err);
     }
@@ -123,7 +123,7 @@ router.delete(
 router.post(
   '/:id/images',
   authenticateAccess,
-  upload.array('images', 10),
+  upload.array('images', 1),
   uploadImages,
 );
 router.patch(

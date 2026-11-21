@@ -7,6 +7,7 @@ import { EmptyState } from '@/components/shared/EmptyState';
 import { ImagePlaceholder } from '@/components/shared/ImagePlaceholder';
 import { ConditionTag } from '@/components/public/BikeBadges';
 import { buildWhatsAppLink } from '@/lib/constants';
+import { getThumbnailUrl } from '@/lib/images';
 import { conditionLabel, formatDisplacement, formatMileage, formatPrice, statusLabel } from '@/lib/format';
 import { useCompareStore } from '@/stores/compare';
 import type { Bike } from '@/types';
@@ -111,7 +112,7 @@ export const Compare: React.FC = () => {
                       <div className="flex min-w-0 items-center gap-3">
                         <div className="h-14 w-20 shrink-0 overflow-hidden border border-white/10 bg-black">
                           {bike.images?.[0] ? (
-                            <img src={bike.images[0].url} alt="" className="h-full w-full object-cover" loading="lazy" />
+                            <img src={getThumbnailUrl(bike.images[0].url)} alt="" className="h-full w-full object-cover" loading="lazy" />
                           ) : (
                             <ImagePlaceholder width={160} height={112} className="h-full w-full" />
                           )}
@@ -164,7 +165,7 @@ export const Compare: React.FC = () => {
             <article key={bike.id} className="panel group overflow-hidden">
               <div className="relative aspect-[16/10] bg-black">
                 {bike.images?.[0] ? (
-                  <img src={bike.images[0].url} alt={bike.title} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" loading="lazy" />
+                  <img src={getThumbnailUrl(bike.images[0].url)} alt={bike.title} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" loading="lazy" />
                 ) : (
                   <ImagePlaceholder width={640} height={400} label="Foto no disponible" className="h-full w-full" />
                 )}

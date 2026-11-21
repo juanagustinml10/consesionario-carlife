@@ -10,6 +10,7 @@ const imageKeySchema = z.object({
   key: z.string().regex(/^[a-f0-9]{32}$/, 'Clave de imagen inválida'),
 });
 
+// `?variant=thumb` se lee en el controller: validate() solo expone los params.
 router.get('/:key', validate(imageKeySchema, 'params'), getImage);
 
 export default router;

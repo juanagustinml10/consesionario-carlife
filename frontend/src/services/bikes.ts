@@ -100,18 +100,27 @@ export const bikesService = {
     return data;
   },
 
-  /** Subir imágenes de una moto */
+  /**
+   * Subir imágenes de una moto, de a una por request.
+   * Vercel limita el body a ~4.5 MB y el backend procesa cada archivo con Sharp.
+   */
   uploadImages: async (bikeId: string, files: FileList | File[]) => {
-    const formData = new FormData();
     const fileArray = Array.isArray(files) ? files : Array.from(files);
-    fileArray.forEach((file) => formData.append('images', file));
-    const { data } = await api.post(
-      `${BASE}/${bikeId}/images`,
-      formData,
-      { headers: { 'Content-Type': 'multipart/form-data' } }
-    );
-    const body = requireObject<{ images?: unknown }>(data, 'respuesta');
-    return { images: requireArray<BikeImage>(body.images, 'galería') };
+    let images: BikeImage[] = [];
+
+    for (const file of fileArray) {
+      const formData = new FormData();
+      formData.append('images', file);
+      const { data } = await api.post(
+        `${BASE}/${bikeId}/images`,
+        formData,
+        { headers: { 'Content-Type': 'multipart/form-data' } }
+      );
+      const body = requireObject<{ images?: unknown }>(data, 'respuesta');
+      images = requireArray<BikeImage>(body.images, 'galería');
+    }
+
+    return { images };
   },
 
   /** Establecer imagen principal */

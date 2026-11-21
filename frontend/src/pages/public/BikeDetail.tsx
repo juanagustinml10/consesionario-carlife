@@ -25,6 +25,7 @@ import { ErrorState } from '@/components/shared/ErrorState';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { useFavoritesStore } from '@/stores/favorites';
 import { bikesService } from '@/services/bikes';
+import { getThumbnailUrl } from '@/lib/images';
 import type { Bike } from '@/types';
 import { buildBikeWhatsAppLink, BUSINESS } from '@/lib/constants';
 import {
@@ -237,7 +238,7 @@ export const BikeDetail: React.FC = () => {
                       i === activeImage ? 'border-sf-red opacity-100' : 'border-white/10 opacity-50 hover:opacity-80'
                     )}
                   >
-                    <img src={img.url} alt="" className="h-full w-full object-cover" loading="lazy" />
+                    <img src={getThumbnailUrl(img.url)} alt="" className="h-full w-full object-cover" loading="lazy" />
                   </button>
                 ))}
               </div>

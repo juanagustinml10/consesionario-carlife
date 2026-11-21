@@ -6,6 +6,7 @@ import { useFavoritesStore } from '@/stores/favorites';
 import { cn } from '@/lib/utils';
 import { BUSINESS, buildBikeWhatsAppLink } from '@/lib/constants';
 import { formatDisplacement, formatMileage, formatPrice } from '@/lib/format';
+import { getThumbnailUrl } from '@/lib/images';
 import { ConditionTag, FeaturedTag, StatusTag } from '@/components/public/BikeBadges';
 import type { Bike } from '@/types';
 
@@ -39,7 +40,7 @@ export const BikeCard: React.FC<BikeCardProps> = ({ bike, className, tone = 'dar
       <div className={cn('relative overflow-hidden bg-black', feature ? 'aspect-[16/10] sm:aspect-[16/9]' : 'aspect-[4/3]')}>
         {primaryImage ? (
           <img
-            src={primaryImage.url}
+            src={getThumbnailUrl(primaryImage.url)}
             alt={`${bike.brand?.name ?? ''} ${bike.model || bike.title}`}
             loading="lazy"
             decoding="async"

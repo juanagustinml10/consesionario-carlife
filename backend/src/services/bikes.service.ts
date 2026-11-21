@@ -7,6 +7,9 @@ export type { StoredUpload } from './storage.service.js';
 
 type BikeStatusValue = 'BORRADOR' | 'DISPONIBLE' | 'RESERVADA' | 'VENDIDA';
 
+/** Máximo de fotografías por publicación (galería del panel y ficha pública). */
+export const MAX_IMAGES_PER_BIKE = 4;
+
 export interface ListBikesFilters {
   q?: string;
   brand?: string;
@@ -281,33 +284,66 @@ export interface BikeImageUpload {
   mimeType?: string;
   sizeBytes?: number;
   checksum?: string;
+  thumbnailData?: Buffer;
+  thumbnailMimeType?: string;
+  thumbnailSizeBytes?: number;
+  thumbnailChecksum?: string;
+  width?: number;
+  height?: number;
 }
 
 export const addBikeImages = async (
   bikeId: string,
   images: BikeImageUpload[],
 ) => {
-  // Si se marca una como principal, desmarcar las demás de la moto
-  const hasPrimary = images.some((image) => image.isPrimary);
-  if (hasPrimary) {
-    await prisma.bikeImage.updateMany({
-      where: { bikeId },
-      data: { isPrimary: false },
-    });
+  const bike = await prisma.bike.findUnique({
+    where: { id: bikeId },
+    select: { id: true },
+  });
+  if (!bike) {
+    const err: any = new Error('Moto no encontrada');
+    err.statusCode = 404;
+    throw err;
   }
 
-  const lastOrder = await prisma.bikeImage.findFirst({
+  const existing = await prisma.bikeImage.findMany({
     where: { bikeId },
+    select: { order: true, checksum: true },
     orderBy: { order: 'desc' },
-    select: { order: true },
   });
-  const baseOrder = (lastOrder?.order ?? -1) + 1;
+
+  // Un mismo archivo (checksum de la imagen optimizada) no se guarda dos veces.
+  const seenChecksums = new Set<string>();
+  for (const image of existing) {
+    if (image.checksum) seenChecksums.add(image.checksum);
+  }
+  const unique = images.filter((image) => {
+    if (!image.checksum || seenChecksums.has(image.checksum)) return false;
+    seenChecksums.add(image.checksum);
+    return true;
+  });
+
+  // Si todo el lote era duplicado, no se hace nada: la galería ya está completa.
+  if (unique.length === 0) return { count: 0 };
+
+  if (existing.length + unique.length > MAX_IMAGES_PER_BIKE) {
+    const err: any = new Error(
+      `Una publicación admite hasta ${MAX_IMAGES_PER_BIKE} fotografías`,
+    );
+    err.statusCode = 400;
+    throw err;
+  }
+
+  // Solo la primera foto de una publicación vacía pasa a ser portada. En una
+  // edición se conserva la portada elegida por el administrador.
+  const makePrimary = existing.length === 0;
+  const baseOrder = (existing[0]?.order ?? -1) + 1;
 
   return prisma.bikeImage.createMany({
-    data: images.map((image, i) => ({
+    data: unique.map((image, i) => ({
       bikeId,
       url: image.url,
-      isPrimary: image.isPrimary ?? false,
+      isPrimary: makePrimary && i === 0,
       order: baseOrder + i,
       ...(image.data
         ? {
@@ -316,6 +352,14 @@ export const addBikeImages = async (
             mimeType: image.mimeType,
             sizeBytes: image.sizeBytes,
             checksum: image.checksum,
+            thumbnailData: image.thumbnailData
+              ? new Uint8Array(image.thumbnailData)
+              : undefined,
+            thumbnailMimeType: image.thumbnailMimeType,
+            thumbnailSizeBytes: image.thumbnailSizeBytes,
+            thumbnailChecksum: image.thumbnailChecksum,
+            width: image.width,
+            height: image.height,
           }
         : {}),
     })),
