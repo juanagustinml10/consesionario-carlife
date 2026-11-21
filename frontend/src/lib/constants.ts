@@ -31,7 +31,7 @@ export const MODEL_YEARS = Array.from(
 );
 
 /** Cantidad máxima de fotografías por publicación. */
-export const MAX_IMAGES_PER_BIKE = 4;
+export const MAX_IMAGES_PER_BIKE = 10;
 
 export const buildWhatsAppLink = (message: string) =>
   `https://wa.me/${BUSINESS.whatsappNumber}?text=${encodeURIComponent(message)}`;

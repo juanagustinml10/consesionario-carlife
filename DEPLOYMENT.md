@@ -72,7 +72,7 @@ Con `STORAGE_DRIVER=db` los bytes se guardan en `BikeImage.data` (BYTEA) y se si
 - Se aceptan JPG, PNG y WebP de entrada; límite de 4 MB por archivo y guardia de 100 MP contra bombas de descompresión.
 - Columnas nuevas en `BikeImage`: `thumbnailData`, `thumbnailMimeType`, `thumbnailSizeBytes`, `thumbnailChecksum`, `width`, `height` (todas nullable; las fotos antiguas siguen funcionando con fallback a la imagen completa).
 - `GET /api/images/:key?variant=thumb` sirve la miniatura; si la fila es legacy, cae a la imagen full. Las respuestas siguen siendo `Cache-Control: public, max-age=31536000, immutable`.
-- Máximo **4 fotos por publicación**, deduplicadas por checksum SHA-256 de la imagen optimizada. Los duplicados dentro de un lote se descartan sin error.
+- Máximo **10 fotos por publicación**, deduplicadas por checksum SHA-256 de la imagen optimizada. Los duplicados dentro de un lote se descartan sin error.
 - La subida es **de a un archivo por request** (body limit de Vercel ~4.5 MB); el frontend itera en el servicio.
 - Al borrar una foto o una moto se eliminan los binarios. En `db` los bytes van con la fila por `ON DELETE CASCADE`; en local/S3 se borran el full y el `-thumb.webp`.
 - Nota: por el caché `immutable` del CDN, una URL ya visitada puede seguir respondiendo desde caché unos minutos tras borrar su fila. No afecta la BD ni a los listados.

@@ -8,7 +8,7 @@ export type { StoredUpload } from './storage.service.js';
 type BikeStatusValue = 'BORRADOR' | 'DISPONIBLE' | 'RESERVADA' | 'VENDIDA';
 
 /** Máximo de fotografías por publicación (galería del panel y ficha pública). */
-export const MAX_IMAGES_PER_BIKE = 4;
+export const MAX_IMAGES_PER_BIKE = 10;
 
 export interface ListBikesFilters {
   q?: string;
