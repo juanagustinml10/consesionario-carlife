@@ -22,7 +22,7 @@ export const BUSINESS = {
 export const MAX_MODEL_YEAR = 2027;
 
 /** Año modelo mínimo aceptado en el panel y en los filtros del catálogo. */
-export const MIN_MODEL_YEAR = 2010;
+export const MIN_MODEL_YEAR = 2000;
 
 /** Años disponibles, de más nuevo a más viejo. */
 export const MODEL_YEARS = Array.from(
