@@ -6,6 +6,7 @@ export { saveUploadedFile, deleteUploadedFile } from './storage.service.js';
 export type { StoredUpload } from './storage.service.js';
 
 type BikeStatusValue = 'BORRADOR' | 'DISPONIBLE' | 'RESERVADA' | 'VENDIDA';
+type BikeUsageValue = 'ENDURO_CROSS' | 'RUTA';
 
 /** Máximo de fotografías por publicación (galería del panel y ficha pública). */
 export const MAX_IMAGES_PER_BIKE = 10;
@@ -16,6 +17,7 @@ export interface ListBikesFilters {
   model?: string;
   year?: number;
   condition?: 'NUEVA' | 'USADA';
+  usage?: BikeUsageValue;
   priceMin?: number;
   priceMax?: number;
   status?: BikeStatusValue;
@@ -31,6 +33,7 @@ export interface CreateBikeInput {
   model: string;
   year: number;
   condition: 'NUEVA' | 'USADA';
+  usage?: BikeUsageValue | null;
   displacementCc?: number | null;
   mileageKm?: number | null;
   /** Horas de uso: opcional, decimal y solo relevante en motos usadas. */
@@ -59,6 +62,7 @@ const bikeSelect: Prisma.BikeSelect = {
   model: true,
   year: true,
   condition: true,
+  usage: true,
   displacementCc: true,
   mileageKm: true,
   usageHours: true,
@@ -96,7 +100,7 @@ export const generateSlug = (title: string) => {
  * intenta filtrar por `status=BORRADOR` en la query.
  */
 export const listBikes = async (filters: ListBikesFilters, includeDrafts = false) => {
-  const { q, brand, model, year, condition, priceMin, priceMax, status, featured, page, limit } = filters;
+  const { q, brand, model, year, condition, usage, priceMin, priceMax, status, featured, page, limit } = filters;
   const skip = (page - 1) * limit;
 
   const where: Record<string, unknown> = {};
@@ -112,6 +116,7 @@ export const listBikes = async (filters: ListBikesFilters, includeDrafts = false
   if (model) where.model = { contains: model, mode: 'insensitive' };
   if (year) where.year = year;
   if (condition) where.condition = condition;
+  if (usage) where.usage = usage;
   if (featured === true) where.featured = true;
   if (priceMin !== undefined || priceMax !== undefined) {
     const price: Record<string, number> = {};
@@ -180,6 +185,7 @@ export const createBike = async (input: CreateBikeInput) => {
       model: input.model,
       year: input.year,
       condition: input.condition,
+      usage: input.usage ?? null,
       displacementCc: input.displacementCc ?? null,
       mileageKm: input.mileageKm ?? null,
       // Una moto 0 km no declara horas de uso: se normaliza a null.
@@ -218,6 +224,8 @@ export const updateBike = async (id: string, input: UpdateBikeInput) => {
   if (input.model !== undefined) data.model = input.model;
   if (input.year !== undefined) data.year = input.year;
   if (input.condition !== undefined) data.condition = input.condition;
+  // null también es un cambio válido: permite volver a "Sin definir".
+  if (input.usage !== undefined) data.usage = input.usage;
   if (input.displacementCc !== undefined) data.displacementCc = input.displacementCc;
   if (input.mileageKm !== undefined) data.mileageKm = input.mileageKm;
   if (input.usageHours !== undefined) data.usageHours = input.usageHours;

@@ -41,11 +41,12 @@ No existe `tsc` en el root; siempre invocarlo con `--prefix` o dentro de cada ca
 ## Estado real (verificado) — no suponer
 
 - **Producción funcionando (20/11/2026):** backend en Vercel (`https://sf-motos-livid.vercel.app`), frontend en Cloudflare Pages (`https://sf-motos.pages.dev`), base de datos en Neon con migraciones aplicadas. Detalle completo en `DEPLOYMENT.md`.
-- **DB de producción operativa:** `/health`, `/api/bikes`, `/api/bikes/brands` y `/api/auth/login` devuelven 200. El catálogo está vacío porque todavía no se cargaron motocicletas; eso es estado de datos, no error de API.
+- **DB de producción operativa:** `/health`, `/api/bikes`, `/api/bikes/brands` y `/api/auth/login` devuelven 200. El catálogo tiene 6 publicaciones reales cargadas (último chequeo): **no eliminar ni modificar esos datos**.
 - **`backend/.env` local sigue siendo placeholder:** los endpoints en `localhost:4000` no conectan a la DB real. No confundir el entorno local con producción.
 - **Panel admin validado en vivo:** existe un usuario `ADMIN` en Neon y el login funciona contra la API de Vercel. Credenciales entregadas fuera del repo (nunca versionar).
 - **Marcas cargadas:** la tabla `Brand` de Neon tiene las 9 marcas de la franja del home (`KTM`, `HUSQVARNA`, `GASGAS`, `BETA`, `SHERCO`, `HONDA`, `YAMAHA`, `KAWASAKI`, `SUZUKI`) con IDs `cuid` válidos para el formulario. No hay endpoint para crear marcas: se insertan directamente en `Brand`.
 - **Imágenes optimizadas (21/11/2026):** `sharp` procesa cada upload en memoria y guarda solo WebP (calidad 82): full ≤1600 px + miniatura ≤500 px. `BikeImage` tiene columnas nullable de miniatura/dimensiones (migración `20261121000000_optimize_images`, ya aplicada en Neon). `GET /api/images/:key?variant=thumb` con fallback a la full. Máximo 10 fotos por moto, dedupe por checksum y subida de a un archivo por request. Helper `getThumbnailUrl()` en `frontend/src/lib/images.ts` (las URLs legacy se sirven sin cambios).
+- **Clasificación por uso (21/11/2026):** `Bike.usage` es un enum nullable `BikeUsage` (`ENDURO_CROSS` | `RUTA`); `null` = "Sin definir" para las publicaciones anteriores. Migración `20261121010000_add_bike_usage` ya aplicada en Neon. El panel admin lo carga en el paso 3 y el catálogo filtra con `?usage=...` mediante dos bloques "ENDURO/CROSS" y "RUTA" sobre el inventario. `BIKE_USAGES` en `frontend/src/lib/constants.ts` es la fuente de etiquetas.
 - **Frontend público muestra estados vacíos** por `catch → []` cuando la API falla — por diseño, no es un bug.
 - **Procesos dev huérfanos** en puertos 4000/5173 pueden persistir entre sesiones y bloquear `prisma generate` — si `EPERM` en backend, matar el tsx watch y borrar los `*.tmp` de `backend/node_modules/.prisma/client`.
 

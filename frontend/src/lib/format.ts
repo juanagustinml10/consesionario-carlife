@@ -1,4 +1,5 @@
-import type { BikeCondition, BikeStatus } from '@/types';
+import { BIKE_USAGES } from '@/lib/constants';
+import type { BikeCondition, BikeStatus, BikeUsage } from '@/types';
 
 /** Formato monetario único para todo el frontend. */
 export const formatPrice = (price: number, currency = 'ARS') =>
@@ -23,6 +24,9 @@ export const formatUsageHours = (hours: number | null | undefined) => {
 
 export const conditionLabel = (condition: BikeCondition) =>
   condition === 'NUEVA' ? '0 km' : 'Usada';
+
+export const usageLabel = (usage: BikeUsage | null | undefined) =>
+  BIKE_USAGES.find((item) => item.value === usage)?.label ?? 'Sin definir';
 
 export const statusLabel = (status: BikeStatus) =>
   status === 'BORRADOR'

@@ -33,6 +33,12 @@ export const MODEL_YEARS = Array.from(
 /** Cantidad máxima de fotografías por publicación. */
 export const MAX_IMAGES_PER_BIKE = 10;
 
+/** Usos/disciplinas disponibles para clasificar una moto. */
+export const BIKE_USAGES = [
+  { value: 'ENDURO_CROSS', label: 'Enduro / Cross', title: 'ENDURO/CROSS' },
+  { value: 'RUTA', label: 'Ruta', title: 'RUTA' },
+] as const;
+
 export const buildWhatsAppLink = (message: string) =>
   `https://wa.me/${BUSINESS.whatsappNumber}?text=${encodeURIComponent(message)}`;
 

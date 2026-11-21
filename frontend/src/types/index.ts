@@ -6,6 +6,9 @@
 /** Condición de la motocicleta */
 export type BikeCondition = 'NUEVA' | 'USADA';
 
+/** Uso/disciplina de la motocicleta; null = sin definir. */
+export type BikeUsage = 'ENDURO_CROSS' | 'RUTA';
+
 /** Estado de disponibilidad de la publicación */
 export type BikeStatus = 'BORRADOR' | 'DISPONIBLE' | 'RESERVADA' | 'VENDIDA';
 
@@ -44,6 +47,8 @@ export interface Bike {
   model: string;
   year: number;
   condition: BikeCondition;
+  /** null en las publicaciones anteriores al campo; se muestra como "Sin definir". */
+  usage: BikeUsage | null;
   displacementCc: number | null;
   mileageKm: number | null;
   /** Horas de uso declaradas en motos usadas; null/0 significa "sin dato". */

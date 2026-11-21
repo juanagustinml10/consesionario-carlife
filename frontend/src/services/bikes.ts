@@ -5,6 +5,7 @@ import type {
   BikeImage,
   BikeCondition,
   BikeStatus,
+  BikeUsage,
 } from '@/types';
 
 export interface BikeFilters {
@@ -13,6 +14,7 @@ export interface BikeFilters {
   model?: string;
   year?: number;
   condition?: BikeCondition;
+  usage?: BikeUsage;
   displacementMin?: number;
   displacementMax?: number;
   priceMin?: number;
@@ -29,6 +31,8 @@ export interface CreateBikeInput {
   model: string;
   year: number;
   condition: BikeCondition;
+  /** null vuelve a dejar la moto sin clasificar. */
+  usage?: BikeUsage | null;
   displacementCc?: number | null;
   mileageKm?: number | null;
   /** Decimal opcional; se envía null para motos 0 km o cuando no hay dato. */

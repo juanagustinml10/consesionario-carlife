@@ -97,6 +97,7 @@ Migraciones versionadas en `backend/prisma/migrations`, **ya aplicadas en Neon y
 - `20261117000000_add_usage_hours_draft`
 - `20261119000000_add_image_blobs`
 - `20261121000000_optimize_images`
+- `20261121010000_add_bike_usage`
 
 Para una base nueva, ejecutar una sola vez con las cadenas directas disponibles:
 

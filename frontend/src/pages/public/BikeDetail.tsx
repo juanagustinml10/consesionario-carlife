@@ -14,6 +14,7 @@ import {
   MessageCircle,
   Clock,
   Timer,
+  Route,
   Bike as BikeIcon,
 } from 'lucide-react';
 import { Link } from '@/components/shared/Link';
@@ -34,6 +35,7 @@ import {
   formatMileage,
   formatPrice,
   formatUsageHours,
+  usageLabel,
 } from '@/lib/format';
 import { cn } from '@/lib/utils';
 
@@ -158,6 +160,7 @@ export const BikeDetail: React.FC = () => {
     { icon: <Gauge size={18} />, label: 'Cilindrada', value: formatDisplacement(bike.displacementCc) },
     { icon: <Fuel size={18} />, label: 'Kilómetros', value: formatMileage(bike.mileageKm) },
     ...(usageHours ? [{ icon: <Timer size={18} />, label: 'Horas de uso', value: usageHours }] : []),
+    ...(bike.usage ? [{ icon: <Route size={18} />, label: 'Uso', value: usageLabel(bike.usage) }] : []),
     { icon: <Tag size={18} />, label: 'Categoría', value: bike.condition === 'NUEVA' ? '0 km' : 'Usada' },
   ];
 

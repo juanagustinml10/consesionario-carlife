@@ -24,9 +24,10 @@ import {
 
 import { Link } from '@/components/shared/Link';
 import { bikesService, type CreateBikeInput } from '@/services/bikes';
-import type { Bike, BikeCondition, BikeImage, BikeStatus } from '@/types';
+import type { Bike, BikeCondition, BikeImage, BikeStatus, BikeUsage } from '@/types';
 import { cn } from '@/lib/utils';
-import { MAX_IMAGES_PER_BIKE, MAX_MODEL_YEAR, MODEL_YEARS } from '@/lib/constants';
+import { BIKE_USAGES, MAX_IMAGES_PER_BIKE, MAX_MODEL_YEAR, MODEL_YEARS } from '@/lib/constants';
+import { usageLabel } from '@/lib/format';
 import { getThumbnailUrl } from '@/lib/images';
 
 const CONDITIONS: BikeCondition[] = ['NUEVA', 'USADA'];
@@ -64,6 +65,8 @@ interface FormValues {
   price: string;
   currency: string;
   condition: BikeCondition;
+  /** '' representa "Sin definir" y se envía como null a la API. */
+  usage: BikeUsage | '';
   displacementCc: string;
   mileageKm: string;
   usageHours: string;
@@ -79,6 +82,7 @@ const emptyForm: FormValues = {
   price: '',
   currency: 'ARS',
   condition: 'USADA',
+  usage: '',
   displacementCc: '',
   mileageKm: '',
   usageHours: '',
@@ -122,6 +126,7 @@ export const BikeForm: React.FC = () => {
           price: String(b.price),
           currency: b.currency,
           condition: b.condition,
+          usage: b.usage ?? '',
           displacementCc: String(b.displacementCc ?? ''),
           mileageKm: String(b.mileageKm ?? ''),
           usageHours: b.condition === 'USADA' && b.usageHours ? String(b.usageHours) : '',
@@ -246,6 +251,7 @@ export const BikeForm: React.FC = () => {
         model: form.model.trim(),
         year: form.year,
         condition: form.condition,
+        usage: form.usage || null,
         displacementCc: form.displacementCc ? Number(form.displacementCc) : null,
         mileageKm: form.mileageKm ? Number(form.mileageKm) : null,
         usageHours:
@@ -530,6 +536,23 @@ export const BikeForm: React.FC = () => {
               </p>
 
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
+                <div className="space-y-2">
+                  <label htmlFor="bike-usage" className={labelClass}>Uso</label>
+                  <select
+                    id="bike-usage"
+                    value={form.usage}
+                    onChange={(event) => update('usage', event.target.value as BikeUsage | '')}
+                    className={inputClass}
+                  >
+                    <option value="">Sin definir</option>
+                    {BIKE_USAGES.map((item) => (
+                      <option key={item.value} value={item.value}>{item.label}</option>
+                    ))}
+                  </select>
+                  <p className="text-[11px] leading-relaxed text-sf-ink-500">
+                    Define en qué bloque del catálogo aparece: Enduro/Cross o Ruta.
+                  </p>
+                </div>
                 {form.condition === 'USADA' && (
                   <div className="space-y-2">
                     <label htmlFor="bike-km" className={labelClass}>Kilometraje (km)</label>
@@ -790,6 +813,7 @@ export const BikeForm: React.FC = () => {
                   <p className="text-[10px] font-bold uppercase tracking-wider text-sf-ink-500">La moto</p>
                   <p className="mt-2 truncate text-sm font-semibold text-white">{form.title || 'Sin título'}</p>
                   <p className="mt-1 text-xs text-sf-ink-500">{form.year} · {form.currency} {form.price || '—'}</p>
+                  <p className="mt-1 text-xs text-sf-ink-500">Uso: {usageLabel(form.usage || null)}</p>
                 </div>
                 <div className="rounded-none border border-sf-border bg-sf-elevated/40 p-4">
                   <p className="text-[10px] font-bold uppercase tracking-wider text-sf-ink-500">Estado</p>

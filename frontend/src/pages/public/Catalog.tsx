@@ -2,6 +2,8 @@ import * as React from 'react';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
+  ArrowRight,
+  Check,
   Search,
   SlidersHorizontal,
   X,
@@ -19,7 +21,7 @@ import { SkeletonCard } from '@/components/shared/SkeletonCard';
 import { bikesService, type BikeFilters } from '@/services/bikes';
 import type { Bike, BikeCondition, BikeStatus } from '@/types';
 import { cn } from '@/lib/utils';
-import { MODEL_YEARS } from '@/lib/constants';
+import { BIKE_USAGES, MODEL_YEARS } from '@/lib/constants';
 
 const CONDITIONS: { value: BikeCondition; label: string }[] = [
   { value: 'NUEVA', label: '0 km' },
@@ -80,6 +82,7 @@ export const Catalog: React.FC = () => {
     const q = value('q');
     const brand = value('brand');
     const condition = value('condition');
+    const usage = value('usage');
     const status = value('status');
     const year = Number(value('year'));
     const priceMin = Number(value('priceMin'));
@@ -88,6 +91,7 @@ export const Catalog: React.FC = () => {
       ...(q ? { q } : {}),
       ...(brand ? { brand } : {}),
       ...(condition === 'NUEVA' || condition === 'USADA' ? { condition } : {}),
+      ...(usage === 'ENDURO_CROSS' || usage === 'RUTA' ? { usage } : {}),
       ...(status === 'DISPONIBLE' || status === 'RESERVADA' || status === 'VENDIDA' ? { status } : {}),
       ...(value('year') && Number.isInteger(year) ? { year } : {}),
       ...(value('priceMin') && Number.isFinite(priceMin) ? { priceMin } : {}),
@@ -181,7 +185,7 @@ export const Catalog: React.FC = () => {
   }, []);
 
   const hasActiveFilters = useMemo(() => {
-    const keys: Array<keyof BikeFilters> = ['q', 'brand', 'model', 'year', 'condition', 'priceMin', 'priceMax', 'status', 'featured'];
+    const keys: Array<keyof BikeFilters> = ['q', 'brand', 'model', 'year', 'condition', 'usage', 'priceMin', 'priceMax', 'status', 'featured'];
     return keys.some((key) => filters[key] !== undefined && filters[key] !== null);
   }, [filters]);
 
@@ -338,6 +342,50 @@ export const Catalog: React.FC = () => {
                   <option key={option.value} value={option.value}>{option.label}</option>
                 ))}
               </select>
+            </div>
+          </div>
+
+          {/* Accesos por uso: filtran el inventario por la disciplina de la moto. */}
+          <div className="mb-10">
+            <p className="mb-3 font-display text-[10px] font-bold uppercase tracking-[0.3em] text-black/45">
+              Explorá por uso
+            </p>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              {BIKE_USAGES.map((item) => {
+                const active = filters.usage === item.value;
+                return (
+                  <button
+                    key={item.value}
+                    type="button"
+                    aria-pressed={active}
+                    onClick={() => setFilter('usage', active ? undefined : item.value)}
+                    className={cn(
+                      'group relative flex min-h-[150px] flex-col items-start justify-between overflow-hidden border p-6 text-left transition-colors sm:min-h-[170px]',
+                      active
+                        ? 'border-sf-red bg-sf-red text-white'
+                        : 'border-black/15 bg-white text-sf-black hover:border-sf-red'
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        'font-display text-2xl font-extrabold uppercase leading-none tracking-tight sm:text-3xl',
+                        active ? 'text-white' : 'text-sf-black group-hover:text-sf-red'
+                      )}
+                    >
+                      {item.title}
+                    </span>
+                    <span
+                      className={cn(
+                        'mt-5 flex items-center gap-2 font-display text-[10px] font-bold uppercase tracking-[0.25em]',
+                        active ? 'text-white/85' : 'text-black/45 group-hover:text-sf-red'
+                      )}
+                    >
+                      {active ? <Check size={15} /> : <ArrowRight size={15} />}
+                      {active ? 'Quitar filtro' : 'Ver motos'}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 

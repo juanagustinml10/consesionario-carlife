@@ -8,18 +8,19 @@ import { ImagePlaceholder } from '@/components/shared/ImagePlaceholder';
 import { ConditionTag } from '@/components/public/BikeBadges';
 import { buildWhatsAppLink } from '@/lib/constants';
 import { getThumbnailUrl } from '@/lib/images';
-import { conditionLabel, formatDisplacement, formatMileage, formatPrice, statusLabel } from '@/lib/format';
+import { conditionLabel, formatDisplacement, formatMileage, formatPrice, statusLabel, usageLabel } from '@/lib/format';
 import { useCompareStore } from '@/stores/compare';
 import type { Bike } from '@/types';
 import { cn } from '@/lib/utils';
 
-type AttrKey = 'brand' | 'model' | 'year' | 'condition' | 'displacementCc' | 'mileageKm' | 'price' | 'status';
+type AttrKey = 'brand' | 'model' | 'year' | 'condition' | 'usage' | 'displacementCc' | 'mileageKm' | 'price' | 'status';
 
 const ATTRS: Array<{ key: AttrKey; label: string }> = [
   { key: 'brand', label: 'Marca' },
   { key: 'model', label: 'Modelo' },
   { key: 'year', label: 'Año' },
   { key: 'condition', label: 'Categoría' },
+  { key: 'usage', label: 'Uso' },
   { key: 'displacementCc', label: 'Cilindrada' },
   { key: 'mileageKm', label: 'Kilometraje' },
   { key: 'price', label: 'Precio' },
@@ -30,6 +31,7 @@ const renderValue = (bike: Bike, key: AttrKey): string => {
   switch (key) {
     case 'price': return formatPrice(bike.price, bike.currency);
     case 'condition': return conditionLabel(bike.condition);
+    case 'usage': return usageLabel(bike.usage);
     case 'brand': return bike.brand?.name ?? '—';
     case 'displacementCc': return formatDisplacement(bike.displacementCc);
     case 'mileageKm': return formatMileage(bike.mileageKm);

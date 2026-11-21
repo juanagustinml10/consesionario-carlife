@@ -29,6 +29,7 @@ const bikeQuerySchema = z.object({
   model: z.string().optional(),
   year: z.coerce.number().int().optional(),
   condition: z.enum(['NUEVA', 'USADA']).optional(),
+  usage: z.enum(['ENDURO_CROSS', 'RUTA']).optional(),
   priceMin: z.coerce.number().nonnegative().optional(),
   priceMax: z.coerce.number().nonnegative().optional(),
   status: z.enum(['BORRADOR', 'DISPONIBLE', 'RESERVADA', 'VENDIDA']).optional(),
@@ -53,6 +54,8 @@ const createBikeSchema = z.object({
   model: z.string().min(1, 'El modelo es requerido').max(100),
   year: z.coerce.number().int().min(1900).max(2100, 'Año inválido'),
   condition: z.enum(['NUEVA', 'USADA']),
+  // null permite volver a "Sin definir" desde el panel.
+  usage: z.enum(['ENDURO_CROSS', 'RUTA']).optional().nullable(),
   displacementCc: z.coerce.number().int().positive().optional().nullable(),
   mileageKm: z.coerce.number().int().nonnegative().optional().nullable(),
   // Opcional y decimal. Solo se muestra en fichas de motos usadas con valor > 0.
