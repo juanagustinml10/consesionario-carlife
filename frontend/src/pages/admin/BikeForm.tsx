@@ -26,10 +26,9 @@ import { Link } from '@/components/shared/Link';
 import { bikesService, type CreateBikeInput } from '@/services/bikes';
 import type { Bike, BikeCondition, BikeImage, BikeStatus } from '@/types';
 import { cn } from '@/lib/utils';
-import { MAX_IMAGES_PER_BIKE, MAX_MODEL_YEAR } from '@/lib/constants';
+import { MAX_IMAGES_PER_BIKE, MAX_MODEL_YEAR, MODEL_YEARS } from '@/lib/constants';
 import { getThumbnailUrl } from '@/lib/images';
 
-const YEARS = Array.from({ length: 12 }, (_, index) => MAX_MODEL_YEAR - index);
 const CONDITIONS: BikeCondition[] = ['NUEVA', 'USADA'];
 const STEPS = [
   { id: 1, label: 'Datos', hint: 'Identificá la moto' },
@@ -430,7 +429,7 @@ export const BikeForm: React.FC = () => {
                     onChange={(event) => update('year', Number(event.target.value))}
                     className={inputClass}
                   >
-                    {YEARS.map((year) => <option key={year} value={year}>{year}</option>)}
+                    {MODEL_YEARS.map((year) => <option key={year} value={year}>{year}</option>)}
                   </select>
                 </div>
                 <div className="space-y-2">

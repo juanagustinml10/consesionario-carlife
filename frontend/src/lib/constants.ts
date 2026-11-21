@@ -21,6 +21,15 @@ export const BUSINESS = {
 /** Año modelo máximo ofrecido (incluye la temporada siguiente). */
 export const MAX_MODEL_YEAR = 2027;
 
+/** Año modelo mínimo aceptado en el panel y en los filtros del catálogo. */
+export const MIN_MODEL_YEAR = 2010;
+
+/** Años disponibles, de más nuevo a más viejo. */
+export const MODEL_YEARS = Array.from(
+  { length: MAX_MODEL_YEAR - MIN_MODEL_YEAR + 1 },
+  (_, index) => MAX_MODEL_YEAR - index,
+);
+
 /** Cantidad máxima de fotografías por publicación. */
 export const MAX_IMAGES_PER_BIKE = 4;
 
