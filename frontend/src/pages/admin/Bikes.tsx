@@ -37,6 +37,8 @@ export const Bikes = () => {
   const [query, setQuery] = useState('');
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [bikeToDelete, setBikeToDelete] = useState<Bike | null>(null);
+  const [updatingStatusId, setUpdatingStatusId] = useState<string | null>(null);
+  const [statusError, setStatusError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     try {
@@ -55,6 +57,27 @@ export const Bikes = () => {
   useEffect(() => {
     void load();
   }, [load]);
+
+  /** Cambia el estado de una publicación con actualización optimista. */
+  const changeStatus = async (bike: Bike, status: BikeStatus) => {
+    if (status === bike.status || updatingStatusId) return;
+    const previous = bike.status;
+    setStatusError(null);
+    setUpdatingStatusId(bike.id);
+    setBikes((prev) =>
+      prev.map((item) => (item.id === bike.id ? { ...item, status } : item)),
+    );
+    try {
+      await bikesService.update(bike.id, { status });
+    } catch {
+      setBikes((prev) =>
+        prev.map((item) => (item.id === bike.id ? { ...item, status: previous } : item)),
+      );
+      setStatusError('No se pudo cambiar el estado. Intentá de nuevo.');
+    } finally {
+      setUpdatingStatusId(null);
+    }
+  };
 
   const handleConfirmDelete = async () => {
     if (!bikeToDelete) return;
@@ -135,6 +158,11 @@ export const Bikes = () => {
             <Motorbike size={13} className="text-sf-red" />
             {filtered.length} publicación{filtered.length !== 1 ? 'es' : ''}
           </div>
+          {statusError && (
+            <p className="mt-2 text-xs text-sf-red-soft" role="alert">
+              {statusError}
+            </p>
+          )}
         </div>
 
         <div className="divide-y divide-sf-border md:hidden">
@@ -171,11 +199,21 @@ export const Bikes = () => {
                       <p className="mt-1 truncate text-[11px] text-sf-ink-500">
                         {bike.brand?.name ?? ''} {bike.model} · {bike.year}
                       </p>
-                      <span
-                        className={`mt-2 inline-flex border px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${statusBadgeClass(bike.status)}`}
+                      <select
+                        value={bike.status}
+                        disabled={updatingStatusId === bike.id}
+                        onChange={(event) =>
+                          void changeStatus(bike, event.target.value as BikeStatus)
+                        }
+                        aria-label={`Estado de ${bike.title}`}
+                        className={`mt-2 border px-2 py-1 text-[10px] font-bold uppercase tracking-wider outline-none disabled:opacity-50 ${statusBadgeClass(bike.status)}`}
                       >
-                        {STATUS_LABELS[bike.status]}
-                      </span>
+                        {(Object.keys(STATUS_LABELS) as BikeStatus[]).map((status) => (
+                          <option key={status} value={status}>
+                            {STATUS_LABELS[status]}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                   </div>
                   <div className="mt-4 flex items-center justify-between gap-3 border-t border-sf-border pt-3">
@@ -273,11 +311,21 @@ export const Bikes = () => {
                         </span>
                       </td>
                       <td className="px-4 py-4">
-                        <span
-                          className={`inline-flex border px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${statusBadgeClass(bike.status)}`}
+                        <select
+                          value={bike.status}
+                          disabled={updatingStatusId === bike.id}
+                          onChange={(event) =>
+                            void changeStatus(bike, event.target.value as BikeStatus)
+                          }
+                          aria-label={`Estado de ${bike.title}`}
+                          className={`border px-2 py-1 text-[10px] font-bold uppercase tracking-wider outline-none disabled:opacity-50 ${statusBadgeClass(bike.status)}`}
                         >
-                          {STATUS_LABELS[bike.status]}
-                        </span>
+                          {(Object.keys(STATUS_LABELS) as BikeStatus[]).map((status) => (
+                            <option key={status} value={status}>
+                              {STATUS_LABELS[status]}
+                            </option>
+                          ))}
+                        </select>
                       </td>
                       <td className="px-5 py-4">
                         <div className="flex items-center justify-end gap-2">

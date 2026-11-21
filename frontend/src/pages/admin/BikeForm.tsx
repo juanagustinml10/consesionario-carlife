@@ -825,7 +825,7 @@ export const BikeForm: React.FC = () => {
               <p className="mb-3 mt-8 text-[10px] font-bold uppercase tracking-widest text-sf-ink-500">
                 Elegí qué hacer con esta publicación
               </p>
-              <div className="grid gap-3 sm:grid-cols-2">
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                 <div className="rounded-none border border-sf-border-strong bg-sf-elevated/40 p-4">
                   <div className="flex items-center justify-between gap-2">
                     <span className="flex h-9 w-9 items-center justify-center rounded-none bg-sf-elevated text-sf-ink-300">
@@ -854,6 +854,34 @@ export const BikeForm: React.FC = () => {
                     La moto pasa a estar disponible en el catálogo público.
                   </p>
                 </div>
+                <div className="rounded-none border border-amber-500/30 bg-amber-500/[0.06] p-4">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-none bg-amber-500/15 text-amber-300">
+                      <Info size={18} />
+                    </span>
+                    <span className="rounded-none border border-amber-500/40 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-300">
+                      Visible
+                    </span>
+                  </div>
+                  <p className="mt-3 text-sm font-semibold text-white">Marcar como reservada</p>
+                  <p className="mt-1 text-xs leading-relaxed text-sf-ink-400">
+                    Sigue en el catálogo con la leyenda “Reservada”.
+                  </p>
+                </div>
+                <div className="rounded-none border border-sf-border-strong bg-sf-elevated/40 p-4">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-none bg-sf-elevated text-sf-ink-400">
+                      <Check size={18} />
+                    </span>
+                    <span className="rounded-none border border-sf-border-strong px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-sf-ink-400">
+                      Visible
+                    </span>
+                  </div>
+                  <p className="mt-3 text-sm font-semibold text-white">Marcar como vendida</p>
+                  <p className="mt-1 text-xs leading-relaxed text-sf-ink-500">
+                    Sigue en el catálogo con la leyenda “Vendida”.
+                  </p>
+                </div>
               </div>
             </section>
           )}
@@ -871,7 +899,7 @@ export const BikeForm: React.FC = () => {
                 </button>
               )}
             </div>
-            <div className="flex flex-col gap-3 sm:flex-row">
+            <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               {step < 5 && (
                 <button
                   type="button"
@@ -893,7 +921,7 @@ export const BikeForm: React.FC = () => {
                     onClick={() => void save('BORRADOR')}
                     className={cn(
                       buttonClass,
-                      'order-2 w-full border-sf-border-strong bg-transparent text-sf-ink-300 hover:border-sf-ink-400 hover:bg-sf-elevated hover:text-white sm:order-1 sm:w-auto'
+                      'w-full border-sf-border-strong bg-transparent text-sf-ink-300 hover:border-sf-ink-400 hover:bg-sf-elevated hover:text-white sm:w-auto'
                     )}
                   >
                     <Save size={16} /> {saving ? 'Guardando...' : 'Guardar como borrador'}
@@ -903,10 +931,32 @@ export const BikeForm: React.FC = () => {
                     disabled={saving}
                     className={cn(
                       buttonClass,
-                      'order-1 w-full border-sf-red bg-sf-red text-white hover:bg-sf-red-dark sm:order-2 sm:w-auto'
+                      'w-full border-sf-red bg-sf-red text-white hover:bg-sf-red-dark sm:w-auto'
                     )}
                   >
                     <Send size={16} /> {saving ? 'Publicando...' : 'Publicar'}
+                  </button>
+                  <button
+                    type="button"
+                    disabled={saving}
+                    onClick={() => void save('RESERVADA')}
+                    className={cn(
+                      buttonClass,
+                      'w-full border-amber-500/60 bg-transparent text-amber-300 hover:bg-amber-500/10 sm:w-auto'
+                    )}
+                  >
+                    <Info size={16} /> {saving ? 'Guardando...' : 'Reservada'}
+                  </button>
+                  <button
+                    type="button"
+                    disabled={saving}
+                    onClick={() => void save('VENDIDA')}
+                    className={cn(
+                      buttonClass,
+                      'w-full border-sf-border-strong bg-transparent text-sf-ink-300 hover:border-sf-ink-400 hover:text-white sm:w-auto'
+                    )}
+                  >
+                    <Check size={16} /> {saving ? 'Guardando...' : 'Vendida'}
                   </button>
                 </>
               )}
