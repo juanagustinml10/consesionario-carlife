@@ -10,40 +10,27 @@ interface BadgeProps {
   tone?: Tone;
 }
 
-export const ConditionTag: React.FC<BadgeProps & { condition: BikeCondition }> = ({ condition, overlay = false, tone = 'dark' }) => {
-  const nueva = condition === 'NUEVA';
-  return (
-    <span
-      className={cn(
-        'tag',
-        overlay
-          ? nueva ? 'bg-sf-red text-white' : 'bg-white text-black'
-          : nueva ? 'bg-sf-red text-white' : tone === 'light' ? 'bg-sf-black text-white' : 'bg-white text-black'
-      )}
-    >
-      {conditionLabel(condition)}
-    </span>
-  );
-};
+/** Etiquetas claras y legibles, pensadas para tarjetas de fondo blanco. */
+export const ConditionTag: React.FC<BadgeProps & { condition: BikeCondition }> = ({ condition }) => (
+  <span className={cn('tag', 'tag-solid')}>{conditionLabel(condition)}</span>
+);
 
-export const StatusTag: React.FC<BadgeProps & { status: BikeStatus }> = ({ status, overlay = false, tone = 'dark' }) => {
+export const StatusTag: React.FC<BadgeProps & { status: BikeStatus }> = ({ status, overlay = false, tone = 'light' }) => {
   const dot =
     status === 'DISPONIBLE'
-      ? 'bg-green-400'
+      ? overlay || tone === 'light' ? 'bg-cc-black' : 'bg-white'
       : status === 'RESERVADA'
-        ? 'bg-amber-400'
-        : status === 'BORRADOR'
-          ? 'bg-gray-400'
-          : 'bg-sf-red';
+        ? 'bg-cc-metal'
+        : 'bg-cc-metal/60';
   return (
     <span
       className={cn(
         'tag',
         overlay
-          ? 'bg-black/70 text-white backdrop-blur'
-          : tone === 'light'
-            ? 'border border-black/15 text-black/70'
-            : 'border border-white/15 text-gray-300'
+          ? 'tag-white shadow-sm'
+          : tone === 'dark'
+            ? 'border-white/20 text-white/75'
+            : 'tag-dark',
       )}
     >
       <span className={cn('h-1.5 w-1.5 shrink-0', dot)} />
@@ -52,17 +39,13 @@ export const StatusTag: React.FC<BadgeProps & { status: BikeStatus }> = ({ statu
   );
 };
 
-export const FeaturedTag: React.FC<BadgeProps> = ({ overlay = false, tone = 'dark' }) => (
+export const FeaturedTag: React.FC<BadgeProps> = ({ overlay = false, tone = 'light' }) => (
   <span
     className={cn(
       'tag',
-      overlay
-        ? 'border border-sf-red/60 bg-black/70 text-sf-red-soft backdrop-blur'
-        : tone === 'light'
-          ? 'border border-sf-red/50 text-sf-red'
-          : 'border border-sf-red/40 bg-sf-red/10 text-sf-red-soft'
+      overlay ? 'tag-white shadow-sm' : tone === 'dark' ? 'border-white/25 text-white/80' : 'tag-dark',
     )}
   >
-    Destacada
+    Destacado
   </span>
 );

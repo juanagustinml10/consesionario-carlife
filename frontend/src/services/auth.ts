@@ -30,14 +30,14 @@ export const authService = {
     try {
       await api.post('/auth/logout');
     } finally {
-      localStorage.removeItem('sf_motos_access_token');
-      localStorage.removeItem('sf_motos_refresh_token');
-      localStorage.removeItem('sf_motos_user');
+      localStorage.removeItem('carlife_access_token');
+      localStorage.removeItem('carlife_refresh_token');
+      localStorage.removeItem('carlife_user');
     }
   },
 
   getStoredUser: (): AdminUser | null => {
-    const raw = localStorage.getItem('sf_motos_user');
+    const raw = localStorage.getItem('carlife_user');
     if (!raw) return null;
     try {
       return JSON.parse(raw) as AdminUser;
@@ -47,18 +47,18 @@ export const authService = {
   },
 
   setSession: (tokens: AuthTokens, user: AdminUser) => {
-    localStorage.setItem('sf_motos_access_token', tokens.accessToken);
+    localStorage.setItem('carlife_access_token', tokens.accessToken);
     if (tokens.refreshToken) {
-      localStorage.setItem('sf_motos_refresh_token', tokens.refreshToken);
+      localStorage.setItem('carlife_refresh_token', tokens.refreshToken);
     }
-    localStorage.setItem('sf_motos_user', JSON.stringify(user));
+    localStorage.setItem('carlife_user', JSON.stringify(user));
   },
 
   clearSession: () => {
-    localStorage.removeItem('sf_motos_access_token');
-    localStorage.removeItem('sf_motos_refresh_token');
-    localStorage.removeItem('sf_motos_user');
+    localStorage.removeItem('carlife_access_token');
+    localStorage.removeItem('carlife_refresh_token');
+    localStorage.removeItem('carlife_user');
   },
 
-  isAuthenticated: () => !!localStorage.getItem('sf_motos_access_token'),
+  isAuthenticated: () => !!localStorage.getItem('carlife_access_token'),
 };

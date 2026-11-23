@@ -13,29 +13,31 @@ interface SectionHeadingProps {
   size?: 'default' | 'large';
 }
 
-/** Encabezado editorial reutilizable: marker numérico, título deportivo y acción opcional. */
+/** Encabezado de sección: una sola etiqueta, un título fuerte y una acción. */
 export const SectionHeading: React.FC<SectionHeadingProps> = ({
   eyebrow,
   title,
   actionLabel,
   actionTo,
-  index,
-  tone = 'dark',
+  tone = 'light',
   size = 'default',
 }) => {
   const light = tone === 'light';
   return (
-    <div className="mb-8 flex flex-col gap-5 border-t-2 border-sf-red pt-5 sm:mb-12 sm:flex-row sm:items-end sm:justify-between">
+    <div
+      className={cn(
+        'mb-12 flex flex-col gap-7 sm:mb-14 sm:flex-row sm:items-end sm:justify-between',
+      )}
+    >
       <div>
-        <div className="flex items-center gap-3">
-          {index && <span className="font-display text-xs font-extrabold tracking-[0.2em] text-sf-red">{index}</span>}
-          <span className={cn('eyebrow', light && '!text-sf-red')}>{eyebrow}</span>
-        </div>
-        <h2 className={cn(
-          'mt-2 font-display font-extrabold uppercase leading-[0.88]',
-          size === 'large' ? 'text-5xl sm:text-7xl lg:text-8xl' : 'text-4xl sm:text-6xl',
-          light ? 'text-sf-black' : 'text-white'
-        )}>
+        <span className={cn('eyebrow', light ? 'eyebrow-dark' : 'eyebrow-light')}>{eyebrow}</span>
+        <h2
+          className={cn(
+            'mt-5 font-display font-bold uppercase',
+            size === 'large' ? 'text-5xl sm:text-7xl lg:text-8xl' : 'text-4xl sm:text-6xl',
+            light ? 'text-cc-black' : 'text-white',
+          )}
+        >
           {title}
         </h2>
       </div>
@@ -43,13 +45,14 @@ export const SectionHeading: React.FC<SectionHeadingProps> = ({
         <Link
           to={actionTo}
           className={cn(
-            'inline-flex shrink-0 items-center gap-2 border-b pb-1 font-display text-xs font-extrabold uppercase tracking-[0.2em] transition-colors',
+            'group inline-flex min-h-8 shrink-0 items-center gap-2 border-b pb-1 text-[10px] font-bold uppercase tracking-[0.2em] transition-colors',
             light
-              ? 'border-black/20 text-black/70 hover:border-sf-red hover:text-sf-red'
-              : 'border-white/20 text-gray-300 hover:border-sf-red hover:text-white'
+              ? 'border-black/25 text-cc-slate hover:border-black hover:text-black'
+              : 'border-white/30 text-white/65 hover:border-white hover:text-white',
           )}
         >
-          {actionLabel} <ArrowUpRight size={16} />
+          {actionLabel}
+          <ArrowUpRight size={16} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
         </Link>
       )}
     </div>

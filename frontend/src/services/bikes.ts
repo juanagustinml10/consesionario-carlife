@@ -31,11 +31,11 @@ export interface CreateBikeInput {
   model: string;
   year: number;
   condition: BikeCondition;
-  /** null vuelve a dejar la moto sin clasificar. */
+  /** null vuelve a dejar el vehículo sin clasificar. */
   usage?: BikeUsage | null;
   displacementCc?: number | null;
   mileageKm?: number | null;
-  /** Decimal opcional; se envía null para motos 0 km o cuando no hay dato. */
+  /** Decimal opcional; se envía null cuando no hay dato. */
   usageHours?: number | null;
   price: number;
   currency?: string;
@@ -51,7 +51,7 @@ const BASE = '/bikes';
 
 /** Las listas opcionales se normalizan para que ningún componente iterate `undefined`. */
 const normalizeBike = (value: unknown): Bike => {
-  const bike = requireObject<Bike>(value, 'moto');
+  const bike = requireObject<Bike>(value, 'vehículo');
   return {
     ...bike,
     images: Array.isArray(bike.images) ? bike.images : [],
@@ -105,7 +105,7 @@ export const bikesService = {
   },
 
   /**
-   * Subir imágenes de una moto, de a una por request.
+   * Subir imágenes de un vehículo, de a una por request.
    * Vercel limita el body a ~4.5 MB y el backend procesa cada archivo con Sharp.
    */
   uploadImages: async (bikeId: string, files: FileList | File[]) => {

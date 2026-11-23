@@ -7,20 +7,18 @@ interface ImagePlaceholderProps {
   className?: string;
 }
 
-/**
- * Imagen de marcador de posición para datos de prueba.
- * Sustituir por fotografías reales de las motos al integrar el módulo de uploads.
- */
+/** Marcador de posición dentro de la paleta blanco / rojo / negro de CARLIFE. */
 export const ImagePlaceholder: React.FC<ImagePlaceholderProps> = ({
   width = 400,
   height = 300,
-  label = 'Imagen de prueba',
+  label = 'Imagen no disponible',
   className,
 }) => {
   const svg = `
     <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
-      <rect width="100%" height="100%" fill="#f3f4f6"/>
-      <text x="50%" y="50%" font-family="system-ui, sans-serif" font-size="16" fill="#9ca3af" text-anchor="middle" dominant-baseline="middle">${label}</text>
+      <rect width="100%" height="100%" fill="#0a0a0a"/>
+      <rect x="0.5" y="0.5" width="99%" height="99%" fill="none" stroke="#e91311"/>
+      <text x="50%" y="50%" font-family="Inter, system-ui, sans-serif" font-size="14" letter-spacing="2" fill="#ffffff" text-anchor="middle" dominant-baseline="middle">${label.toUpperCase()}</text>
     </svg>
   `;
   const src = `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svg)))}`;
@@ -32,7 +30,7 @@ export const ImagePlaceholder: React.FC<ImagePlaceholderProps> = ({
       width={width}
       height={height}
       className={className}
-      style={{ backgroundColor: '#f3f4f6', color: '#9ca3af' }}
+      style={{ backgroundColor: '#111111' }}
     />
   );
 };

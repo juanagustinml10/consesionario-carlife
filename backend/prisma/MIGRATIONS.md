@@ -1,32 +1,16 @@
-# Migraciones de SF MOTOS
+# Migraciones de CARLIFE
 
-## Estado actual: pendientes en la base de SF MOTOS
+## Estado actual
 
-Las tres migraciones están versionadas en el repo, pero **no fueron aplicadas a ninguna
-base propia de SF MOTOS**. No existe una URL de base de datos configurada para este
-proyecto. Ejecutar `prisma migrate deploy` contra la nueva base antes de usar la API.
+Las migraciones están versionadas en `backend/prisma/migrations` y aplicadas en la
+base de producción (Neon). Para levantar un entorno nuevo, configurar `DATABASE_URL`
+y `DATABASE_URL_UNPOOLED` y ejecutar `prisma migrate deploy`.
 
-La tercera, `20261119000000_add_image_blobs`, es aditiva: agrega `data` (BYTEA),
+La migración `20261119000000_add_image_blobs` es aditiva: agrega `data` (BYTEA),
 `mimeType`, `sizeBytes`, `checksum`, `storageKey` (único) y `legacyUrl` a `BikeImage`.
 No modifica ni borra filas existentes.
 
-Orden de aplicación:
-
-1. `20261116000000_init` — migración baseline. Crea los enums `BikeCondition` y
-   `BikeStatus` (sin `BORRADOR`), las tablas `Brand`, `Bike`, `BikeImage`,
-   `BikeFeature`, `BikeVisit`, `AdminUser` y `Session`, sus índices y foreign keys.
-   **No incluye** `usageHours` ni `BORRADOR`: esos cambios pertenecen a la
-   migración siguiente.
-2. `20261117000000_add_usage_hours_draft` — agrega `Bike.usageHours`
-   (`DOUBLE PRECISION`, nullable) y el valor `BORRADOR` al enum `BikeStatus`.
-   Las filas existentes conservan `NULL`: no se inventan valores.
-
-La baseline se generó con `prisma migrate diff --from-empty` desde un esquema
-sin esos dos cambios, y se verificó que `baseline + migración existente` produce
-exactamente el `schema.prisma` actual. No se borró ni modificó ninguna migración
-previa.
-
-### Conexión
+## Conexión
 
 `schema.prisma` usa dos cadenas:
 
@@ -35,7 +19,7 @@ previa.
 - `DATABASE_URL_UNPOOLED`: endpoint **directo** (sin `-pooler`), declarado como
   `directUrl` en el bloque `datasource`. Lo usa el CLI de Prisma para migraciones.
 
-### Comandos
+## Comandos
 
 Para aplicar migraciones en otro entorno con la DB ya configurada:
 
@@ -52,11 +36,10 @@ npx prisma generate
 No usar `db push` ni reiniciar el historial de migraciones: las migraciones son
 la fuente de verdad del esquema.
 
-### Comportamiento de las columnas agregadas
+## Comportamiento de las columnas agregadas
 
-- Las motos con `usageHours` **mayor a 0** y condición `USADA` muestran el dato en
-  la ficha pública.
-- `NULL`, `0` y motos `NUEVA` nunca muestran el campo.
+- Las publicaciones con `usageHours` **mayor a 0** muestran el dato en la ficha pública.
+- `NULL` y `0` se consideran "sin dato" y nunca se muestran como horas cargadas.
 - Las publicaciones `BORRADOR` no aparecen en el catálogo ni se pueden abrir por
   slug o por ID público; sí se ven y se pueden editar desde el panel
   administrativo (endpoints autenticados).

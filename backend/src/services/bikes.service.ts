@@ -188,7 +188,7 @@ export const createBike = async (input: CreateBikeInput) => {
       usage: input.usage ?? null,
       displacementCc: input.displacementCc ?? null,
       mileageKm: input.mileageKm ?? null,
-      // Una moto 0 km no declara horas de uso: se normaliza a null.
+      // Sin kilometraje declarado no se informan horas de uso: se normaliza a null.
       usageHours: input.condition === 'NUEVA' ? null : (input.usageHours ?? null),
       price: input.price,
       currency: input.currency,
@@ -235,13 +235,13 @@ export const updateBike = async (id: string, input: UpdateBikeInput) => {
   if (input.status !== undefined) data.status = input.status;
   if (input.featured !== undefined) data.featured = input.featured;
 
-  // Si la moto pasa a 0 km (o ya lo era), las horas no tienen sentido.
+  // Si la condición interna no admite horas de uso, se normalizan a null.
   const current = await prisma.bike.findUnique({
     where: { id },
     select: { condition: true },
   });
   if (!current) {
-    const err: any = new Error('Moto no encontrada');
+    const err: any = new Error('Vehículo no encontrado');
     err.statusCode = 404;
     throw err;
   }
@@ -309,7 +309,7 @@ export const addBikeImages = async (
     select: { id: true },
   });
   if (!bike) {
-    const err: any = new Error('Moto no encontrada');
+    const err: any = new Error('Vehículo no encontrado');
     err.statusCode = 404;
     throw err;
   }
@@ -430,7 +430,7 @@ export const reorderBikeImages = async (bikeId: string, ids: string[]) => {
 export const trackBikeVisit = async (bikeId: string, ip?: string, userAgent?: string) => {
   const bike = await prisma.bike.findUnique({ where: { id: bikeId }, select: { id: true } });
   if (!bike) {
-    const err: any = new Error('Moto no encontrada');
+    const err: any = new Error('Vehículo no encontrado');
     err.statusCode = 404;
     throw err;
   }

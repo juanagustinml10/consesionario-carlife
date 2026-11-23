@@ -5,9 +5,9 @@ import type { BikeCondition, BikeStatus, BikeUsage } from '@/types';
 export const formatPrice = (price: number, currency = 'ARS') =>
   `$${price.toLocaleString('es-AR')} ${currency}`;
 
-/** Kilometraje: las unidades 0 km no declaran kilometraje en la API. */
+/** Kilometraje: cuando no hay dato se muestra "A confirmar". */
 export const formatMileage = (km: number | null | undefined) =>
-  km == null ? '0 km' : `${km.toLocaleString('es-AR')} km`;
+  km == null ? 'A confirmar' : `${km.toLocaleString('es-AR')} km`;
 
 export const formatDisplacement = (cc: number | null | undefined) =>
   cc ? `${cc} cc` : 'A confirmar';
@@ -22,8 +22,7 @@ export const formatUsageHours = (hours: number | null | undefined) => {
   return `${value} ${hours === 1 ? 'hora' : 'horas'}`;
 };
 
-export const conditionLabel = (condition: BikeCondition) =>
-  condition === 'NUEVA' ? '0 km' : 'Usada';
+export const conditionLabel = (_condition: BikeCondition) => 'Usado';
 
 export const usageLabel = (usage: BikeUsage | null | undefined) =>
   BIKE_USAGES.find((item) => item.value === usage)?.label ?? 'Sin definir';

@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
+  CarFront,
   Edit2,
   ImageOff,
-  Motorbike,
   Plus,
   Search,
   Trash2,
@@ -21,10 +21,10 @@ const STATUS_LABELS: Record<BikeStatus, string> = {
 };
 
 const statusBadgeClass = (status: BikeStatus) => {
-  if (status === 'BORRADOR') return 'border-sf-border-strong bg-sf-elevated text-sf-ink-300';
-  if (status === 'DISPONIBLE') return 'border-emerald-500/40 bg-emerald-500/10 text-emerald-300';
-  if (status === 'RESERVADA') return 'border-amber-500/40 bg-amber-500/10 text-amber-300';
-  return 'border-sf-red/40 bg-sf-red/10 text-sf-red-soft';
+  if (status === 'BORRADOR') return 'border-white/15 text-white/50';
+  if (status === 'DISPONIBLE') return 'border-white bg-white text-cc-black';
+  if (status === 'RESERVADA') return 'border-white/40 text-white/80';
+  return 'border-white/15 bg-white/10 text-white';
 };
 
 const getThumb = (bike: Bike) =>
@@ -106,36 +106,31 @@ export const Bikes = () => {
 
   return (
     <div>
-      <div className="mb-7 flex flex-col gap-5 border-b border-sf-border pb-6 sm:flex-row sm:items-end sm:justify-between">
+      <div className="mb-7 flex flex-col gap-5 border-b border-white/15 pb-6 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <span className="micro-label text-sf-red">Inventario</span>
-          <h1 className="mt-2 font-display text-3xl uppercase tracking-wide text-white sm:text-4xl">
-            Motocicletas
-          </h1>
-          <p className="mt-2 text-sm text-sf-ink-400">
+          <span className="eyebrow eyebrow-light">Inventario</span>
+          <h1 className="display-md mt-3">Vehículos</h1>
+          <p className="mt-3 text-sm text-white/55">
             Administración de publicaciones del catálogo.
           </p>
         </div>
-        <Link to="/admin/motos/nuevo" className="btn btn-red self-start sm:self-auto">
+        <Link to="/admin/motos/nuevo" className="btn btn-light self-start sm:self-auto">
           <Plus size={16} /> Nueva publicación
         </Link>
       </div>
 
-      <div className="border border-sf-border bg-sf-surface">
-        <div className="border-b border-sf-border p-4 sm:p-5">
+      <div className="border border-white/10 bg-cc-carbon">
+        <div className="border-b border-white/10 p-4 sm:p-5">
           <div className="flex flex-col gap-3 md:flex-row">
             <div className="relative flex-1">
-              <Search
-                size={16}
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-sf-ink-500"
-              />
+              <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" />
               <input
                 type="search"
                 placeholder="Buscar por marca, modelo o título…"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 aria-label="Buscar publicaciones"
-                className="h-11 w-full border border-sf-border-strong bg-sf-black pl-11 pr-4 text-sm text-white outline-none transition-colors placeholder:text-sf-ink-600 focus:border-sf-red"
+                className="field pl-11"
               />
             </div>
             <select
@@ -145,7 +140,7 @@ export const Bikes = () => {
                 setStatusFilter(event.target.value as BikeStatus | 'TODOS');
               }}
               aria-label="Filtrar por estado"
-              className="h-11 border border-sf-border-strong bg-sf-black px-4 text-sm text-white outline-none transition-colors focus:border-sf-red md:min-w-52"
+              className="field md:min-w-52"
             >
               <option value="TODOS">Todos los estados</option>
               <option value="BORRADOR">Borradores</option>
@@ -154,76 +149,59 @@ export const Bikes = () => {
               <option value="VENDIDA">Vendidas</option>
             </select>
           </div>
-          <div className="mt-4 flex items-center gap-2 text-[11px] uppercase tracking-wider text-sf-ink-500">
-            <Motorbike size={13} className="text-sf-red" />
+          <div className="mt-4 flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-white/45">
+            <CarFront size={13} className="text-white/60" />
             {filtered.length} publicación{filtered.length !== 1 ? 'es' : ''}
           </div>
           {statusError && (
-            <p className="mt-2 text-xs text-sf-red-soft" role="alert">
+            <p className="mt-2 text-xs text-white" role="alert">
               {statusError}
             </p>
           )}
         </div>
 
-        <div className="divide-y divide-sf-border md:hidden">
+        <div className="divide-y divide-white/10 md:hidden">
           {loading ? (
-            <p className="py-14 text-center text-sm text-sf-ink-500">
-              Cargando publicaciones…
-            </p>
+            <p className="py-14 text-center text-sm text-white/50">Cargando publicaciones…</p>
           ) : filtered.length === 0 ? (
-            <p className="py-14 text-center text-sm text-sf-ink-500">
-              No se encontraron publicaciones.
-            </p>
+            <p className="py-14 text-center text-sm text-white/50">No se encontraron publicaciones.</p>
           ) : (
             filtered.map((bike) => {
               const thumb = getThumb(bike);
               return (
                 <div key={bike.id} className="p-4">
                   <div className="flex items-start gap-3">
-                    <div className="flex h-14 w-16 shrink-0 items-center justify-center overflow-hidden border border-sf-border bg-sf-black">
+                    <div className="flex h-14 w-16 shrink-0 items-center justify-center overflow-hidden border border-white/15 bg-cc-black">
                       {thumb ? (
-                        <img
-                          src={getThumbnailUrl(thumb)}
-                          alt=""
-                          loading="lazy"
-                          className="h-full w-full object-cover"
-                        />
+                        <img src={getThumbnailUrl(thumb)} alt="" loading="lazy" className="photo h-full w-full object-cover" />
                       ) : (
-                        <ImageOff size={18} className="text-sf-ink-600" />
+                        <ImageOff size={18} className="text-white/35" />
                       )}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-semibold text-white">
-                        {bike.title}
-                      </p>
-                      <p className="mt-1 truncate text-[11px] text-sf-ink-500">
+                      <p className="truncate text-sm font-semibold text-white">{bike.title}</p>
+                      <p className="mt-1 truncate text-[11px] text-white/45">
                         {bike.brand?.name ?? ''} {bike.model} · {bike.year}
                       </p>
                       <select
                         value={bike.status}
                         disabled={updatingStatusId === bike.id}
-                        onChange={(event) =>
-                          void changeStatus(bike, event.target.value as BikeStatus)
-                        }
+                        onChange={(event) => void changeStatus(bike, event.target.value as BikeStatus)}
                         aria-label={`Estado de ${bike.title}`}
-                        className={`mt-2 border px-2 py-1 text-[10px] font-bold uppercase tracking-wider outline-none disabled:opacity-50 ${statusBadgeClass(bike.status)}`}
+                        className={`mt-2 border bg-cc-black px-2 py-1 text-[10px] font-bold uppercase tracking-wider outline-none disabled:opacity-50 ${statusBadgeClass(bike.status)}`}
                       >
                         {(Object.keys(STATUS_LABELS) as BikeStatus[]).map((status) => (
-                          <option key={status} value={status}>
-                            {STATUS_LABELS[status]}
-                          </option>
+                          <option key={status} value={status}>{STATUS_LABELS[status]}</option>
                         ))}
                       </select>
                     </div>
                   </div>
-                  <div className="mt-4 flex items-center justify-between gap-3 border-t border-sf-border pt-3">
-                    <span className="font-display text-lg text-white">
-                      {bike.price.toLocaleString('es-AR')} {bike.currency}
-                    </span>
+                  <div className="mt-4 flex items-center justify-between gap-3 border-t border-white/10 pt-3">
+                    <span className="data-num text-lg">{bike.price.toLocaleString('es-AR')} {bike.currency}</span>
                     <div className="flex gap-2">
                       <Link
                         to={`/admin/motos/${bike.id}/editar`}
-                        className="flex h-9 w-9 items-center justify-center border border-sf-border-strong text-sf-ink-300 transition-colors hover:border-sf-red hover:text-white"
+                        className="flex h-9 w-9 items-center justify-center border border-white/20 text-white/70 transition-colors hover:border-white hover:text-white"
                         title="Editar"
                         aria-label="Editar publicación"
                       >
@@ -232,7 +210,7 @@ export const Bikes = () => {
                       <button
                         type="button"
                         onClick={() => setBikeToDelete(bike)}
-                        className="flex h-9 w-9 items-center justify-center border border-sf-border-strong text-sf-ink-300 transition-colors hover:border-sf-red hover:bg-sf-red hover:text-white"
+                        className="flex h-9 w-9 items-center justify-center border border-white/20 text-white/70 transition-colors hover:border-white hover:bg-white hover:text-cc-black"
                         title="Eliminar"
                         aria-label="Eliminar publicación"
                       >
@@ -249,81 +227,57 @@ export const Bikes = () => {
         <div className="hidden overflow-x-auto md:block">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-sf-border bg-sf-black/40 text-[10px] uppercase tracking-wider text-sf-ink-500">
-                <th className="px-5 py-3.5 font-bold">Moto</th>
+              <tr className="border-b border-white/10 bg-white/[0.03] text-[10px] uppercase tracking-wider text-white/45">
+                <th className="px-5 py-3.5 font-bold">Vehículo</th>
                 <th className="px-4 py-3.5 font-bold">Año</th>
                 <th className="px-4 py-3.5 font-bold">Precio</th>
                 <th className="px-4 py-3.5 font-bold">Estado</th>
                 <th className="px-5 py-3.5 text-right font-bold">Acciones</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-sf-border">
+            <tbody className="divide-y divide-white/10">
               {loading ? (
                 <tr>
-                  <td colSpan={5} className="py-14 text-center text-sm text-sf-ink-500">
-                    Cargando publicaciones…
-                  </td>
+                  <td colSpan={5} className="py-14 text-center text-sm text-white/50">Cargando publicaciones…</td>
                 </tr>
               ) : filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="py-14 text-center text-sm text-sf-ink-500">
-                    No se encontraron publicaciones.
-                  </td>
+                  <td colSpan={5} className="py-14 text-center text-sm text-white/50">No se encontraron publicaciones.</td>
                 </tr>
               ) : (
                 filtered.map((bike) => {
                   const thumb = getThumb(bike);
                   return (
-                    <tr
-                      key={bike.id}
-                      className="transition-colors hover:bg-sf-elevated/40"
-                    >
+                    <tr key={bike.id} className="transition-colors hover:bg-white/[0.03]">
                       <td className="px-5 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="flex h-11 w-14 shrink-0 items-center justify-center overflow-hidden border border-sf-border bg-sf-black">
+                          <div className="flex h-11 w-14 shrink-0 items-center justify-center overflow-hidden border border-white/15 bg-cc-black">
                             {thumb ? (
-                              <img
-                                src={getThumbnailUrl(thumb)}
-                                alt=""
-                                loading="lazy"
-                                className="h-full w-full object-cover"
-                              />
+                              <img src={getThumbnailUrl(thumb)} alt="" loading="lazy" className="photo h-full w-full object-cover" />
                             ) : (
-                              <ImageOff size={16} className="text-sf-ink-600" />
+                              <ImageOff size={16} className="text-white/35" />
                             )}
                           </div>
                           <div className="min-w-0">
-                            <p className="truncate font-semibold text-white">
-                              {bike.title}
-                            </p>
-                            <p className="mt-0.5 truncate text-[11px] text-sf-ink-500">
-                              {bike.brand?.name ?? ''} {bike.model}
-                            </p>
+                            <p className="truncate font-semibold text-white">{bike.title}</p>
+                            <p className="mt-0.5 truncate text-[11px] text-white/45">{bike.brand?.name ?? ''} {bike.model}</p>
                           </div>
                         </div>
                       </td>
-                      <td className="px-4 py-4 font-mono text-xs text-sf-ink-300">
-                        {bike.year}
-                      </td>
+                      <td className="data-num px-4 py-4 text-xs text-white/60">{bike.year}</td>
                       <td className="px-4 py-4">
-                        <span className="font-display text-base text-white">
-                          {bike.price.toLocaleString('es-AR')} {bike.currency}
-                        </span>
+                        <span className="data-num text-base">{bike.price.toLocaleString('es-AR')} {bike.currency}</span>
                       </td>
                       <td className="px-4 py-4">
                         <select
                           value={bike.status}
                           disabled={updatingStatusId === bike.id}
-                          onChange={(event) =>
-                            void changeStatus(bike, event.target.value as BikeStatus)
-                          }
+                          onChange={(event) => void changeStatus(bike, event.target.value as BikeStatus)}
                           aria-label={`Estado de ${bike.title}`}
-                          className={`border px-2 py-1 text-[10px] font-bold uppercase tracking-wider outline-none disabled:opacity-50 ${statusBadgeClass(bike.status)}`}
+                          className={`border bg-cc-black px-2 py-1 text-[10px] font-bold uppercase tracking-wider outline-none disabled:opacity-50 ${statusBadgeClass(bike.status)}`}
                         >
                           {(Object.keys(STATUS_LABELS) as BikeStatus[]).map((status) => (
-                            <option key={status} value={status}>
-                              {STATUS_LABELS[status]}
-                            </option>
+                            <option key={status} value={status}>{STATUS_LABELS[status]}</option>
                           ))}
                         </select>
                       </td>
@@ -331,7 +285,7 @@ export const Bikes = () => {
                         <div className="flex items-center justify-end gap-2">
                           <Link
                             to={`/admin/motos/${bike.id}/editar`}
-                            className="flex h-9 w-9 items-center justify-center border border-sf-border-strong text-sf-ink-300 transition-colors hover:border-sf-red hover:text-white"
+                            className="flex h-9 w-9 items-center justify-center border border-white/20 text-white/70 transition-colors hover:border-white hover:text-white"
                             title="Editar"
                             aria-label="Editar publicación"
                           >
@@ -340,7 +294,7 @@ export const Bikes = () => {
                           <button
                             type="button"
                             onClick={() => setBikeToDelete(bike)}
-                            className="flex h-9 w-9 items-center justify-center border border-sf-border-strong text-sf-ink-300 transition-colors hover:border-sf-red hover:bg-sf-red hover:text-white"
+                            className="flex h-9 w-9 items-center justify-center border border-white/20 text-white/70 transition-colors hover:border-white hover:bg-white hover:text-cc-black"
                             title="Eliminar"
                             aria-label="Eliminar publicación"
                           >
@@ -358,55 +312,45 @@ export const Bikes = () => {
       </div>
 
       {bikeToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-cc-black/70 p-4 backdrop-blur-[2px]">
           <div
             role="dialog"
             aria-modal="true"
             aria-labelledby="delete-dialog-title"
-            className="w-full max-w-md border border-sf-border-strong bg-sf-surface shadow-2xl"
+            className="w-full max-w-md border border-white/15 bg-cc-carbon shadow-card"
           >
-            <div className="flex items-start justify-between gap-4 border-b border-sf-border p-6">
+            <div className="flex items-start justify-between gap-4 border-b border-white/10 p-6">
               <div>
-                <Motorbike size={22} className="text-sf-red" />
-                <h2
-                  id="delete-dialog-title"
-                  className="mt-3 font-display text-xl uppercase text-white"
-                >
+                <CarFront size={22} className="text-white/60" />
+                <h2 id="delete-dialog-title" className="display-sm mt-3">
                   Eliminar publicación
                 </h2>
               </div>
               <button
                 type="button"
                 onClick={() => setBikeToDelete(null)}
-                className="text-sf-ink-500 transition-colors hover:text-white"
+                className="text-white/50 transition-colors hover:text-white"
                 aria-label="Cerrar"
               >
                 <X size={20} />
               </button>
             </div>
             <div className="p-6">
-              <p className="text-sm leading-relaxed text-sf-ink-300">
+              <p className="text-sm leading-relaxed text-white/60">
                 ¿Estás seguro de que querés eliminar{' '}
-                <strong className="text-white">“{bikeToDelete.title}”</strong>? Esta
-                acción no se puede deshacer.
+                <strong className="font-semibold text-white">“{bikeToDelete.title}”</strong>? Esta acción no se puede deshacer.
               </p>
               <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:justify-end">
-                <button
-                  type="button"
-                  onClick={() => setBikeToDelete(null)}
-                  className="btn border border-sf-border-strong text-sf-ink-200 hover:border-white hover:text-white"
-                >
+                <button type="button" onClick={() => setBikeToDelete(null)} className="btn btn-outline">
                   Cancelar
                 </button>
                 <button
                   type="button"
                   onClick={handleConfirmDelete}
                   disabled={deletingId !== null}
-                  className="btn btn-red"
+                  className="btn btn-light"
                 >
-                  {deletingId === bikeToDelete.id
-                    ? 'Eliminando…'
-                    : 'Eliminar publicación'}
+                  {deletingId === bikeToDelete.id ? 'Eliminando…' : 'Eliminar publicación'}
                 </button>
               </div>
             </div>

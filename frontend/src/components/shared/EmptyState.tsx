@@ -18,36 +18,41 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   title,
   description,
   actions,
-  tone = 'dark',
+  tone = 'light',
   className,
 }) => {
   const light = tone === 'light';
   return (
     <div
       className={cn(
-        'relative flex min-h-[26rem] flex-col items-center justify-center overflow-hidden px-6 py-16 text-center',
-        light ? 'panel-light' : 'panel',
-        className
+        'relative flex min-h-[26rem] flex-col items-center justify-center overflow-hidden border px-6 py-16 text-center',
+        light ? 'border-black/10 bg-white' : 'border-white/10 bg-cc-carbon',
+        className,
       )}
     >
       {code && (
         <span
           aria-hidden="true"
           className={cn(
-            'pointer-events-none absolute -top-4 select-none font-display text-[11rem] font-extrabold leading-none sm:text-[16rem]',
-            light ? 'text-outline-light' : 'text-outline'
+            'pointer-events-none absolute -top-6 select-none font-display text-[12rem] font-bold leading-none sm:text-[18rem]',
+            light ? 'text-outline-dark' : 'text-outline-light',
           )}
         >
           {code}
         </span>
       )}
-      <div className={cn('relative flex h-16 w-16 items-center justify-center border', light ? 'border-sf-red/40 text-sf-red' : 'border-sf-red/40 text-sf-red-soft bg-sf-red/5')}>
+      <div
+        className={cn(
+          'relative flex h-16 w-16 items-center justify-center border',
+          light ? 'border-black/15 bg-cc-soft text-cc-black' : 'border-white/25 text-white',
+        )}
+      >
         {icon}
       </div>
-      <h2 className={cn('relative mt-6 font-display text-4xl font-extrabold uppercase leading-[0.9] sm:text-5xl', light ? 'text-sf-black' : 'text-white')}>
+      <h2 className={cn('relative mt-6 font-display text-3xl font-bold uppercase sm:text-5xl', light ? 'text-cc-black' : 'text-white')}>
         {title}
       </h2>
-      <p className={cn('relative mt-3 max-w-md text-sm leading-relaxed', light ? 'text-black/55' : 'text-gray-400')}>
+      <p className={cn('relative mt-3 max-w-md text-sm leading-relaxed', light ? 'text-black/55' : 'text-white/55')}>
         {description}
       </p>
       {actions && <div className="relative mt-8 flex w-full flex-col items-center gap-3 sm:w-auto sm:flex-row">{actions}</div>}

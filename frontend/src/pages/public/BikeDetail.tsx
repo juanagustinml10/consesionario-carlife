@@ -2,34 +2,36 @@ import * as React from 'react';
 import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import {
-  ChevronRight,
+  ArrowRight,
+  Calendar,
+  Car as CarIcon,
   ChevronLeft,
-  Phone,
-  Share2,
-  Heart,
+  ChevronRight,
+  Clock,
   Fuel,
   Gauge,
-  Calendar,
-  Tag,
-  MessageCircle,
-  Clock,
-  Timer,
+  Heart,
+  Phone,
   Route,
-  Bike as BikeIcon,
+  Share2,
+  Tag,
+  Timer,
 } from 'lucide-react';
 import { Link } from '@/components/shared/Link';
 import { BikeCard } from '@/components/public/BikeCard';
 import { ConditionTag, FeaturedTag, StatusTag } from '@/components/public/BikeBadges';
 import { SectionHeading } from '@/components/public/SectionHeading';
 import { ImagePlaceholder } from '@/components/shared/ImagePlaceholder';
+import { WhatsAppButton } from '@/components/shared/WhatsAppButton';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { useFavoritesStore } from '@/stores/favorites';
 import { bikesService } from '@/services/bikes';
 import { getThumbnailUrl } from '@/lib/images';
 import type { Bike } from '@/types';
-import { buildBikeWhatsAppLink, BUSINESS } from '@/lib/constants';
+import { BUSINESS } from '@/lib/constants';
 import {
+  conditionLabel,
   featureLabel,
   formatDisplacement,
   formatMileage,
@@ -67,7 +69,7 @@ export const BikeDetail: React.FC = () => {
       setActiveImage(0);
 
       try {
-        const all = await bikesService.list({ limit: 8 });
+        const all = await bikesService.list({ condition: 'USADA', limit: 8 });
         const relatedList = Array.isArray(all.data) ? all.data : [];
         setRelated(relatedList.filter((item) => item.id !== data.id).slice(0, 4));
       } catch {
@@ -91,10 +93,10 @@ export const BikeDetail: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center bg-sf-black text-gray-500" role="status">
+      <div className="flex min-h-[70vh] items-center justify-center bg-white" role="status">
         <div className="text-center">
-          <div className="mx-auto h-12 w-12 border-2 border-white/10 border-t-sf-red animate-spin" />
-          <p className="mt-5 font-display text-xs font-bold uppercase tracking-[0.3em]">Cargando ficha...</p>
+          <div className="mx-auto h-12 w-12 animate-spin border-2 border-black/10 border-t-black" />
+          <p className="mt-5 text-[11px] font-bold uppercase tracking-[0.32em] text-cc-gray">Cargando ficha...</p>
         </div>
       </div>
     );
@@ -102,12 +104,9 @@ export const BikeDetail: React.FC = () => {
 
   if (error) {
     return (
-      <div className="container-sf flex min-h-[70vh] flex-col justify-center py-12">
-        <ErrorState
-          title="No pudimos cargar la ficha"
-          onRetry={() => setReloadKey((key) => key + 1)}
-        />
-        <Link to="/motos" className="btn btn-ghost mx-auto mt-6 px-6 py-3 text-xs">
+      <div className="container-cc flex min-h-[70vh] flex-col justify-center py-20">
+        <ErrorState title="No pudimos cargar la ficha" onRetry={() => setReloadKey((key) => key + 1)} />
+        <Link to="/motos" className="btn btn-outline-dark mx-auto mt-6 px-6">
           <ChevronLeft size={15} /> Volver al catálogo
         </Link>
       </div>
@@ -116,14 +115,14 @@ export const BikeDetail: React.FC = () => {
 
   if (!bike || notFound) {
     return (
-      <div className="container-sf flex min-h-[70vh] items-center py-12">
+      <div className="container-cc flex min-h-[70vh] items-center py-20">
         <EmptyState
-          icon={<BikeIcon size={30} />}
+          icon={<CarIcon size={30} strokeWidth={1.5} />}
           code="404"
-          title={<>Moto no encontrada</>}
+          title={<>Vehículo no encontrado</>}
           description="La publicación buscada no existe o ya no está disponible."
           actions={
-            <Link to="/motos" className="btn btn-red px-6 py-3 text-xs">
+            <Link to="/motos" className="btn btn-dark px-6">
               Volver al catálogo
             </Link>
           }
@@ -136,7 +135,6 @@ export const BikeDetail: React.FC = () => {
   const images = bike.images ?? [];
   const features = bike.features ?? [];
   const currentImage = images[activeImage] ?? images[0];
-  const whatsappLink = buildBikeWhatsAppLink(bike);
   const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
 
   const handleShare = async () => {
@@ -153,61 +151,58 @@ export const BikeDetail: React.FC = () => {
     }
   };
 
-  // null, 0 y motos 0 km nunca se muestran como si tuvieran horas cargadas.
-  const usageHours = bike.condition === 'USADA' ? formatUsageHours(bike.usageHours) : null;
+  // null y 0 se consideran "sin dato": nunca se muestran como horas cargadas.
+  const usageHours = formatUsageHours(bike.usageHours);
   const specs = [
-    { icon: <Calendar size={18} />, label: 'Año', value: String(bike.year) },
-    { icon: <Gauge size={18} />, label: 'Cilindrada', value: formatDisplacement(bike.displacementCc) },
-    { icon: <Fuel size={18} />, label: 'Kilómetros', value: formatMileage(bike.mileageKm) },
-    ...(usageHours ? [{ icon: <Timer size={18} />, label: 'Horas de uso', value: usageHours }] : []),
-    ...(bike.usage ? [{ icon: <Route size={18} />, label: 'Uso', value: usageLabel(bike.usage) }] : []),
-    { icon: <Tag size={18} />, label: 'Categoría', value: bike.condition === 'NUEVA' ? '0 km' : 'Usada' },
+    { icon: <Calendar size={18} strokeWidth={1.6} />, label: 'Año', value: String(bike.year) },
+    { icon: <Gauge size={18} strokeWidth={1.6} />, label: 'Motor', value: formatDisplacement(bike.displacementCc) },
+    { icon: <Fuel size={18} strokeWidth={1.6} />, label: 'Kilómetros', value: formatMileage(bike.mileageKm) },
+    ...(usageHours ? [{ icon: <Timer size={18} strokeWidth={1.6} />, label: 'Horas de uso', value: usageHours }] : []),
+    ...(bike.usage ? [{ icon: <Route size={18} strokeWidth={1.6} />, label: 'Uso', value: usageLabel(bike.usage) }] : []),
+    { icon: <Tag size={18} strokeWidth={1.6} />, label: 'Categoría', value: conditionLabel(bike.condition) },
   ];
 
   return (
-    <div className="min-h-screen bg-sf-black text-sf-white">
-      {/* Breadcrumb */}
-      <div className="border-b border-white/5 bg-black">
-        <nav className="container-sf flex h-12 items-center gap-2 overflow-x-auto text-[10px] font-bold uppercase tracking-[0.25em] text-gray-500" aria-label="Ruta de navegación">
-          <Link to="/motos" className="shrink-0 transition-colors hover:text-sf-red">Catálogo</Link>
-          <span className="text-gray-700">/</span>
-          <span className="shrink-0 text-gray-300">{bike.brand?.name ?? 'Moto'}</span>
-          <span className="text-gray-700">/</span>
-          <span className="truncate text-white">{bike.title}</span>
+    <div className="min-h-screen bg-white text-cc-black">
+      <div className="border-b border-cc-paper bg-cc-soft pt-24">
+        <nav className="container-cc flex h-14 items-center gap-3 overflow-x-auto text-[10px] font-bold uppercase tracking-[0.22em] text-cc-gray" aria-label="Ruta de navegación">
+          <Link to="/motos" className="shrink-0 transition-colors hover:text-cc-black">Catálogo</Link>
+          <span className="text-black/25">/</span>
+          <span className="shrink-0">{bike.brand?.name ?? 'Vehículo'}</span>
+          <span className="text-black/25">/</span>
+          <span className="truncate text-cc-black/75">{bike.title}</span>
         </nav>
       </div>
 
-      {/* Ficha principal */}
-      <section className="track-lines">
-        <div className="container-sf grid min-w-0 gap-10 py-10 lg:grid-cols-12 lg:gap-12 lg:py-16">
-          {/* Galería */}
+      <section className="relative overflow-hidden bg-white">
+        <div className="container-cc relative grid min-w-0 gap-12 py-12 lg:grid-cols-12 lg:gap-16 lg:py-20">
           <div className="min-w-0 lg:col-span-7">
-            <div className="mb-4 flex items-center gap-3">
-              <span className="font-display text-xs font-extrabold tracking-[0.2em] text-sf-red">01</span>
-              <span className="h-px w-10 bg-sf-red" />
-              <span className="font-display text-[10px] font-bold uppercase tracking-[0.35em] text-gray-500">Galería</span>
+            <div className="mb-5 flex items-center gap-3">
+              <span className="data-num text-xs text-cc-gray">01</span>
+              <span className="h-px w-10 bg-black/20" />
+              <span className="eyebrow eyebrow-dark !gap-0 !before:hidden">Galería</span>
             </div>
-            <div className="relative overflow-hidden border border-white/10 bg-black">
-              <div className="aspect-[4/3] sm:aspect-[16/11]">
+            <div className="relative overflow-hidden border border-cc-paper bg-cc-soft">
+              <div className="aspect-[4/3] bg-cc-soft sm:aspect-[16/11]">
                 {currentImage ? (
                   <img
                     key={currentImage.id}
                     src={currentImage.url}
                     alt={`${bike.brand?.name ?? ''} ${bike.model || bike.title} — vista ${activeImage + 1}`}
                     fetchPriority="high"
-                    className="h-full w-full object-contain"
+                    className="photo-soft h-full w-full object-contain"
                   />
                 ) : (
                   <ImagePlaceholder width={1200} height={900} label="Foto no disponible" className="h-full w-full" />
                 )}
               </div>
-              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-sf-red" aria-hidden="true" />
+
               {images.length > 1 && (
                 <>
                   <button
                     type="button"
                     onClick={() => setActiveImage((i) => (i + 1) % images.length)}
-                    className="absolute right-4 top-4 flex h-11 w-11 items-center justify-center border border-white/20 bg-black/70 text-white transition-colors hover:border-sf-red hover:bg-sf-red"
+                    className="absolute right-4 top-4 flex h-12 w-12 items-center justify-center border border-black/10 bg-white/95 text-cc-black shadow-sm transition-colors hover:bg-cc-black hover:text-white"
                     aria-label="Siguiente fotografía"
                   >
                     <ChevronRight size={22} />
@@ -215,14 +210,14 @@ export const BikeDetail: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setActiveImage((i) => (i - 1 + images.length) % images.length)}
-                    className="absolute left-4 top-4 flex h-11 w-11 items-center justify-center border border-white/20 bg-black/70 text-white transition-colors hover:border-sf-red hover:bg-sf-red"
+                    className="absolute left-4 top-4 flex h-12 w-12 items-center justify-center border border-black/10 bg-white/95 text-cc-black shadow-sm transition-colors hover:bg-cc-black hover:text-white"
                     aria-label="Fotografía anterior"
                   >
                     <ChevronLeft size={22} />
                   </button>
                 </>
               )}
-              <span className="pointer-events-none absolute bottom-4 right-4 border border-white/15 bg-black/80 px-3 py-2 font-display text-[10px] font-bold uppercase tracking-[0.2em] text-white backdrop-blur">
+              <span className="data-num pointer-events-none absolute bottom-4 right-4 border border-black/10 bg-white/95 px-3 py-2 text-[11px] font-bold tracking-[0.18em] text-cc-black shadow-sm">
                 {images.length ? `${String(activeImage + 1).padStart(2, '0')} / ${String(images.length).padStart(2, '0')}` : 'Sin fotos'}
               </span>
             </div>
@@ -237,41 +232,41 @@ export const BikeDetail: React.FC = () => {
                     aria-label={`Ver fotografía ${i + 1}`}
                     aria-current={i === activeImage ? 'true' : undefined}
                     className={cn(
-                      'h-20 w-28 shrink-0 overflow-hidden border transition-all',
-                      i === activeImage ? 'border-sf-red opacity-100' : 'border-white/10 opacity-50 hover:opacity-80'
+                      'image-zoom h-20 w-28 shrink-0 border transition-all',
+                      i === activeImage ? 'border-cc-black opacity-100' : 'border-cc-paper opacity-60 hover:opacity-100'
                     )}
                   >
-                    <img src={getThumbnailUrl(img.url)} alt="" className="h-full w-full object-cover" loading="lazy" />
+                    <img src={getThumbnailUrl(img.url)} alt="" className="photo h-full w-full object-cover" loading="lazy" />
                   </button>
                 ))}
               </div>
             )}
 
-            {/* Acciones secundarias */}
-            <div className="mt-5 flex flex-wrap gap-2">
+            <div className="mt-6 flex flex-wrap gap-3">
               <button
                 type="button"
                 onClick={() => toggleFavorite(bike.id)}
                 className={cn(
-                  'inline-flex items-center gap-2 border px-4 py-3 font-display text-[11px] font-bold uppercase tracking-widest transition-colors',
-                  isFavorite ? 'border-sf-red bg-sf-red/15 text-sf-red-soft' : 'border-white/15 text-gray-300 hover:border-sf-red hover:text-white'
+                  'inline-flex items-center gap-2 border px-5 py-3 text-[10px] font-bold uppercase tracking-[0.2em] transition-colors',
+                  isFavorite
+                    ? 'border-cc-black bg-cc-black text-white'
+                    : 'border-black/20 text-black/65 hover:border-black hover:text-black'
                 )}
               >
-                <Heart size={16} className={isFavorite ? 'fill-sf-red text-sf-red' : ''} />
+                <Heart size={16} className={isFavorite ? 'fill-current stroke-current' : ''} strokeWidth={1.7} />
                 {isFavorite ? 'En favoritos' : 'Guardar'}
               </button>
               <button
                 type="button"
                 onClick={handleShare}
-                className="inline-flex items-center gap-2 border border-white/15 px-4 py-3 font-display text-[11px] font-bold uppercase tracking-widest text-gray-300 transition-colors hover:border-sf-red hover:text-white"
+                className="inline-flex items-center gap-2 border border-black/20 px-5 py-3 text-[10px] font-bold uppercase tracking-[0.2em] text-black/65 transition-colors hover:border-black hover:text-black"
               >
-                <Share2 size={16} />
+                <Share2 size={16} strokeWidth={1.7} />
                 {copied ? '¡Copiado!' : 'Compartir'}
               </button>
             </div>
           </div>
 
-          {/* Información */}
           <div className="min-w-0 lg:col-span-5">
             <div className="flex flex-wrap items-center gap-2">
               <ConditionTag condition={bike.condition} />
@@ -279,111 +274,109 @@ export const BikeDetail: React.FC = () => {
               {bike.featured && <FeaturedTag />}
             </div>
 
-            <p className="mt-6 font-display text-xs font-extrabold uppercase tracking-[0.3em] text-sf-red">
-              {bike.brand?.name ?? 'SF MOTOS'}
+            <p className="mt-7 text-[10px] font-bold uppercase tracking-[0.3em] text-cc-gray">
+              {bike.brand?.name ?? 'CARLIFE'}
             </p>
-            <h1 className="mt-2 break-words font-display text-5xl font-extrabold uppercase leading-[0.85] text-white sm:text-7xl">
+            <h1 className="mt-3 break-words font-display text-5xl font-bold uppercase leading-[0.92] tracking-[-0.045em] text-cc-black sm:text-6xl lg:text-7xl">
               {bike.model || bike.title}
             </h1>
-            <p className="mt-3 text-sm text-gray-400">{bike.title}</p>
+            <p className="mt-3 text-sm text-cc-gray">{bike.title}</p>
 
-            {/* Precio */}
-            <div className="relative mt-7 border-y border-white/10 bg-sf-surface/60 py-6 pl-5 pr-5">
-              <div className="absolute inset-y-0 left-0 w-[3px] bg-sf-red" aria-hidden="true" />
+            <div className="relative mt-8 border-y border-cc-paper bg-white py-7 pl-6 pr-5">
+              <div className="absolute inset-y-0 left-0 w-[2px] bg-cc-black" aria-hidden="true" />
               <p className="field-label">Precio publicado</p>
-              <p className="mt-1 break-words font-display text-5xl font-extrabold leading-none text-white sm:text-6xl">
+              <p className="data-num mt-2 break-words text-4xl leading-none text-cc-black sm:text-5xl">
                 {formatPrice(bike.price, bike.currency)}
               </p>
-              <p className="mt-2 text-[11px] leading-relaxed text-gray-500">
+              <p className="mt-3 text-[11px] leading-relaxed text-cc-gray">
                 Precio informado por la concesionaria. Consultanos por disponibilidad y condiciones de esta unidad.
               </p>
             </div>
 
-            <a
-              href={whatsappLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-red mt-6 flex w-full items-center justify-center gap-2 py-4 text-sm"
-            >
-              <Phone size={20} />
-              Consultar disponibilidad
-            </a>
-            <p className="mt-2 text-center text-[11px] text-gray-500">Te esperamos en {BUSINESS.address}</p>
+            <WhatsAppButton bike={bike} size="lg" label="Consultar disponibilidad" className="mt-6 w-full" />
+            <p className="mt-3 flex items-center justify-center gap-2 text-center text-[11px] text-cc-gray">
+              <Phone size={13} /> Te esperamos en {BUSINESS.address}
+            </p>
 
-            {/* Datos principales */}
-            <div className="mt-10">
-              <div className="mb-4 flex items-center gap-3">
-                <span className="font-display text-xs font-extrabold tracking-[0.2em] text-sf-red">02</span>
-                <span className="h-px w-10 bg-sf-red" />
-                <span className="font-display text-[10px] font-bold uppercase tracking-[0.35em] text-gray-500">Datos principales</span>
+            <div className="mt-12">
+              <div className="mb-5 flex items-center gap-3">
+                <span className="data-num text-xs text-cc-gray">02</span>
+                <span className="h-px w-10 bg-black/20" />
+                <span className="eyebrow eyebrow-dark !gap-0 !before:hidden">Datos principales</span>
               </div>
-              <div className={cn(
-                'grid grid-cols-2 gap-px border border-white/8 bg-white/8',
-                usageHours ? 'sm:grid-cols-5' : 'sm:grid-cols-4'
-              )}>
+              <div className={cn('grid grid-cols-2 gap-px border border-cc-paper bg-cc-paper', usageHours ? 'sm:grid-cols-5' : 'sm:grid-cols-4')}>
                 {specs.map((spec) => (
-                  <div key={spec.label} className="min-w-0 bg-sf-surface p-4">
-                    <div className="text-sf-red-soft">{spec.icon}</div>
+                  <div key={spec.label} className="min-w-0 bg-white p-4">
+                    <div className="text-cc-gray">{spec.icon}</div>
                     <p className="field-label mt-3 !text-[9px]">{spec.label}</p>
-                    <p className="mt-1 font-display text-lg font-bold text-white">{spec.value}</p>
+                    <p className="data-num mt-1 text-base text-cc-black">{spec.value}</p>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Características técnicas */}
             {features.length > 0 && (
-              <div className="mt-10">
-                <div className="mb-4 flex items-center gap-3">
-                  <span className="font-display text-xs font-extrabold tracking-[0.2em] text-sf-red">03</span>
-                  <span className="h-px w-10 bg-sf-red" />
-                  <span className="font-display text-[10px] font-bold uppercase tracking-[0.35em] text-gray-500">Características técnicas</span>
+              <div className="mt-12">
+                <div className="mb-5 flex items-center gap-3">
+                  <span className="data-num text-xs text-cc-gray">03</span>
+                  <span className="h-px w-10 bg-black/20" />
+                  <span className="eyebrow eyebrow-dark !gap-0 !before:hidden">Equipamiento</span>
                 </div>
-                <dl className="border border-white/8">
+                <dl className="border border-cc-paper">
                   {features.map((feature, index) => (
-                    <div key={feature.id} className={cn('flex items-center justify-between gap-4 px-4 py-3', index % 2 === 1 && 'bg-white/[0.02]')}>
-                      <dt className="text-xs text-gray-400">{featureLabel(feature.key)}</dt>
-                      <dd className="text-right font-display text-sm font-bold uppercase text-white">{feature.value}</dd>
+                    <div key={feature.id} className={cn('flex items-center justify-between gap-4 px-4 py-3', index % 2 === 1 && 'bg-cc-soft')}>
+                      <dt className="text-xs text-cc-gray">{featureLabel(feature.key)}</dt>
+                      <dd className="text-right text-sm font-semibold uppercase text-cc-black">{feature.value}</dd>
                     </div>
                   ))}
                 </dl>
               </div>
             )}
 
-            {/* Descripción */}
             {bike.description && (
-              <div className="mt-10">
-                <div className="mb-4 flex items-center gap-3">
-                  <span className="font-display text-xs font-extrabold tracking-[0.2em] text-sf-red">04</span>
-                  <span className="h-px w-10 bg-sf-red" />
-                  <span className="font-display text-[10px] font-bold uppercase tracking-[0.35em] text-gray-500">Descripción</span>
+              <div className="mt-12">
+                <div className="mb-5 flex items-center gap-3">
+                  <span className="data-num text-xs text-cc-gray">04</span>
+                  <span className="h-px w-10 bg-black/20" />
+                  <span className="eyebrow eyebrow-dark !gap-0 !before:hidden">Descripción</span>
                 </div>
-                <p className="whitespace-pre-line text-sm leading-relaxed text-gray-300">{bike.description}</p>
+                <p className="whitespace-pre-line text-sm leading-relaxed text-black/65">{bike.description}</p>
               </div>
             )}
 
-            {/* Aviso prudente: no se inventan garantías ni condiciones */}
-            <div className="mt-10 flex items-start gap-3 border border-white/10 bg-sf-surface p-5">
-              <MessageCircle size={20} className="mt-0.5 shrink-0 text-sf-red" />
+            <div className="mt-12 flex items-start gap-3 border border-cc-paper bg-cc-soft p-5">
+              <WhatsAppIconDetail />
               <div>
-                <p className="font-display text-sm font-bold uppercase tracking-wider text-white">Consultá las condiciones de esta unidad</p>
-                <p className="mt-1 text-xs leading-relaxed text-gray-400">
-                  Las características y condiciones de cada moto se confirman al consultar. Escribinos por WhatsApp para recibir la información disponible.
+                <p className="text-sm font-semibold uppercase tracking-wider text-cc-black">
+                  Consultá las condiciones de esta unidad
+                </p>
+                <p className="mt-2 text-xs leading-relaxed text-cc-gray">
+                  Las características y condiciones de cada vehículo se confirman al consultar. Escribinos por WhatsApp para recibir la información disponible.
                 </p>
               </div>
             </div>
 
-            <p className="mt-5 flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-gray-600">
+            <div className="mt-4 border-l-2 border-cc-red bg-white p-5">
+              <p className="text-sm font-semibold uppercase tracking-wider text-cc-black">Créditos prendarios</p>
+              <p className="mt-2 text-xs leading-relaxed text-cc-gray">{BUSINESS.financingMessage}</p>
+              <Link
+                to="/financiacion"
+                className="mt-4 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-cc-red-dark transition-colors hover:text-cc-red"
+              >
+                Ver financiación <ArrowRight size={14} />
+              </Link>
+            </div>
+
+            <p className="mt-6 flex items-center gap-2 text-[10px] uppercase tracking-[0.22em] text-cc-gray">
               <Clock size={12} /> Publicada el {new Date(bike.createdAt).toLocaleDateString('es-AR')}
             </p>
           </div>
         </div>
       </section>
 
-      {/* Relacionadas */}
       {related.length > 0 && (
-        <section className="bg-sf-paper text-sf-black">
-          <div className="container-sf py-14 sm:py-20">
+        <section className="section-light">
+          <div className="container-cc py-16 sm:py-24">
             <SectionHeading
               index="05"
               eyebrow="También te puede interesar"
@@ -395,7 +388,7 @@ export const BikeDetail: React.FC = () => {
             <div className="scrollbar-none -mx-5 flex snap-x snap-mandatory gap-5 overflow-x-auto px-5 pb-3 sm:mx-0 sm:px-0 lg:grid lg:grid-cols-4 lg:overflow-visible">
               {related.map((item) => (
                 <div key={item.id} className="w-[78vw] max-w-xs shrink-0 snap-start sm:w-72 lg:w-auto lg:max-w-none">
-                  <BikeCard bike={item} tone="light" />
+                  <BikeCard bike={item} />
                 </div>
               ))}
             </div>
@@ -403,12 +396,23 @@ export const BikeDetail: React.FC = () => {
         </section>
       )}
 
-      {/* Retorno al catálogo */}
-      <div className="container-sf py-10">
-        <Link to="/motos" className="inline-flex items-center gap-2 border-b border-white/20 pb-1 font-display text-xs font-extrabold uppercase tracking-[0.2em] text-gray-400 transition-colors hover:border-sf-red hover:text-sf-red">
-          <ChevronLeft size={15} /> Volver al catálogo
-        </Link>
+      <div className="bg-white py-10">
+        <div className="container-cc">
+          <Link
+            to="/motos"
+            className="group inline-flex items-center gap-2 border-b border-black/25 pb-1 text-[10px] font-bold uppercase tracking-[0.22em] text-black/60 transition-colors hover:border-black hover:text-black"
+          >
+            <ChevronLeft size={15} className="transition-transform group-hover:-translate-x-1" /> Volver al catálogo
+          </Link>
+        </div>
       </div>
     </div>
   );
 };
+
+/** Icono de WhatsApp en tono oscuro para el aviso de la ficha. */
+const WhatsAppIconDetail: React.FC = () => (
+  <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true" className="mt-0.5 shrink-0 text-cc-gray">
+    <path d="M12.04 2C6.5 2 2 6.48 2 11.98c0 1.76.46 3.48 1.34 5L2 22l5.16-1.32a10 10 0 0 0 4.88 1.25h.01c5.53 0 10.03-4.48 10.03-10.02C22.08 6.48 17.58 2 12.04 2Zm0 18.05a8.3 8.3 0 0 1-4.23-1.16l-.3-.18-3.06.78.82-2.98-.2-.31a8.28 8.28 0 0 1-1.27-4.42c0-4.59 3.76-8.32 8.38-8.32a8.36 8.36 0 0 1 8.38 8.32c0 4.6-3.77 8.27-8.42 8.27Zm4.6-6.2c-.25-.13-1.47-.73-1.7-.81-.23-.08-.4-.12-.56.12-.17.25-.64.81-.79.98-.14.17-.29.19-.54.06-.25-.12-1.05-.39-2-1.23-.74-.66-1.24-1.47-1.38-1.72-.15-.25-.02-.38.11-.5.11-.11.25-.29.37-.43.12-.15.17-.25.25-.42.08-.17.04-.31-.02-.43-.06-.12-.56-1.35-.77-1.84-.2-.49-.4-.42-.56-.43h-.48c-.17 0-.43.06-.66.31-.23.25-.87.85-.87 2.07s.89 2.4 1.01 2.57c.13.17 1.75 2.67 4.24 3.74.59.25 1.06.41 1.42.52.6.19 1.14.16 1.57.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.14-1.18-.06-.1-.23-.16-.48-.28Z" />
+  </svg>
+);

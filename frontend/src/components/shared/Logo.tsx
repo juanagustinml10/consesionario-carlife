@@ -6,28 +6,38 @@ interface LogoProps {
   alt?: string;
   /** true cuando el logo se apoya sobre fondo oscuro: usa la versión blanca. */
   onDark?: boolean;
-  /** Sólo el isotipo SF, para espacios reducidos (favicon, avatar, etc.). */
+  /** Sólo el isotipo, para espacios reducidos (favicon, panel, etc.). */
   icon?: boolean;
 }
 
 const ASSETS = {
-  dark: { light: '/logo/sf-motos-black.png', dark: '/logo/sf-motos-white.png', width: 653, height: 350 },
-  icon: { light: '/logo/sf-motos-icon.png', dark: '/logo/sf-motos-icon-white.png', width: 653, height: 653 },
+  wordmark: {
+    light: '/logo/carlife-dark.png',
+    dark: '/logo/carlife-light.png',
+    width: 983,
+    height: 214,
+  },
+  icon: {
+    light: '/logo/carlife-mark.png',
+    dark: '/logo/carlife-mark-light.png',
+    width: 128,
+    height: 128,
+  },
 } as const;
 
 /**
- * Logo oficial de SF MOTOS.
- * Se generó desde el JPEG original conservando trazos y proporciones: la
- * versión "black" va sobre fondos claros y la "white" sobre fondos oscuros.
- * No se redibuja ni se reemplaza por texto.
+ * Logotipo oficial de CARLIFE.
+ * Se deriva del JPEG original conservando el trazo y las proporciones: se
+ * calcula una máscara de alfa y se tiñe con los colores de la paleta
+ * (blanco, rojo y negro). No se redibuja ni se reemplaza por texto.
  */
 export const Logo: React.FC<LogoProps> = ({
   className,
-  alt = 'SF MOTOS',
+  alt = 'CARLIFE',
   onDark = false,
   icon = false,
 }) => {
-  const set = icon ? ASSETS.icon : ASSETS.dark;
+  const set = icon ? ASSETS.icon : ASSETS.wordmark;
   const src = onDark ? set.dark : set.light;
 
   return (

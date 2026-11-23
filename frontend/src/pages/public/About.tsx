@@ -1,131 +1,137 @@
 import * as React from 'react';
-import { ArrowRight, MapPin, MessageCircle, Search } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, CarFront, MapPin, Search } from 'lucide-react';
 import { Link } from '@/components/shared/Link';
-import { HeroBike } from '@/components/public/HeroBike';
-import { BUSINESS, buildWhatsAppLink } from '@/lib/constants';
-import ktmPhoto from '@/assets/ktm-enduro-promo.jpg';
+import { PageIntro } from '@/components/public/PageIntro';
+import { WhatsAppButton, WhatsAppIcon } from '@/components/shared/WhatsAppButton';
+import { Reveal } from '@/components/shared/Reveal';
+import { BUSINESS } from '@/lib/constants';
 
 const PILLARS = [
-  { icon: <Search size={24} />, title: 'Catálogo claro', text: 'Cada publicación muestra fotos, datos principales y precio.', n: '01' },
-  { icon: <MessageCircle size={24} />, title: 'Consulta directa', text: 'Escribinos por WhatsApp para saber más sobre una unidad.', n: '02' },
-  { icon: <MapPin size={24} />, title: 'Punto de encuentro', text: `Vení a vernos a ${BUSINESS.address}.`, n: '03' },
+  { icon: <Search size={22} strokeWidth={1.5} />, title: 'Catálogo claro', text: 'Cada publicación muestra fotos, datos principales y precio.', n: '01' },
+  { icon: <WhatsAppIcon size={22} />, title: 'Consulta directa', text: 'Escribinos por WhatsApp para saber más sobre una unidad.', n: '02' },
+  { icon: <MapPin size={22} strokeWidth={1.5} />, title: 'Punto de encuentro', text: `Vení a vernos a ${BUSINESS.address}.`, n: '03' },
 ];
 
 export const About: React.FC = () => (
-  <div className="bg-sf-black text-sf-white">
-    <section className="relative overflow-hidden border-b border-white/10">
-      <div className="track-lines pointer-events-none absolute inset-0 opacity-50" aria-hidden="true" />
-      <div className="container-sf relative grid gap-10 py-14 sm:py-20 lg:grid-cols-12 lg:items-center">
-        <div className="lg:col-span-6">
-          <div className="section-index !text-sf-red">01 / Sobre nosotros</div>
-          <h1 className="mt-5 font-display text-6xl font-extrabold uppercase leading-[0.82] text-white sm:text-8xl lg:text-9xl">
-            SF<br /><span className="text-sf-red">MOTOS</span>
-          </h1>
-          <p className="mt-7 max-w-md text-lg leading-relaxed text-gray-300">
-            {BUSINESS.activity}
+  <div className="bg-white text-cc-black">
+    <PageIntro
+      eyebrow="CARLIFE · Sobre nosotros"
+      title={<>Estamos en el<br />mismo lugar</>}
+      tone="dark"
+      description={
+        <>
+          <p>{BUSINESS.activity} Vení a vernos, mirá las unidades y consultanos sin compromiso.</p>
+          <p className="mt-3 text-xs text-white/65">{BUSINESS.institutional}</p>
+          <p className="mt-4 flex items-center gap-2 text-xs text-white/55">
+            <MapPin size={14} /> {BUSINESS.address}
           </p>
-          <div className="mt-8 border-l-2 border-sf-red pl-5">
-            <p className="font-display text-3xl font-extrabold uppercase leading-[0.9] text-white sm:text-4xl">
-              {BUSINESS.tagline}
-            </p>
-          </div>
-          <a
-            href={buildWhatsAppLink(BUSINESS.whatsappGeneralMessage)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn btn-red mt-8 px-7 py-4 text-xs"
-          >
-            Hablemos por WhatsApp <ArrowRight size={16} />
-          </a>
-        </div>
-        <div className="relative lg:col-span-6">
-          <div className="border border-white/10 bg-sf-surface/40 p-4 sm:p-6">
-            <div className="border border-sf-red/30">
-              <HeroBike className="aspect-[15/8] w-full object-cover" />
-            </div>
-          </div>
-          <div className="absolute -bottom-3 left-4 flex items-center gap-3 bg-sf-red px-4 py-3 font-display text-[10px] font-bold uppercase tracking-[0.25em] text-white sm:left-8">
-            0 km <span className="h-1 w-1 bg-white" /> Usadas
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section className="bg-white text-sf-black">
-      <div className="container-sf grid gap-8 py-16 sm:py-24 lg:grid-cols-12">
-        <div className="lg:col-span-4">
-          <span className="section-index !text-sf-red">Nuestra mirada</span>
-          <p className="mt-5 font-display text-5xl font-extrabold uppercase leading-[0.85] text-sf-red sm:text-6xl">Más que motos</p>
-        </div>
-        <div className="lg:col-span-7 lg:col-start-6">
-          <p className="text-2xl leading-relaxed text-black/75 sm:text-3xl">
-            En SF MOTOS vendemos <strong className="text-sf-black">motos 0 km y usadas</strong>.
-            Buscamos que encuentres la información que necesitás para elegir.
-          </p>
-          <p className="mt-6 text-2xl leading-relaxed text-black/75 sm:text-3xl">
-            Si querés ver una unidad o consultar por ella, <strong className="text-sf-red">escribinos o pasate por la agencia</strong>.
-          </p>
-          <div className="mt-8 flex items-center gap-4 border-t border-black/10 pt-6">
-            <MapPin size={20} className="shrink-0 text-sf-red" />
-            <span className="font-display text-lg font-bold uppercase tracking-[0.15em]">{BUSINESS.address}</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section className="container-sf py-16 sm:py-24">
-      <div className="mb-10 flex flex-col gap-5 border-t-2 border-sf-red pt-5 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <span className="micro-label text-sf-red">02</span>
-          <h2 className="mt-3 font-display text-5xl font-extrabold uppercase leading-[0.88] text-white sm:text-7xl">
-            Cómo <span className="text-sf-red">trabajamos</span>
-          </h2>
-        </div>
-        <p className="max-w-sm text-sm text-gray-400">Información clara, consultas sin vueltas y un lugar al que podés venir.</p>
-      </div>
-      <div className="grid gap-px border border-white/10 bg-white/10 md:grid-cols-3">
-        {PILLARS.map((p) => (
-          <div key={p.title} className="group relative bg-sf-surface p-7 transition-colors hover:bg-sf-elevated">
-            <span className="pointer-events-none absolute right-5 top-4 font-display text-5xl font-extrabold text-white/5">{p.n}</span>
-            <div className="flex h-12 w-12 items-center justify-center border border-sf-red/40 text-sf-red-soft">
-              {p.icon}
-            </div>
-            <h3 className="mt-6 font-display text-2xl font-extrabold uppercase text-white">{p.title}</h3>
-            <p className="mt-2 text-sm leading-relaxed text-gray-400">{p.text}</p>
-            <span className="mt-6 block h-[2px] w-8 bg-sf-red transition-all duration-300 group-hover:w-full" aria-hidden="true" />
+        </>
+      }
+      actions={<WhatsAppButton size="lg" label="Hablemos por WhatsApp" className="px-8" />}
+    >
+      <div className="mt-14 grid gap-px border border-white/10 bg-white/10 sm:grid-cols-3">
+        {[
+          { label: 'Actividad', value: BUSINESS.tagline },
+          { label: 'Ubicación', value: 'Yerba Buena, Tucumán' },
+          { label: 'Cobertura', value: BUSINESS.shippingLabel },
+        ].map((item) => (
+          <div key={item.label} className="bg-cc-black p-6">
+            <p className="micro-label text-white/45">{item.label}</p>
+            <p className="mt-3 font-display text-sm font-bold uppercase leading-tight tracking-tight text-white">{item.value}</p>
           </div>
         ))}
       </div>
+    </PageIntro>
+
+    <section className="section-white">
+      <div className="container-cc grid gap-12 py-24 sm:py-32 lg:grid-cols-12 lg:items-center lg:gap-20">
+        <Reveal className="lg:col-span-5">
+          <span className="eyebrow eyebrow-dark">Nuestra mirada</span>
+          <h2 className="display-lg mt-6">Más que <span className="text-cc-metal">autos</span></h2>
+        </Reveal>
+        <Reveal delay={100} className="lg:col-span-7">
+          <p className="font-display text-2xl font-semibold uppercase leading-tight tracking-[-0.045em] text-cc-slate sm:text-4xl">
+            En CARLIFE trabajamos con autos usados seleccionados. Buscamos que encuentres la información que necesitás para elegir.
+          </p>
+          <p className="mt-7 max-w-2xl text-sm leading-relaxed text-cc-slate">
+            Si querés ver una unidad o consultar por ella, escribinos o pasate por la agencia. Estamos en {BUSINESS.address}.
+          </p>
+          <Link
+            to="/motos"
+            className="group mt-9 inline-flex items-center gap-3 border-b border-black/25 pb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-cc-slate transition-colors hover:border-black hover:text-black"
+          >
+            Explorar el inventario
+            <ArrowUpRight size={16} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+          </Link>
+        </Reveal>
+      </div>
     </section>
 
-    <section className="relative overflow-hidden border-y border-white/10">
-      <img src={ktmPhoto} alt="Moto de enduro en un camino de montaña" loading="lazy" className="min-h-[320px] w-full object-cover object-[70%_20%] sm:min-h-[480px]" />
-      <div className="absolute inset-0 bg-sf-black/65" aria-hidden="true" />
-      <div className="container-sf relative flex min-h-[320px] flex-col justify-center py-14 sm:min-h-[480px]">
-        <div className="relative max-w-lg">
-          <span className="section-index !text-sf-red">En movimiento</span>
-          <h2 className="mt-4 font-display text-5xl font-extrabold uppercase leading-[0.85] text-white sm:text-7xl">
-            La moto se<br /><span className="text-sf-red">vive afuera</span>
-          </h2>
-          <p className="mt-5 text-base leading-relaxed text-gray-200">
-            Nos gustan las motos que se usan. Mirá el catálogo, compará modelos y elegí la que mejor va con vos.
-          </p>
+    <section className="section-light">
+      <div className="container-cc py-24 sm:py-32">
+        <Reveal>
+          <div className="mb-12 flex flex-col gap-6 border-t border-black/15 pt-7 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <span className="eyebrow eyebrow-dark">Cómo trabajamos</span>
+              <h2 className="display-lg mt-6">Sin vueltas</h2>
+            </div>
+            <p className="max-w-sm text-sm leading-relaxed text-cc-slate">
+              Información clara, consultas directas y un lugar al que podés venir.
+            </p>
+          </div>
+        </Reveal>
+        <div className="grid gap-px border border-cc-paper bg-cc-paper md:grid-cols-3">
+          {PILLARS.map((pillar, index) => (
+            <Reveal key={pillar.title} delay={index * 80}>
+              <article className="group h-full bg-white p-7 transition-colors hover:bg-cc-soft">
+                <div className="flex h-12 w-12 items-center justify-center border border-black/25 text-cc-black">{pillar.icon}</div>
+                <h3 className="mt-8 font-display text-xl font-bold uppercase tracking-[-0.04em] text-cc-black">{pillar.title}</h3>
+                <p className="mt-3 text-sm leading-relaxed text-cc-slate">{pillar.text}</p>
+                <span className="mt-8 block h-px w-8 bg-cc-black transition-all duration-500 group-hover:w-full" aria-hidden="true" />
+              </article>
+            </Reveal>
+          ))}
         </div>
       </div>
     </section>
 
-    <section className="bg-sf-panel">
-      <div className="container-sf flex flex-col items-start justify-between gap-8 py-14 sm:py-20 lg:flex-row lg:items-center">
-        <div>
-          <span className="section-index !text-sf-red">Tu próxima moto</span>
-          <p className="mt-4 font-display text-4xl font-extrabold uppercase leading-[0.88] text-white sm:text-6xl">
-            Empieza <span className="text-sf-red">acá</span>
+    <section className="section-dark">
+      <div className="container-cc grid gap-12 py-24 sm:py-32 lg:grid-cols-12 lg:items-center lg:gap-20">
+        <Reveal className="lg:col-span-7">
+          <div className="aspect-[16/10] w-full overflow-hidden bg-cc-carbon">
+            <img
+              src="/images/editorial-side.webp"
+              alt="Detalle de un automóvil"
+              loading="lazy"
+              className="h-full w-full object-cover"
+            />
+          </div>
+        </Reveal>
+        <Reveal delay={100} className="lg:col-span-5">
+          <span className="eyebrow eyebrow-light">En movimiento</span>
+          <h2 className="display-lg mt-6 text-white">Nos gustan los vehículos que se usan</h2>
+          <p className="mt-6 max-w-md text-sm leading-relaxed text-white/60">
+            Mirá el catálogo, compará modelos y elegí el que mejor va con vos. Si querés verlo en persona, estamos en Yerba Buena.
           </p>
-          <p className="mt-3 max-w-md text-sm text-gray-400">{BUSINESS.specialty}</p>
-        </div>
+          <Link to="/comparador" className="btn btn-outline mt-9">
+            Comparar modelos <ArrowRight size={16} />
+          </Link>
+        </Reveal>
+      </div>
+    </section>
+
+    <section className="section-white">
+      <div className="container-cc flex flex-col items-start justify-between gap-9 py-20 sm:py-28 lg:flex-row lg:items-center">
+        <Reveal>
+          <span className="eyebrow eyebrow-dark">Tu próximo vehículo</span>
+          <p className="display-lg mt-6">Empieza acá</p>
+          <p className="mt-5 max-w-md text-sm text-cc-slate">{BUSINESS.specialty}</p>
+        </Reveal>
         <div className="flex w-full flex-col gap-3 sm:w-auto">
-          <Link to="/motos" className="btn btn-red px-8 py-4 text-xs">Ver catálogo <ArrowRight size={16} /></Link>
-          <Link to="/contacto" className="btn btn-ghost px-8 py-4 text-xs">Contactanos</Link>
+          <Link to="/motos" className="btn btn-dark btn-lg px-8">Ver catálogo <ArrowRight size={16} /></Link>
+          <Link to="/contacto" className="btn btn-outline-dark btn-lg px-8">
+            <CarFront size={16} /> Contactanos
+          </Link>
         </div>
       </div>
     </section>

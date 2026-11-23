@@ -44,11 +44,13 @@ function run(label, args, cwd) {
 // Backend: tsx watch (recarga en caliente de src/index.ts)
 const backend = run('backend', ['node_modules/tsx/dist/cli.mjs', 'watch', 'src/index.ts'], 'backend');
 
-// Frontend: Vite dev server
-const frontend = run('frontend', ['node_modules/vite/bin/vite.js'], 'frontend');
+// Frontend: Vite dev server. FRONTEND_PORT permite evitar conflictos con otros proyectos.
+const frontendArgs = ['node_modules/vite/bin/vite.js'];
+if (process.env.FRONTEND_PORT) frontendArgs.push('--port', process.env.FRONTEND_PORT);
+const frontend = run('frontend', frontendArgs, 'frontend');
 
 const shutdown = (signal) => {
-  console.log(`\n[${signal}] Cerrando SF MOTOS...`);
+  console.log(`\n[${signal}] Cerrando CARLIFE...`);
   for (const p of [backend, frontend]) {
     if (!p.killed) p.kill('SIGTERM');
   }

@@ -1,12 +1,12 @@
 /**
- * Tipos del dominio de SF MOTOS.
+ * Tipos del dominio del catálogo de vehículos (contrato de la API).
  * Estos tipos reflejan el contrato de la API del backend.
  */
 
-/** Condición de la motocicleta */
+/** Condición del vehículo */
 export type BikeCondition = 'NUEVA' | 'USADA';
 
-/** Uso/disciplina de la motocicleta; null = sin definir. */
+/** Clasificación de uso del vehículo; null = sin definir. */
 export type BikeUsage = 'ENDURO_CROSS' | 'RUTA';
 
 /** Estado de disponibilidad de la publicación */
@@ -51,7 +51,7 @@ export interface Bike {
   usage: BikeUsage | null;
   displacementCc: number | null;
   mileageKm: number | null;
-  /** Horas de uso declaradas en motos usadas; null/0 significa "sin dato". */
+  /** Horas de uso declaradas en vehículos usados; null/0 significa "sin dato". */
   usageHours: number | null;
   price: number;
   currency: string;

@@ -1,8 +1,8 @@
-# SF MOTOS — Guía de despliegue
+# CARLIFE — Guía de despliegue
 
 Arquitectura en producción: **SPA (Vite/React) en Cloudflare Pages** → **API Express en Vercel** → **PostgreSQL (Neon)**.
 
-> Estado verificado el 20/11/2026: infraestructura propia de SF MOTOS configurada y funcionando. **Este archivo no contiene secretos.**
+> Estado verificado el 20/11/2026: infraestructura de despliegue configurada y funcionando (los nombres de proyectos son heredados). **Este archivo no contiene secretos.**
 
 ---
 
@@ -20,14 +20,20 @@ Cloudflare Pages y Vercel despliegan automáticamente cada push a `main`. El fro
 ### Verificación actual
 
 ```text
-GET  https://sf-motos-livid.vercel.app/health            -> 200 {"ok":true,"service":"sfmotos-backend","db":"ok"}
-GET  https://sf-motos-livid.vercel.app/api/bikes         -> 200 {"data":[],"meta":{...}}
-GET  https://sf-motos-livid.vercel.app/api/bikes/brands  -> 200 []
-POST https://sf-motos-livid.vercel.app/api/auth/login    -> 200 { accessToken, refreshToken }
-GET  https://sf-motos.pages.dev                          -> 200 SPA de SF MOTOS
+GET  https://sf-motos-livid.vercel.app/health                      -> 200 {"ok":true,"service":"<nombre desplegado>","db":"ok"}
+GET  https://sf-motos-livid.vercel.app/api/bikes                   -> 200 {"data":[...6 publicaciones heredadas...],"meta":{...}}
+GET  https://sf-motos-livid.vercel.app/api/bikes?condition=USADA   -> 200 {"data":[...2 publicaciones...],"meta":{...}}
+GET  https://sf-motos-livid.vercel.app/api/bikes/brands            -> 200 [...9 marcas...]
+POST https://sf-motos-livid.vercel.app/api/auth/login              -> 200 { accessToken, refreshToken }
+GET  https://sf-motos.pages.dev                                    -> 200 SPA de CARLIFE
 ```
 
-Las listas están vacías porque **todavía no se cargaron motocicletas**. Eso es un estado de datos, no un error de API.
+> El código ya informa `service: "carlife-backend"` en `/health`; el valor heredado
+> que todavía devuelva la API se actualizará con el próximo deploy de `main`.
+
+Los datos del catálogo son heredados del proyecto anterior y **no se eliminan ni
+modifican**. El frontend público filtra `condition=USADA` para mostrar solo unidades
+usadas.
 
 ---
 
@@ -43,7 +49,7 @@ Build del backend: `prisma generate && tsc --noEmit` (el runtime usa `tsx`, no c
 | --- | --- |
 | `DATABASE_URL` | Secret de Neon (pooled, hostname `-pooler`) |
 | `DATABASE_URL_UNPOOLED` | Secret de Neon (directo, sin `-pooler`) |
-| `JWT_ACCESS_SECRET` | Secret aleatorio, propio de SF MOTOS |
+| `JWT_ACCESS_SECRET` | Secret aleatorio, propio de CARLIFE |
 | `JWT_REFRESH_SECRET` | Secret aleatorio, distinto del anterior |
 | `JWT_ACCESS_TTL` | `900` |
 | `JWT_REFRESH_TTL` | `604800` |

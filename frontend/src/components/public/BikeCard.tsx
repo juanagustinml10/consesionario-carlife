@@ -1,10 +1,11 @@
 import * as React from 'react';
-import { ArrowUpRight, Heart, MessageCircle } from 'lucide-react';
+import { ArrowUpRight, Heart, Scale } from 'lucide-react';
 import { Link } from '@/components/shared/Link';
 import { ImagePlaceholder } from '@/components/shared/ImagePlaceholder';
+import { WhatsAppButton } from '@/components/shared/WhatsAppButton';
 import { useFavoritesStore } from '@/stores/favorites';
+import { useCompareStore } from '@/stores/compare';
 import { cn } from '@/lib/utils';
-import { BUSINESS, buildBikeWhatsAppLink } from '@/lib/constants';
 import { formatDisplacement, formatMileage, formatPrice } from '@/lib/format';
 import { getThumbnailUrl } from '@/lib/images';
 import { ConditionTag, FeaturedTag, StatusTag } from '@/components/public/BikeBadges';
@@ -13,113 +14,147 @@ import type { Bike } from '@/types';
 interface BikeCardProps {
   bike: Bike;
   className?: string;
-  /** Las secciones claras de la home usan la variante light. */
+  /** Las tarjetas son claras por defecto en todo el sitio. */
   tone?: 'dark' | 'light';
   /** Tarjeta protagonista: imagen más amplia y tipografía mayor. */
   feature?: boolean;
 }
 
-export const BikeCard: React.FC<BikeCardProps> = ({ bike, className, tone = 'dark', feature = false }) => {
+export const BikeCard: React.FC<BikeCardProps> = ({ bike, className, tone = 'light', feature = false }) => {
   const isFavorite = useFavoritesStore((state) => state.isFavorite(bike.id));
   const toggleFavorite = useFavoritesStore((state) => state.toggle);
+  const inCompare = useCompareStore((state) => state.isInCompare(bike.id));
+  const addToCompare = useCompareStore((state) => state.add);
+  const removeFromCompare = useCompareStore((state) => state.remove);
+  const canAdd = useCompareStore((state) => state.canAdd);
+
   const images = bike.images ?? [];
   const primaryImage = images.find((img) => img.isPrimary) ?? images[0];
-  const whatsappLink = buildBikeWhatsAppLink(bike);
   const light = tone === 'light';
+
+  const toggleCompare = () => {
+    if (inCompare) removeFromCompare(bike.id);
+    else if (canAdd()) addToCompare(bike);
+  };
 
   return (
     <article
       className={cn(
-        'group relative flex h-full flex-col overflow-hidden border transition-colors duration-200',
+        'group relative flex h-full flex-col transition-colors duration-300',
         light
-          ? 'border-black/10 bg-white text-sf-black hover:border-sf-red'
-          : 'border-white/10 bg-sf-surface text-white hover:border-sf-red',
-        className
+          ? 'card-vehicle text-cc-black'
+          : 'border border-white/12 bg-cc-carbon text-white',
+        className,
       )}
     >
-      <div className={cn('relative overflow-hidden bg-black', feature ? 'aspect-[16/10] sm:aspect-[16/9]' : 'aspect-[4/3]')}>
+      <div className={cn('image-zoom relative overflow-hidden bg-cc-paper', feature ? 'aspect-[16/10]' : 'aspect-[4/3]')}>
         {primaryImage ? (
           <img
             src={getThumbnailUrl(primaryImage.url)}
             alt={`${bike.brand?.name ?? ''} ${bike.model || bike.title}`}
             loading="lazy"
             decoding="async"
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+            className="h-full w-full object-cover"
           />
         ) : (
           <ImagePlaceholder width={800} height={600} label="Foto no disponible" className="h-full w-full" />
         )}
-        <div className="pointer-events-none absolute inset-0 bg-sf-black/20" aria-hidden="true" />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[3px] bg-sf-red" aria-hidden="true" />
 
         <div className="absolute left-4 top-4 flex flex-wrap items-center gap-2">
           <ConditionTag condition={bike.condition} overlay />
           {bike.featured && <FeaturedTag overlay />}
         </div>
 
-        <button
-          type="button"
-          onClick={() => toggleFavorite(bike.id)}
-          aria-label={isFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos'}
-          className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center border border-white/30 bg-sf-black/75 text-white transition-colors hover:border-sf-red hover:bg-sf-red"
-        >
-          <Heart size={18} className={isFavorite ? 'fill-white stroke-white' : ''} strokeWidth={2} />
-        </button>
+        <div className="absolute right-4 top-4 flex gap-2">
+          <button
+            type="button"
+            onClick={toggleCompare}
+            aria-label={inCompare ? 'Quitar del comparador' : 'Agregar al comparador'}
+            aria-pressed={inCompare}
+            title="Comparar"
+            className={cn(
+              'flex h-10 w-10 items-center justify-center border bg-white/95 transition-colors',
+              inCompare
+                ? 'border-cc-black bg-cc-black text-white'
+                : 'border-black/10 text-cc-black hover:bg-cc-black hover:text-white',
+            )}
+          >
+            <Scale size={16} strokeWidth={1.7} />
+          </button>
+          <button
+            type="button"
+            onClick={() => toggleFavorite(bike.id)}
+            aria-label={isFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos'}
+            aria-pressed={isFavorite}
+            className={cn(
+              'flex h-10 w-10 items-center justify-center border bg-white/95 transition-colors',
+              isFavorite
+                ? 'border-cc-black bg-cc-black text-white'
+                : 'border-black/10 text-cc-black hover:bg-cc-black hover:text-white',
+            )}
+          >
+            <Heart size={16} className={isFavorite ? 'fill-current' : ''} strokeWidth={1.7} />
+          </button>
+        </div>
 
         <div className="absolute bottom-4 left-4">
           <StatusTag status={bike.status} overlay />
         </div>
       </div>
 
-      <div className={cn('flex flex-1 flex-col p-5', feature && 'sm:p-7')}>
-        <div className="flex items-center justify-between gap-3">
-          <p className="font-display text-[11px] font-bold uppercase tracking-[0.28em] text-sf-red">
-            {bike.brand?.name ?? BUSINESS.name}
+      <div className={cn('flex flex-1 flex-col p-5 sm:p-6', feature && 'sm:p-7')}>
+        <div className="flex items-baseline justify-between gap-3">
+          <p className={cn('text-[10px] font-bold uppercase tracking-[0.22em]', light ? 'text-cc-metal' : 'text-white/45')}>
+            {bike.brand?.name ?? 'CARLIFE'}
           </p>
-          <span className="font-display text-[10px] font-bold tracking-[0.2em] text-gray-500">
-            {bike.year}
-          </span>
+          <span className={cn('data-num text-xs', light ? 'text-cc-metal' : 'text-white/45')}>{bike.year}</span>
         </div>
+
         <Link to={`/motos/${bike.slug}`} className="mt-2 block">
-          <h3 className={cn(
-            'font-display font-extrabold uppercase leading-[0.95] line-clamp-2 transition-colors group-hover:text-sf-red',
-            feature ? 'text-3xl sm:text-4xl' : 'text-2xl'
-          )}>
+          <h3
+            className={cn(
+              'break-words font-display font-bold uppercase leading-[0.98] tracking-[-0.045em] transition-colors duration-300',
+              feature ? 'text-2xl sm:text-3xl' : 'text-xl sm:text-2xl',
+              light ? 'text-cc-black group-hover:text-cc-metal' : 'text-white group-hover:text-white/70',
+            )}
+          >
             {bike.model || bike.title}
           </h3>
         </Link>
-        <p className={cn('mt-2 text-xs', light ? 'text-black/55' : 'text-gray-400')}>
-          {formatDisplacement(bike.displacementCc)} · {formatMileage(bike.mileageKm)}
+
+        <p className={cn('mt-2 truncate text-xs', light ? 'text-cc-metal' : 'text-white/50')}>
+          {bike.title}
         </p>
 
-        <div className={cn('mt-auto flex items-end justify-between gap-3 border-t pt-4', light ? 'border-black/10' : 'border-white/10')}>
-          <div>
-            <p className={cn('text-[9px] font-bold uppercase tracking-[0.25em]', light ? 'text-black/45' : 'text-gray-500')}>
+        <div className={cn('mt-5 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs', light ? 'text-cc-slate' : 'text-white/55')}>
+          <span>{formatDisplacement(bike.displacementCc)}</span>
+          <span aria-hidden="true" className={cn('h-1 w-1', light ? 'bg-black/20' : 'bg-white/30')} />
+          <span>{formatMileage(bike.mileageKm)}</span>
+        </div>
+
+        <div className={cn('mt-auto flex items-end justify-between gap-3 border-t pt-5', light ? 'border-cc-paper' : 'border-white/12')}>
+          <div className="min-w-0">
+            <p className={cn('text-[9px] font-bold uppercase tracking-[0.2em]', light ? 'text-cc-metal' : 'text-white/40')}>
               Precio publicado
             </p>
-            <p className="mt-0.5 font-display text-2xl font-extrabold leading-none text-sf-red sm:text-3xl">
+            <p className={cn('data-num mt-1.5 break-words text-2xl leading-none', feature && 'sm:text-3xl', light ? 'text-cc-black' : 'text-white')}>
               {formatPrice(bike.price, bike.currency)}
             </p>
           </div>
-          <a
-            href={whatsappLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Consultar por WhatsApp"
-            className={cn(
-              'flex h-10 w-10 shrink-0 items-center justify-center border transition-colors',
-              light
-                ? 'border-black/15 text-black/60 hover:border-sf-red hover:bg-sf-red hover:text-white'
-                : 'border-white/15 text-gray-300 hover:border-sf-red hover:bg-sf-red hover:text-white'
-            )}
-          >
-            <MessageCircle size={17} />
-          </a>
+          <WhatsAppButton
+            bike={bike}
+            variant="icon"
+            ariaLabel={`Consultar por WhatsApp sobre ${bike.brand?.name ?? ''} ${bike.model || bike.title}`}
+            className="h-11 min-h-11 w-11 min-w-11"
+          />
         </div>
 
         <Link
           to={`/motos/${bike.slug}`}
-          className="mt-4 inline-flex items-center gap-2 font-display text-xs font-extrabold uppercase tracking-[0.2em] text-sf-red transition-colors hover:text-sf-red-soft"
+          className={cn(
+            'mt-5 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] transition-colors',
+            light ? 'text-cc-black hover:text-cc-metal' : 'text-white/60 hover:text-white',
+          )}
         >
           Ver ficha <ArrowUpRight size={15} />
         </Link>

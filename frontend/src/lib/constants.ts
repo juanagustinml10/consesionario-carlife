@@ -1,21 +1,27 @@
 /**
- * Datos oficiales de SF MOTOS.
+ * Datos oficiales de CARLIFE.
  * Fuente única de verdad para la información institucional y comercial.
  * ⚠️ No agregar datos que no hayan sido confirmados oficialmente.
  */
 export const BUSINESS = {
-  name: 'SF MOTOS',
-  tagline: 'POTENCIA EN CADA ARRANQUE.',
-  activity: 'Venta de motocicletas 0 km y usadas.',
-  specialty: 'Motocicletas 0 km y usadas en Juan B. Alberdi, Tucumán.',
-  address: '9 de Julio 119, Juan B. Alberdi, Tucumán, Argentina',
+  name: 'CARLIFE',
+  tagline: 'VEHÍCULOS SELECCIONADOS EN YERBA BUENA.',
+  slogan: 'Vehículos seleccionados en Yerba Buena.',
+  institutional: 'Confianza, Trayectoria y Renovación.',
+  activity: 'Venta de autos usados seleccionados.',
+  specialty: 'Autos usados seleccionados en Yerba Buena, Tucumán.',
+  address: 'Aconquija 1727, Yerba Buena, Tucumán, Argentina',
   addressLink:
-    'https://maps.google.com/?q=9+de+Julio+119+Juan+B.+Alberdi+Tucuman+Argentina',
-  phoneDisplay: '381 201-1613',
-  whatsappNumber: '5493812011613',
-  whatsappGeneralMessage: 'Hola! Quisiera recibir información sobre las motos de SF MOTOS.',
-  whatsappLink: 'https://wa.me/5493812011613',
-  shippingLabel: 'Consultá por envíos',
+    'https://maps.google.com/?q=Aconquija+1727+Yerba+Buena+Tucuman+Argentina',
+  mapsEmbed:
+    'https://www.google.com/maps?q=Aconquija+1727+Yerba+Buena+Tucuman+Argentina&output=embed',
+  phoneDisplay: '381 361-4178',
+  whatsappNumber: '5493813614178',
+  whatsappGeneralMessage: 'Hola! Quisiera recibir información sobre los autos usados de CARLIFE.',
+  whatsappLink: 'https://wa.me/5493813614178',
+  shippingLabel: 'Envíos a todo el país',
+  financingMessage:
+    'Consultá nuestras opciones de financiación mediante créditos prendarios. Te asesoramos para encontrar una alternativa acorde a tus posibilidades.',
 } as const;
 
 /** Año modelo máximo ofrecido (incluye la temporada siguiente). */
@@ -33,9 +39,9 @@ export const MODEL_YEARS = Array.from(
 /** Cantidad máxima de fotografías por publicación. */
 export const MAX_IMAGES_PER_BIKE = 10;
 
-/** Usos/disciplinas disponibles para clasificar una moto. */
+/** Usos/disciplinas disponibles para clasificar una publicación. */
 export const BIKE_USAGES = [
-  { value: 'ENDURO_CROSS', label: 'Enduro / Cross', title: 'ENDURO/CROSS' },
+  { value: 'ENDURO_CROSS', label: 'Todoterreno', title: 'TODOTERRENO' },
   { value: 'RUTA', label: 'Ruta', title: 'RUTA' },
 ] as const;
 
@@ -50,6 +56,6 @@ export const buildBikeWhatsAppLink = (bike: {
 }) => {
   const label = bike.brand?.name && bike.model ? `${bike.brand.name} ${bike.model}` : bike.title;
   return buildWhatsAppLink(
-    `Hola! Estoy interesado en la ${label} que vi publicada en SF MOTOS. ¿Me podrían brindar más información?`
+    `Hola, estoy interesado en el auto usado ${label}. ¿Me podrían brindar más información?`
   );
 };

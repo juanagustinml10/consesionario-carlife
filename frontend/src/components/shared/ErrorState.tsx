@@ -11,16 +11,13 @@ interface ErrorStateProps {
   className?: string;
 }
 
-/**
- * Estado de error honesto: la API puede no responder y nunca debemos
- * transformar ese fallo en "no hay resultados" ni en datos inventados.
- */
+/** Estado de error honesto: nunca convertimos un fallo de API en datos inventados. */
 export const ErrorState: React.FC<ErrorStateProps> = ({
   title = 'No pudimos cargar la información',
   message = 'No pudimos conectarnos con el servidor en este momento. Intentá de nuevo en unos instantes.',
   onRetry,
   compact = false,
-  tone = 'dark',
+  tone = 'light',
   className,
 }) => {
   const light = tone === 'light';
@@ -29,27 +26,39 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
       role="alert"
       className={cn(
         'flex flex-col items-center justify-center border border-dashed text-center',
-        light ? 'border-black/15 bg-white/60' : 'border-white/10 bg-sf-surface/40',
+        light ? 'border-black/20 bg-white' : 'border-white/20 bg-cc-carbon',
         compact ? 'gap-3 px-5 py-8' : 'gap-4 px-6 py-16',
-        className
+        className,
       )}
     >
-      <CircleAlert size={compact ? 26 : 36} className={cn('shrink-0 text-sf-red', !light && 'text-sf-red-soft')} aria-hidden="true" />
+      <CircleAlert
+        size={compact ? 26 : 36}
+        className={cn('shrink-0', light ? 'text-black/45' : 'text-white/50')}
+        aria-hidden="true"
+      />
       <div>
-        <p className={cn('font-display font-bold uppercase', compact ? 'text-lg' : 'text-2xl', light ? 'text-sf-black' : 'text-white')}>
+        <p
+          className={cn(
+            'font-display font-bold uppercase',
+            compact ? 'text-lg' : 'text-2xl',
+            light ? 'text-cc-black' : 'text-white',
+          )}
+        >
           {title}
         </p>
-        <p className={cn('mx-auto mt-1 max-w-md text-sm leading-relaxed', light ? 'text-black/55' : 'text-gray-400')}>{message}</p>
+        <p className={cn('mx-auto mt-2 max-w-md text-sm leading-relaxed', light ? 'text-black/55' : 'text-white/55')}>
+          {message}
+        </p>
       </div>
       {onRetry && (
         <button
           type="button"
           onClick={onRetry}
           className={cn(
-            'inline-flex items-center gap-2 border px-5 py-3 font-display text-xs font-bold uppercase tracking-widest transition-colors',
+            'inline-flex items-center gap-2 border px-5 py-3 text-[10px] font-bold uppercase tracking-[0.2em] transition-colors',
             light
-              ? 'border-sf-black/70 text-sf-black hover:border-sf-red hover:text-sf-red'
-              : 'btn btn-ghost'
+              ? 'border-black/30 text-cc-black hover:bg-cc-black hover:text-white'
+              : 'border-white/40 text-white hover:bg-white hover:text-cc-black',
           )}
         >
           <RefreshCw size={15} />

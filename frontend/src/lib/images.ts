@@ -1,5 +1,5 @@
 /**
- * Devuelve la URL de la miniatura (~500 px) de una foto de moto.
+ * Devuelve la URL de la miniatura (~500 px) de una fotografía del vehículo.
  *
  * - Con STORAGE_DRIVER=db la API sirve `/api/images/:key?variant=thumb`.
  * - Con local/S3 el archivo se guardó como `<nombre>-thumb.webp`.

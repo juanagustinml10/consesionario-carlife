@@ -9,6 +9,8 @@ import { Favorites } from '@/pages/public/Favorites';
 import { Financiacion } from '@/pages/public/Financiacion';
 import { About } from '@/pages/public/About';
 import { Contact } from '@/pages/public/Contact';
+import { Services } from '@/pages/public/Services';
+import { NotFound } from '@/pages/public/NotFound';
 
 import { Login } from '@/pages/admin/Login';
 import { Dashboard } from '@/pages/admin/Dashboard';
@@ -46,8 +48,10 @@ export const App = () => (
         <Route path="/comparador" element={<Compare />} />
         <Route path="/favoritos" element={<Favorites />} />
         <Route path="/financiacion" element={<Financiacion />} />
+        <Route path="/servicios" element={<Services />} />
         <Route path="/nosotros" element={<About />} />
         <Route path="/contacto" element={<Contact />} />
+        <Route path="*" element={<NotFound />} />
       </Route>
 
       {/* Panel administrativo */}
