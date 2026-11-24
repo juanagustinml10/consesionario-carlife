@@ -92,6 +92,13 @@ export const Footer: React.FC = () => {
             <p className="text-xs uppercase tracking-[0.14em] text-white/40">
               © {CURRENT_YEAR} {BUSINESS.name} · {BUSINESS.tagline}
             </p>
+            <Link
+              to="/admin"
+              className="group mt-2 inline-flex min-h-11 items-center gap-1 text-xs uppercase tracking-[0.14em] text-white/45 transition-colors hover:text-cc-red-light"
+            >
+              Acceso administrativo
+              <ArrowUpRight size={12} className="opacity-60 transition-opacity group-hover:opacity-100" />
+            </Link>
           </div>
           <p className="max-w-2xl text-xs leading-relaxed text-white/35 lg:text-right">
             Fotografías: Beta RR Freenduro (CC BY 4.0, Jimmy Boakes / Jix31), KTM forest (CC BY 3.0, Tim Gotzkowsky) y Toyota Corolla SE (CC BY-SA 4.0, Kevauto / Wikimedia Commons, imagen adaptada). Otras imágenes: Unsplash y Wikimedia Commons. Precios y condiciones sujetos a confirmación.
