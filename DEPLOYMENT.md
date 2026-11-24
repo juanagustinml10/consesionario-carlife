@@ -2,7 +2,7 @@
 
 Arquitectura en producción: **SPA (Vite/React) en Cloudflare Pages** → **API Express en Vercel** → **PostgreSQL (Neon)**.
 
-> Estado verificado el 20/11/2026: infraestructura de despliegue configurada y funcionando (los nombres de proyectos son heredados). **Este archivo no contiene secretos.**
+> Estado verificado el 23/11/2026: stack final de CARLIFE operativo. Los proyectos `sf-motos` siguen existiendo como referencia heredada, pero **ya no son el despliegue oficial**. **Este archivo no contiene secretos.**
 
 ---
 
@@ -10,30 +10,28 @@ Arquitectura en producción: **SPA (Vite/React) en Cloudflare Pages** → **API 
 
 | Capa | Plataforma | Proyecto | URL |
 | --- | --- | --- | --- |
-| Repositorio | GitHub | `juanagustinml10/sf-motos` (público) | https://github.com/juanagustinml10/sf-motos |
-| Frontend | Cloudflare Pages | `sf-motos` (rama `main`) | https://sf-motos.pages.dev |
-| Backend | Vercel | `sf-motos` (cuenta `agustinmolina17`) | https://sf-motos-livid.vercel.app |
-| Base de datos | Neon | proyecto configurado en Vercel | (solo cadenas Secret) |
+| Repositorio | GitHub | `juanagustinml10/consesionario-carlife` (público, rama `main`) | https://github.com/juanagustinml10/consesionario-carlife |
+| Frontend | Cloudflare Pages | `consesionario-carlife` (rama `main`, root `frontend`) | https://consesionario-carlife.pages.dev |
+| Backend | Vercel | `backend` (cuenta `agustinmolina17`, root `backend`) | https://backend-gold-five-28.vercel.app |
+| Base de datos | Neon | proyecto `carlife`, branch `production`, DB `neondb` | (solo cadenas Secret en Vercel) |
 
 Cloudflare Pages y Vercel despliegan automáticamente cada push a `main`. El frontend apunta a la API de Vercel mediante el fallback productivo en `frontend/src/lib/api.ts`; no hace falta definir `VITE_API_BASE_URL` en Pages.
 
 ### Verificación actual
 
 ```text
-GET  https://sf-motos-livid.vercel.app/health                      -> 200 {"ok":true,"service":"<nombre desplegado>","db":"ok"}
-GET  https://sf-motos-livid.vercel.app/api/bikes                   -> 200 {"data":[...6 publicaciones heredadas...],"meta":{...}}
-GET  https://sf-motos-livid.vercel.app/api/bikes?condition=USADA   -> 200 {"data":[...2 publicaciones...],"meta":{...}}
-GET  https://sf-motos-livid.vercel.app/api/bikes/brands            -> 200 [...9 marcas...]
-POST https://sf-motos-livid.vercel.app/api/auth/login              -> 200 { accessToken, refreshToken }
-GET  https://sf-motos.pages.dev                                    -> 200 SPA de CARLIFE
+GET  https://backend-gold-five-28.vercel.app/health                      -> 200 {"ok":true,"service":"carlife-backend","db":"ok"}
+GET  https://backend-gold-five-28.vercel.app/api/bikes                   -> 200 {"data":[...6 publicaciones heredadas...],"meta":{...}}
+GET  https://backend-gold-five-28.vercel.app/api/bikes?condition=USADA   -> 200 {"data":[...2 publicaciones...],"meta":{...}}
+GET  https://backend-gold-five-28.vercel.app/api/bikes/brands            -> 200 [...9 marcas...]
+POST https://backend-gold-five-28.vercel.app/api/auth/login              -> 200 { accessToken, refreshToken }
+GET  https://consesionario-carlife.pages.dev                             -> 200 SPA de CARLIFE
 ```
 
-> El código ya informa `service: "carlife-backend"` en `/health`; el valor heredado
-> que todavía devuelva la API se actualizará con el próximo deploy de `main`.
-
-Los datos del catálogo son heredados del proyecto anterior y **no se eliminan ni
-modifican**. El frontend público filtra `condition=USADA` para mostrar solo unidades
-usadas.
+Los datos del catálogo se **copiaron** del Neon heredado (`sf-motos`) al Neon final
+(`carlife`) sin eliminarlos ni modificarlos: 9 marcas, 6 publicaciones, 10 imágenes,
+2 features, 86 visitas y el usuario `ADMIN`. El frontend público filtra
+`condition=USADA` para mostrar solo unidades usadas.
 
 ---
 
@@ -53,18 +51,23 @@ Build del backend: `prisma generate && tsc --noEmit` (el runtime usa `tsx`, no c
 | `JWT_REFRESH_SECRET` | Secret aleatorio, distinto del anterior |
 | `JWT_ACCESS_TTL` | `900` |
 | `JWT_REFRESH_TTL` | `604800` |
-| `CORS_ORIGIN` | `https://sf-motos.pages.dev,https://sf-motos-livid.vercel.app` |
-| `PUBLIC_BASE_URL` | `https://sf-motos-livid.vercel.app` |
+| `CORS_ORIGIN` | `https://consesionario-carlife.pages.dev,https://sf-motos.pages.dev,https://sf-motos-livid.vercel.app,https://backend-gold-five-28.vercel.app` |
+| `PUBLIC_BASE_URL` | `https://backend-gold-five-28.vercel.app` |
 | `STORAGE_DRIVER` | `db` (fotos en Neon; sin disco efímero) |
 | `MAX_FILE_SIZE` | `4194304` |
 
 Comandos útiles:
 
 ```bash
-vercel env ls --project sf-motos
-vercel env add NOMBRE --project sf-motos --environment production --value VALOR --yes --force
+vercel env ls --project backend
+vercel env add NOMBRE --project backend --environment production --force   # valor por stdin
 vercel logs --deployment <url-del-deploy>
-vercel --prod --yes            # redeploy manual desde el working tree
+vercel redeploy backend-gold-five-28.vercel.app --environment production   # aplicar cambios de env
+
+# `vercel env pull` redacta los secretos como [SENSITIVE]: no sirve para copiarlos.
+# Las cadenas de Neon se obtienen con:
+neon connection-string production --project-id hidden-morning-18059722 --pooled
+neon connection-string production --project-id hidden-morning-18059722
 ```
 
 ### Almacenamiento de fotos
@@ -88,8 +91,8 @@ Con `STORAGE_DRIVER=db` los bytes se guardan en `BikeImage.data` (BYTEA) y se si
 ## 3. Frontend (Cloudflare Pages)
 
 - Root directory: `frontend` · Framework: Vite · Build: `npm run build` · Output: `dist`.
-- Proyecto: `sf-motos`, cuenta `38903a9d035a6f38fbf883173b296d6e`.
-- Dominio: `https://sf-motos.pages.dev`.
+- Proyecto: `consesionario-carlife` (conectado a `juanagustinml10/consesionario-carlife`).
+- Dominio: `https://consesionario-carlife.pages.dev`.
 - `frontend/public/_redirects` contiene `/* /index.html 200` para que las rutas profundas recarguen sin 404.
 - No hay secretos en el bundle: la única URL inyectada es la pública de la API.
 
@@ -97,7 +100,7 @@ Con `STORAGE_DRIVER=db` los bytes se guardan en `BikeImage.data` (BYTEA) y se si
 
 ## 4. Base de datos y migraciones
 
-Migraciones versionadas en `backend/prisma/migrations`, **ya aplicadas en Neon y registradas en `_prisma_migrations`**:
+Migraciones versionadas en `backend/prisma/migrations`, **ya aplicadas en el Neon `carlife` (branch `production`) y registradas en `_prisma_migrations`**:
 
 - `20261116000000_init`
 - `20261117000000_add_usage_hours_draft`
@@ -116,7 +119,7 @@ Nunca `db push` ni reiniciar el historial de migraciones.
 
 ### Usuario administrador
 
-Existe un usuario `ADMIN` creado en Neon. Sus credenciales **no se versionan**; se entregaron fuera del repositorio. El panel está en `https://sf-motos.pages.dev/admin`. El registro público de administradores no existe (el alta es solo por seed/insercion controlada). Si se pierden las credenciales, crear otro admin con `backend/prisma/seed.ts` definiendo `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` localmente y ejecutando `npm run prisma:seed` **una sola vez**.
+Existe un usuario `ADMIN` creado en Neon y copiado al proyecto `carlife`. Sus credenciales **no se versionan**; se entregaron fuera del repositorio. El panel está en `https://consesionario-carlife.pages.dev/admin` (accesible solo por URL: no hay link en el navbar ni en el footer). El registro público de administradores no existe (el alta es solo por seed/insercion controlada). Si se pierden las credenciales, crear otro admin con `backend/prisma/seed.ts` definiendo `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` localmente y ejecutando `npm run prisma:seed` **una sola vez**.
 
 ### Marcas
 

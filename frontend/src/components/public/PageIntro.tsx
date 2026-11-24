@@ -31,10 +31,10 @@ export const PageIntro: React.FC<PageIntroProps> = ({
   const compact = size === 'compact';
 
   const titleSize = compact
-    ? 'mt-6 text-4xl sm:text-6xl lg:text-7xl'
+    ? 'mt-6 text-3xl min-[360px]:text-4xl sm:text-6xl lg:text-7xl'
     : size === 'large'
-      ? 'mt-7 text-5xl sm:text-7xl lg:text-[7.5rem]'
-      : 'mt-7 text-5xl sm:text-7xl lg:text-[7rem]';
+      ? 'mt-7 text-[2.6rem] min-[360px]:text-5xl sm:text-7xl lg:text-[7.5rem]'
+      : 'mt-7 text-[2.6rem] min-[360px]:text-5xl sm:text-7xl lg:text-[7rem]';
 
   return (
     <section

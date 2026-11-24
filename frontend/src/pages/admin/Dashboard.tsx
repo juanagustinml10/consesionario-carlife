@@ -97,8 +97,8 @@ export const Dashboard = () => {
           const Icon = STAT_ICONS[index];
           return (
             <Card key={label} className="border-0 p-5">
-              <div className="flex items-start justify-between gap-3">
-                <p className="micro-label">{label}</p>
+              <div className="flex flex-wrap items-start justify-between gap-2">
+                <p className="micro-label min-w-0 break-words">{label}</p>
                 <Icon size={17} className="shrink-0 text-white/45" />
               </div>
               <p className="data-num mt-5 text-3xl leading-none sm:text-4xl">

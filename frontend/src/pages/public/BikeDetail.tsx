@@ -165,12 +165,12 @@ export const BikeDetail: React.FC = () => {
   return (
     <div className="min-h-screen bg-white text-cc-black">
       <div className="border-b border-cc-paper bg-cc-soft pt-24">
-        <nav className="container-cc flex h-14 items-center gap-3 overflow-x-auto text-[10px] font-bold uppercase tracking-[0.22em] text-cc-gray" aria-label="Ruta de navegación">
-          <Link to="/motos" className="shrink-0 transition-colors hover:text-cc-black">Catálogo</Link>
-          <span className="text-black/25">/</span>
-          <span className="shrink-0">{bike.brand?.name ?? 'Vehículo'}</span>
-          <span className="text-black/25">/</span>
-          <span className="truncate text-cc-black/75">{bike.title}</span>
+        <nav className="container-cc flex min-h-14 flex-wrap items-center gap-x-2 gap-y-1 overflow-visible py-3 text-[10px] font-bold uppercase tracking-[0.22em] text-cc-gray sm:h-14 sm:flex-nowrap sm:gap-x-3 sm:overflow-x-auto sm:py-0" aria-label="Ruta de navegación">
+          <Link to="/motos" className="inline-flex min-h-11 shrink-0 items-center transition-colors hover:text-cc-black">Catálogo</Link>
+          <span className="hidden text-black/25 sm:inline">/</span>
+          <span className="hidden shrink-0 sm:inline">{bike.brand?.name ?? 'Vehículo'}</span>
+          <span className="hidden text-black/25 sm:inline">/</span>
+          <span className="min-w-0 break-words text-cc-black/75 sm:truncate">{bike.title}</span>
         </nav>
       </div>
 
@@ -247,7 +247,7 @@ export const BikeDetail: React.FC = () => {
                 type="button"
                 onClick={() => toggleFavorite(bike.id)}
                 className={cn(
-                  'inline-flex items-center gap-2 border px-5 py-3 text-[10px] font-bold uppercase tracking-[0.2em] transition-colors',
+                  'inline-flex min-h-11 items-center gap-2 border px-5 py-3 text-[10px] font-bold uppercase tracking-[0.2em] transition-colors',
                   isFavorite
                     ? 'border-cc-black bg-cc-black text-white'
                     : 'border-black/20 text-black/65 hover:border-black hover:text-black'
@@ -259,7 +259,7 @@ export const BikeDetail: React.FC = () => {
               <button
                 type="button"
                 onClick={handleShare}
-                className="inline-flex items-center gap-2 border border-black/20 px-5 py-3 text-[10px] font-bold uppercase tracking-[0.2em] text-black/65 transition-colors hover:border-black hover:text-black"
+                className="inline-flex min-h-11 items-center gap-2 border border-black/20 px-5 py-3 text-[10px] font-bold uppercase tracking-[0.2em] text-black/65 transition-colors hover:border-black hover:text-black"
               >
                 <Share2 size={16} strokeWidth={1.7} />
                 {copied ? '¡Copiado!' : 'Compartir'}
@@ -304,7 +304,7 @@ export const BikeDetail: React.FC = () => {
                 <span className="h-px w-10 bg-black/20" />
                 <span className="eyebrow eyebrow-dark !gap-0 !before:hidden">Datos principales</span>
               </div>
-              <div className={cn('grid grid-cols-2 gap-px border border-cc-paper bg-cc-paper', usageHours ? 'sm:grid-cols-5' : 'sm:grid-cols-4')}>
+              <div className={cn('grid grid-cols-2 gap-px border border-cc-paper bg-cc-paper sm:grid-cols-3 lg:grid-cols-2', usageHours ? 'xl:grid-cols-5' : 'xl:grid-cols-4')}>
                 {specs.map((spec) => (
                   <div key={spec.label} className="min-w-0 bg-white p-4">
                     <div className="text-cc-gray">{spec.icon}</div>
@@ -326,7 +326,7 @@ export const BikeDetail: React.FC = () => {
                   {features.map((feature, index) => (
                     <div key={feature.id} className={cn('flex items-center justify-between gap-4 px-4 py-3', index % 2 === 1 && 'bg-cc-soft')}>
                       <dt className="text-xs text-cc-gray">{featureLabel(feature.key)}</dt>
-                      <dd className="text-right text-sm font-semibold uppercase text-cc-black">{feature.value}</dd>
+                      <dd className="min-w-0 break-words text-right text-sm font-semibold uppercase text-cc-black">{feature.value}</dd>
                     </div>
                   ))}
                 </dl>
@@ -361,7 +361,7 @@ export const BikeDetail: React.FC = () => {
               <p className="mt-2 text-xs leading-relaxed text-cc-gray">{BUSINESS.financingMessage}</p>
               <Link
                 to="/financiacion"
-                className="mt-4 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-cc-red-dark transition-colors hover:text-cc-red"
+                className="mt-4 inline-flex min-h-11 items-center gap-2 self-start text-[10px] font-bold uppercase tracking-[0.2em] text-cc-red-dark transition-colors hover:text-cc-red"
               >
                 Ver financiación <ArrowRight size={14} />
               </Link>
@@ -400,7 +400,7 @@ export const BikeDetail: React.FC = () => {
         <div className="container-cc">
           <Link
             to="/motos"
-            className="group inline-flex items-center gap-2 border-b border-black/25 pb-1 text-[10px] font-bold uppercase tracking-[0.22em] text-black/60 transition-colors hover:border-black hover:text-black"
+            className="group inline-flex min-h-11 items-center gap-2 self-start border-b border-black/25 pb-1 text-[10px] font-bold uppercase tracking-[0.22em] text-black/60 transition-colors hover:border-black hover:text-black"
           >
             <ChevronLeft size={15} className="transition-transform group-hover:-translate-x-1" /> Volver al catálogo
           </Link>

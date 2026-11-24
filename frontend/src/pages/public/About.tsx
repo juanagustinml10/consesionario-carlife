@@ -58,7 +58,7 @@ export const About: React.FC = () => (
           </p>
           <Link
             to="/motos"
-            className="group mt-9 inline-flex items-center gap-3 border-b border-black/25 pb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-cc-slate transition-colors hover:border-black hover:text-black"
+            className="group mt-9 inline-flex min-h-11 items-center gap-3 self-start border-b border-black/25 pb-1 text-[10px] font-bold uppercase tracking-[0.2em] text-cc-slate transition-colors hover:border-black hover:text-black sm:pb-2"
           >
             Explorar el inventario
             <ArrowUpRight size={16} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />

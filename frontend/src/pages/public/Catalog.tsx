@@ -29,8 +29,8 @@ const CONDITIONS: { value: BikeCondition; label: string }[] = [
 ];
 
 const CATEGORIES: { key: 'condition' | 'status'; value: BikeCondition | BikeStatus; label: string }[] = [
-  { key: 'condition', value: 'USADA', label: 'Autos usados' },
-  { key: 'status', value: 'DISPONIBLE', label: 'Disponibles' },
+  { key: 'condition', value: 'USADA', label: 'Autos' },
+  { key: 'status', value: 'DISPONIBLE', label: 'Camionetas/SUV' },
 ];
 
 const STATUSES: { value: BikeStatus; label: string }[] = [
@@ -203,14 +203,14 @@ export const Catalog: React.FC = () => {
           <button
             type="button"
             onClick={clearFilters}
-            className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-[0.18em] text-cc-gray transition-colors hover:text-cc-black"
+            className="-mr-2 inline-flex min-h-11 items-center gap-1 px-2 text-[10px] font-bold uppercase tracking-[0.18em] text-cc-gray transition-colors hover:text-cc-black"
           >
             <X size={13} /> Limpiar
           </button>
         )}
       </div>
 
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-12">
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-6 xl:grid-cols-12">
         <div className="col-span-2 space-y-2 md:col-span-2">
           <label className="field-label" htmlFor={`${prefix}-marca`}>Marca</label>
           <select id={`${prefix}-marca`} value={filters.brand ?? ''} onChange={(e) => setFilter('brand', e.target.value || undefined)} className="field field-light">
@@ -263,7 +263,7 @@ export const Catalog: React.FC = () => {
           </select>
         </div>
 
-        <div className="col-span-2 flex items-end md:col-span-12 md:w-64">
+        <div className="col-span-2 flex items-end md:col-span-6 md:w-64 xl:col-span-12">
           <button
             type="button"
             onClick={() => setFilter('featured', !filters.featured)}
@@ -370,13 +370,13 @@ export const Catalog: React.FC = () => {
                     aria-pressed={active}
                     onClick={() => setFilter(item.key, active ? undefined : item.value)}
                     className={cn(
-                      'group relative flex min-h-[150px] flex-col items-start justify-between border p-6 text-left transition-colors',
+                      'group relative flex min-h-[150px] flex-col items-start justify-between border p-5 text-left transition-colors sm:p-6',
                       active
                         ? 'border-cc-black bg-cc-black text-white'
                         : 'border-cc-paper bg-cc-soft text-cc-black hover:border-black/40'
                     )}
                   >
-                    <span className="font-display text-4xl font-bold uppercase leading-none tracking-tight">{item.label}</span>
+                    <span className="break-words font-display text-2xl font-bold uppercase leading-none tracking-tight min-[360px]:text-3xl sm:text-4xl">{item.label}</span>
                     <span className={cn(
                       'mt-5 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.22em]',
                       active ? 'text-white/60' : 'text-cc-gray'

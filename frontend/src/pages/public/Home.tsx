@@ -22,6 +22,10 @@ import { bikesService } from '@/services/bikes';
 import { BUSINESS } from '@/lib/constants';
 import type { Bike } from '@/types';
 
+// Sección 05 (experiencia) desactivada temporalmente. Se conserva el JSX y la
+// ruta /nosotros para volver a activarla cuando se necesite.
+const SHOW_EXPERIENCE_SECTION = false;
+
 const SERVICES = [
   {
     index: '01',
@@ -99,15 +103,28 @@ export const Home: React.FC = () => {
           <div className="container-cc">
             <p className="hero__eyebrow animate-fade-up">
               <span className="hero__eyebrow-rule" aria-hidden="true" />
-              CARLIFE · YERBA BUENA
+              <span className="hero__eyebrow-desktop">CARLIFE · YERBA BUENA</span>
+              <span className="hero__eyebrow-mobile">
+                CARLIFE <span className="hero__eyebrow-place">· YERBA BUENA</span>
+              </span>
             </p>
             <h1 id="hero-title" className="hero__title animate-fade-up" style={{ animationDelay: '0.07s' }}>
-              <span>TU PRÓXIMO <span className="text-cc-metal">AUTO</span></span>
-              <span>COMIENZA</span>
-              <span className="hero__title-accent">AQUÍ.</span>
+              <span className="hero__title-desktop">
+                <span>TU PRÓXIMO <span className="text-cc-metal">AUTO</span></span>
+                <span>COMIENZA</span>
+                <span className="hero__title-accent">AQUÍ.</span>
+              </span>
+              <span className="hero__title-mobile">
+                <span>TU PRÓXIMO</span>
+                <span><span className="text-cc-metal">AUTO</span> COMIENZA</span>
+                <span className="hero__title-accent">AQUÍ.</span>
+              </span>
             </h1>
             <p className="hero__description animate-fade-up" style={{ animationDelay: '0.14s' }}>
-              {BUSINESS.slogan} En CARLIFE trabajamos con autos usados seleccionados.
+              <span className="hero__description-desktop">
+                {BUSINESS.slogan} En CARLIFE trabajamos con autos usados seleccionados.
+              </span>
+              <span className="hero__description-mobile">{BUSINESS.slogan}</span>
             </p>
             <div className="hero__actions animate-fade-up" style={{ animationDelay: '0.21s' }}>
               <Link to="/motos" className="btn btn-dark">
@@ -161,24 +178,36 @@ export const Home: React.FC = () => {
           </Reveal>
 
           <Reveal delay={90}>
-            <Link to="/motos" className="group relative flex min-h-[340px] flex-col justify-end overflow-hidden bg-cc-black p-7 sm:min-h-[400px] sm:p-10">
-              <img
-                src="/images/automotive-01.webp"
-                alt="Autos usados seleccionados en el catálogo de CARLIFE"
-                loading="lazy"
-                className="absolute inset-0 h-full w-full object-cover opacity-70 transition-transform duration-700 group-hover:scale-[1.04]"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-cc-black via-cc-black/45 to-transparent" aria-hidden="true" />
-              <div className="relative flex items-end justify-between gap-6">
-                <div>
-                  <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-white/55">Acceso al catálogo</p>
-                  <p className="mt-3 font-display text-5xl font-bold uppercase leading-none tracking-[-0.06em] text-white sm:text-6xl">Ver vehículos seleccionados</p>
-                  <p className="mt-4 max-w-md text-xs leading-relaxed text-white/65">Explorá las unidades disponibles con sus fotos y datos.</p>
+            <Link
+              to="/motos"
+              className="group relative flex min-h-[300px] flex-col justify-between overflow-hidden bg-cc-black p-7 sm:min-h-[360px] sm:p-10"
+            >
+              <span className="absolute inset-y-0 left-0 w-1 bg-cc-red" aria-hidden="true" />
+              <div className="flex items-start justify-between gap-6">
+                <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-white/55">
+                  Acceso al catálogo
+                </p>
+                <span className="font-display text-5xl font-bold leading-none tracking-[-0.09em] text-white/10 sm:text-7xl" aria-hidden="true">
+                  01
+                </span>
+              </div>
+              <div className="flex flex-col items-start gap-5 sm:flex-row sm:items-end sm:justify-between sm:gap-6">
+                <div className="min-w-0">
+                  <p className="font-display text-3xl font-bold uppercase leading-none tracking-[-0.06em] text-white sm:text-6xl">
+                    Ver vehículos <span className="break-words">seleccionados</span>
+                  </p>
+                  <p className="mt-4 max-w-md text-xs leading-relaxed text-white/65">
+                    Explorá las unidades disponibles con sus fotos y datos.
+                  </p>
                 </div>
-                <span className="flex h-12 w-12 shrink-0 items-center justify-center border border-white/40 text-white transition-colors group-hover:border-white group-hover:bg-white group-hover:text-cc-black">
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center border border-cc-red text-cc-red transition-colors group-hover:border-white group-hover:bg-white group-hover:text-cc-black sm:h-12 sm:w-12">
                   <ArrowUpRight size={20} />
                 </span>
               </div>
+              <span
+                className="absolute bottom-0 left-0 h-1 w-12 bg-cc-red transition-all duration-500 group-hover:w-full"
+                aria-hidden="true"
+              />
             </Link>
           </Reveal>
         </div>
@@ -294,7 +323,7 @@ export const Home: React.FC = () => {
               </div>
               <Link
                 to="/servicios"
-                className="group inline-flex shrink-0 items-center gap-3 border-b border-white/30 pb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-white/65 transition-colors hover:border-white hover:text-white"
+                className="group inline-flex min-h-11 shrink-0 items-center gap-3 self-start border-b border-white/30 pb-1 text-[10px] font-bold uppercase tracking-[0.2em] text-white/65 transition-colors hover:border-white hover:text-white lg:self-auto lg:pb-2"
               >
                 Ver todos los servicios
                 <ArrowUpRight size={16} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
@@ -330,7 +359,8 @@ export const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* ============ 05 / EXPERIENCIA ============ */}
+      {/* ============ 05 / EXPERIENCIA (oculta temporalmente) ============ */}
+      {SHOW_EXPERIENCE_SECTION && (
       <section className="section-soft">
         <div className="container-cc grid gap-12 py-24 sm:py-32 lg:grid-cols-12 lg:items-center lg:gap-20 lg:py-40">
           <Reveal className="lg:col-span-7">
@@ -373,6 +403,7 @@ export const Home: React.FC = () => {
           </Reveal>
         </div>
       </section>
+      )}
 
       {/* ============ 06 / FINANCIACIÓN ============ */}
       <section className="section-white">
@@ -453,7 +484,7 @@ export const Home: React.FC = () => {
                       href={`https://wa.me/${BUSINESS.whatsappNumber}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex min-h-8 items-center font-medium transition-colors hover:text-white"
+                      className="inline-flex min-h-11 items-center font-medium transition-colors hover:text-white"
                     >
                       <span className="data-num">{BUSINESS.phoneDisplay}</span> <span className="text-white/45">(WhatsApp)</span>
                     </a>

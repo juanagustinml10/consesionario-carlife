@@ -64,9 +64,10 @@ export const Login = () => {
 
       <div className="flex flex-1 items-center justify-center px-5 py-10 sm:px-8">
         <div className="w-full max-w-md">
+          <Logo onDark className="mb-8 h-10 w-auto lg:hidden" />
           <Link
             to="/"
-            className="mb-10 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-white/50 transition-colors hover:text-white"
+            className="mb-6 inline-flex min-h-11 items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-white/50 transition-colors hover:text-white lg:mb-10"
           >
             <ArrowLeft size={16} /> Volver al sitio público
           </Link>

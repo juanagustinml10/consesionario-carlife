@@ -3,8 +3,7 @@ import { Link } from '@/components/shared/Link';
 import { Logo } from '@/components/shared/Logo';
 import { BUSINESS } from '@/lib/constants';
 import { WhatsAppButton, WhatsAppIcon } from '@/components/shared/WhatsAppButton';
-import { authService } from '@/services/auth';
-import { ArrowUpRight, LockKeyhole, MapPin, Truck } from 'lucide-react';
+import { ArrowUpRight, MapPin, Truck } from 'lucide-react';
 
 const LINKS = [
   { label: 'Vehículos', to: '/motos' },
@@ -20,14 +19,12 @@ const LINKS = [
 const CURRENT_YEAR = new Date().getFullYear();
 
 export const Footer: React.FC = () => {
-  const adminLink = authService.isAuthenticated() ? '/admin' : '/admin/login';
-
   return (
     <footer className="border-t-2 border-cc-red bg-cc-black text-white">
-      <div className="container-cc py-16 sm:py-20 lg:py-24">
-        <div className="grid gap-14 border-b border-white/10 pb-14 lg:grid-cols-12 lg:gap-10 lg:pb-20">
-          <div className="lg:col-span-5">
-            <Link to="/" aria-label="CARLIFE — Inicio" className="inline-block">
+      <div className="container-cc pb-32 pt-16 sm:pb-24 sm:pt-20 lg:py-24">
+        <div className="grid gap-10 border-b border-white/10 pb-14 sm:grid-cols-2 sm:gap-x-10 sm:gap-y-14 lg:grid-cols-12 lg:gap-10 lg:pb-20">
+          <div className="sm:col-span-2 lg:col-span-5">
+            <Link to="/" aria-label="CARLIFE — Inicio" className="inline-flex min-h-11 items-center">
               <Logo onDark className="h-10 w-auto sm:h-12" />
             </Link>
             <p className="mt-8 max-w-md font-display text-2xl font-semibold uppercase leading-[1.1] tracking-[-0.045em] text-white sm:text-3xl">
@@ -41,15 +38,15 @@ export const Footer: React.FC = () => {
 
           <nav className="lg:col-span-3" aria-label="Enlaces del sitio">
             <p className="eyebrow eyebrow-light mb-7">Navegación</p>
-            <ul className="grid grid-cols-2 gap-x-5 gap-y-3.5">
+            <ul className="grid grid-cols-1 gap-x-5 gap-y-1 min-[380px]:grid-cols-2 min-[380px]:gap-y-3.5">
               {LINKS.map((link) => (
                 <li key={link.label}>
                   <Link
                     to={link.to}
-                    className="group inline-flex min-h-8 items-center gap-1 text-sm text-white/60 transition-colors hover:text-cc-red-light"
+                    className="group inline-flex min-h-11 items-center gap-1 text-sm text-white/60 transition-colors hover:text-cc-red-light"
                   >
                     {link.label}
-                    <ArrowUpRight size={12} className="opacity-0 transition-opacity group-hover:opacity-100" />
+                    <ArrowUpRight size={12} className="opacity-60 transition-opacity lg:opacity-0 lg:group-hover:opacity-100" />
                   </Link>
                 </li>
               ))}
@@ -65,7 +62,7 @@ export const Footer: React.FC = () => {
                   href={BUSINESS.addressLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex min-h-8 items-start gap-1 transition-colors hover:text-white"
+                  className="inline-flex min-h-11 items-start gap-1 transition-colors hover:text-white"
                 >
                   <span>{BUSINESS.address}</span>
                   <ArrowUpRight size={13} className="shrink-0" />
@@ -77,7 +74,7 @@ export const Footer: React.FC = () => {
                   href={BUSINESS.whatsappLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex min-h-8 items-center transition-colors hover:text-white"
+                  className="inline-flex min-h-11 items-center transition-colors hover:text-white"
                 >
                   <span className="data-num">{BUSINESS.phoneDisplay}</span> · WhatsApp
                 </a>
@@ -92,19 +89,12 @@ export const Footer: React.FC = () => {
 
         <div className="flex flex-col gap-7 pt-8 lg:flex-row lg:items-start lg:justify-between">
           <div>
-            <p className="text-[11px] uppercase tracking-[0.16em] text-white/40">
+            <p className="text-xs uppercase tracking-[0.14em] text-white/40">
               © {CURRENT_YEAR} {BUSINESS.name} · {BUSINESS.tagline}
             </p>
-            <Link
-              to={adminLink}
-              className="mt-5 inline-flex min-h-10 items-center gap-2 border border-white/20 px-3 py-2 text-[10px] uppercase tracking-[0.16em] text-white/60 transition-colors hover:border-cc-red hover:text-white"
-            >
-              <LockKeyhole size={13} className="shrink-0" aria-hidden="true" />
-              Acceso administrativo
-            </Link>
           </div>
-          <p className="max-w-2xl text-[11px] leading-relaxed text-white/35 lg:text-right">
-            Fotografías: Beta RR Freenduro (CC BY 4.0, Jimmy Boakes / Jix31) y KTM forest (CC BY 3.0, Tim Gotzkowsky). Otras imágenes: Unsplash y Wikimedia Commons. Precios y condiciones sujetos a confirmación.
+          <p className="max-w-2xl text-xs leading-relaxed text-white/35 lg:text-right">
+            Fotografías: Beta RR Freenduro (CC BY 4.0, Jimmy Boakes / Jix31), KTM forest (CC BY 3.0, Tim Gotzkowsky) y Toyota Corolla SE (CC BY-SA 4.0, Kevauto / Wikimedia Commons, imagen adaptada). Otras imágenes: Unsplash y Wikimedia Commons. Precios y condiciones sujetos a confirmación.
           </p>
         </div>
       </div>

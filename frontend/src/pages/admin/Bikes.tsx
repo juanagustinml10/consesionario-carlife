@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   CarFront,
   Edit2,
@@ -39,6 +39,8 @@ export const Bikes = () => {
   const [bikeToDelete, setBikeToDelete] = useState<Bike | null>(null);
   const [updatingStatusId, setUpdatingStatusId] = useState<string | null>(null);
   const [statusError, setStatusError] = useState<string | null>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const dialogCloseRef = useRef<HTMLButtonElement>(null);
 
   const load = useCallback(async () => {
     try {
@@ -57,6 +59,35 @@ export const Bikes = () => {
   useEffect(() => {
     void load();
   }, [load]);
+
+  useEffect(() => {
+    if (!bikeToDelete) return;
+    dialogCloseRef.current?.focus();
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setBikeToDelete(null);
+        return;
+      }
+      if (e.key !== 'Tab') return;
+      const focusables = Array.from(
+        dialogRef.current?.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+        ) ?? [],
+      );
+      if (!focusables.length) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [bikeToDelete]);
 
   /** Cambia el estado de una publicación con actualización optimista. */
   const changeStatus = async (bike: Bike, status: BikeStatus) => {
@@ -188,7 +219,7 @@ export const Bikes = () => {
                         disabled={updatingStatusId === bike.id}
                         onChange={(event) => void changeStatus(bike, event.target.value as BikeStatus)}
                         aria-label={`Estado de ${bike.title}`}
-                        className={`mt-2 border bg-cc-black px-2 py-1 text-[10px] font-bold uppercase tracking-wider outline-none disabled:opacity-50 ${statusBadgeClass(bike.status)}`}
+                        className={`mt-2 min-h-11 border bg-cc-black px-3 text-[11px] font-bold uppercase tracking-wider outline-none disabled:opacity-50 ${statusBadgeClass(bike.status)}`}
                       >
                         {(Object.keys(STATUS_LABELS) as BikeStatus[]).map((status) => (
                           <option key={status} value={status}>{STATUS_LABELS[status]}</option>
@@ -201,7 +232,7 @@ export const Bikes = () => {
                     <div className="flex gap-2">
                       <Link
                         to={`/admin/motos/${bike.id}/editar`}
-                        className="flex h-9 w-9 items-center justify-center border border-white/20 text-white/70 transition-colors hover:border-white hover:text-white"
+                        className="flex h-11 w-11 items-center justify-center border border-white/20 text-white/70 transition-colors hover:border-white hover:text-white"
                         title="Editar"
                         aria-label="Editar publicación"
                       >
@@ -210,7 +241,7 @@ export const Bikes = () => {
                       <button
                         type="button"
                         onClick={() => setBikeToDelete(bike)}
-                        className="flex h-9 w-9 items-center justify-center border border-white/20 text-white/70 transition-colors hover:border-white hover:bg-white hover:text-cc-black"
+                        className="flex h-11 w-11 items-center justify-center border border-white/20 text-white/70 transition-colors hover:border-white hover:bg-white hover:text-cc-black"
                         title="Eliminar"
                         aria-label="Eliminar publicación"
                       >
@@ -225,7 +256,7 @@ export const Bikes = () => {
         </div>
 
         <div className="hidden overflow-x-auto md:block">
-          <table className="w-full text-left text-sm">
+          <table className="w-full min-w-[640px] text-left text-sm">
             <thead>
               <tr className="border-b border-white/10 bg-white/[0.03] text-[10px] uppercase tracking-wider text-white/45">
                 <th className="px-5 py-3.5 font-bold">Vehículo</th>
@@ -274,7 +305,7 @@ export const Bikes = () => {
                           disabled={updatingStatusId === bike.id}
                           onChange={(event) => void changeStatus(bike, event.target.value as BikeStatus)}
                           aria-label={`Estado de ${bike.title}`}
-                          className={`border bg-cc-black px-2 py-1 text-[10px] font-bold uppercase tracking-wider outline-none disabled:opacity-50 ${statusBadgeClass(bike.status)}`}
+                          className={`min-h-11 border bg-cc-black px-3 text-[11px] font-bold uppercase tracking-wider outline-none disabled:opacity-50 ${statusBadgeClass(bike.status)}`}
                         >
                           {(Object.keys(STATUS_LABELS) as BikeStatus[]).map((status) => (
                             <option key={status} value={status}>{STATUS_LABELS[status]}</option>
@@ -285,7 +316,7 @@ export const Bikes = () => {
                         <div className="flex items-center justify-end gap-2">
                           <Link
                             to={`/admin/motos/${bike.id}/editar`}
-                            className="flex h-9 w-9 items-center justify-center border border-white/20 text-white/70 transition-colors hover:border-white hover:text-white"
+                            className="flex h-11 w-11 items-center justify-center border border-white/20 text-white/70 transition-colors hover:border-white hover:text-white"
                             title="Editar"
                             aria-label="Editar publicación"
                           >
@@ -294,7 +325,7 @@ export const Bikes = () => {
                           <button
                             type="button"
                             onClick={() => setBikeToDelete(bike)}
-                            className="flex h-9 w-9 items-center justify-center border border-white/20 text-white/70 transition-colors hover:border-white hover:bg-white hover:text-cc-black"
+                            className="flex h-11 w-11 items-center justify-center border border-white/20 text-white/70 transition-colors hover:border-white hover:bg-white hover:text-cc-black"
                             title="Eliminar"
                             aria-label="Eliminar publicación"
                           >
@@ -312,11 +343,16 @@ export const Bikes = () => {
       </div>
 
       {bikeToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-cc-black/70 p-4 backdrop-blur-[2px]">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-cc-black/70 p-4 backdrop-blur-[2px]"
+          onClick={() => setBikeToDelete(null)}
+        >
           <div
+            ref={dialogRef}
             role="dialog"
             aria-modal="true"
             aria-labelledby="delete-dialog-title"
+            onClick={(event) => event.stopPropagation()}
             className="w-full max-w-md border border-white/15 bg-cc-carbon shadow-card"
           >
             <div className="flex items-start justify-between gap-4 border-b border-white/10 p-6">
@@ -327,9 +363,10 @@ export const Bikes = () => {
                 </h2>
               </div>
               <button
+                ref={dialogCloseRef}
                 type="button"
                 onClick={() => setBikeToDelete(null)}
-                className="text-white/50 transition-colors hover:text-white"
+                className="flex min-h-11 min-w-11 items-center justify-center text-white/50 transition-colors hover:text-white"
                 aria-label="Cerrar"
               >
                 <X size={20} />

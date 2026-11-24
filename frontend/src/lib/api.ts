@@ -6,7 +6,7 @@ import { ApiResponseError } from '@/lib/api-response';
 // relativo /api evita dejar un localhost hardcodeado en el bundle.
 // ⚠️ No apuntar al dominio de Cloudflare Pages: el catch-all `/* /index.html`
 // respondería con HTML para /api/* y parecería que la API "responde".
-const productionApiBase = 'https://sf-motos-livid.vercel.app';
+const productionApiBase = 'https://backend-gold-five-28.vercel.app';
 const configuredBase = (import.meta.env.VITE_API_BASE_URL ?? (import.meta.env.PROD ? productionApiBase : '/api')).replace(/\/+$/, '');
 const API_BASE_URL = configuredBase.endsWith('/api') ? configuredBase : `${configuredBase}/api`;
 

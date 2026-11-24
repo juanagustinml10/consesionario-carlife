@@ -45,7 +45,7 @@ export const SectionHeading: React.FC<SectionHeadingProps> = ({
         <Link
           to={actionTo}
           className={cn(
-            'group inline-flex min-h-8 shrink-0 items-center gap-2 border-b pb-1 text-[10px] font-bold uppercase tracking-[0.2em] transition-colors',
+            'group inline-flex min-h-11 shrink-0 items-center gap-2 self-start border-b pb-1 text-[10px] font-bold uppercase tracking-[0.2em] transition-colors sm:self-auto',
             light
               ? 'border-black/25 text-cc-slate hover:border-black hover:text-black'
               : 'border-white/30 text-white/65 hover:border-white hover:text-white',

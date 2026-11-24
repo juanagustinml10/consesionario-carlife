@@ -341,7 +341,7 @@ export const BikeForm: React.FC = () => {
                         {done ? <Check size={12} /> : item.id}
                       </span>
                       <span className={cn(
-                        'text-xs font-bold uppercase tracking-wider',
+                        'min-w-0 break-words text-xs font-bold uppercase tracking-wider',
                         active ? 'text-white' : done ? 'text-white/70' : 'text-white/35'
                       )}>
                         {item.label}
@@ -647,13 +647,13 @@ export const BikeForm: React.FC = () => {
                             </span>
                           )}
                         </div>
-                        <div className="flex items-center justify-center gap-1.5 border-t border-white/15 bg-cc-black p-2">
+                        <div className="flex flex-wrap items-center justify-center gap-1 border-t border-white/15 bg-cc-black p-2">
                           <button
                             type="button"
                             aria-label={`Mover foto ${index + 1} hacia arriba`}
                             disabled={index === 0}
                             onClick={() => void moveExisting(index, -1)}
-                            className={cn(iconButtonClass, 'h-8 w-8 sm:h-10 sm:w-10')}
+                            className={iconButtonClass}
                           >
                             <ArrowUp size={14} />
                           </button>
@@ -662,7 +662,7 @@ export const BikeForm: React.FC = () => {
                             aria-label={`Mover foto ${index + 1} hacia abajo`}
                             disabled={index === existingImages.length - 1}
                             onClick={() => void moveExisting(index, 1)}
-                            className={cn(iconButtonClass, 'h-8 w-8 sm:h-10 sm:w-10')}
+                            className={iconButtonClass}
                           >
                             <ArrowDown size={14} />
                           </button>
@@ -672,7 +672,7 @@ export const BikeForm: React.FC = () => {
                               title="Usar como portada"
                               aria-label={`Usar foto ${index + 1} como portada`}
                               onClick={() => void makePrimary(image.id)}
-                              className={cn(iconButtonClass, 'h-8 w-8 sm:h-10 sm:w-10')}
+                              className={iconButtonClass}
                             >
                               <Check size={14} />
                             </button>
@@ -682,7 +682,7 @@ export const BikeForm: React.FC = () => {
                             title="Eliminar fotografía"
                             aria-label={`Eliminar foto ${index + 1}`}
                             onClick={() => void deleteExisting(image.id)}
-                            className={cn(iconButtonClass, 'h-8 w-8 hover:border-white hover:text-white sm:h-10 sm:w-10')}
+                            className={iconButtonClass}
                           >
                             <Trash2 size={14} />
                           </button>
@@ -703,13 +703,13 @@ export const BikeForm: React.FC = () => {
                           <ImageIcon size={24} className="text-white/50" />
                           <span className="w-full truncate text-center text-[10px] text-white/50">{file.name}</span>
                         </div>
-                        <div className="flex items-center justify-center gap-1.5">
+                        <div className="flex flex-wrap items-center justify-center gap-1">
                           <button
                             type="button"
                             aria-label={`Mover foto nueva ${index + 1} antes`}
                             disabled={index === 0}
                             onClick={() => moveNew(index, -1)}
-                            className={cn(iconButtonClass, 'h-8 w-8 sm:h-10 sm:w-10')}
+                            className={iconButtonClass}
                           >
                             <ArrowUp size={14} />
                           </button>
@@ -718,7 +718,7 @@ export const BikeForm: React.FC = () => {
                             aria-label={`Mover foto nueva ${index + 1} después`}
                             disabled={index === newImages.length - 1}
                             onClick={() => moveNew(index, 1)}
-                            className={cn(iconButtonClass, 'h-8 w-8 sm:h-10 sm:w-10')}
+                            className={iconButtonClass}
                           >
                             <ArrowDown size={14} />
                           </button>
@@ -726,7 +726,7 @@ export const BikeForm: React.FC = () => {
                             type="button"
                             aria-label={`Quitar foto nueva ${index + 1}`}
                             onClick={() => setNewImages((prev) => prev.filter((_, i) => i !== index))}
-                            className={cn(iconButtonClass, 'h-8 w-8 hover:border-white hover:text-white sm:h-10 sm:w-10')}
+                            className={iconButtonClass}
                           >
                             <Trash2 size={14} />
                           </button>

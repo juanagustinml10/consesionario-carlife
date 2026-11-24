@@ -102,11 +102,11 @@ export const Compare: React.FC = () => {
           <table className="w-full min-w-[640px] border-collapse text-left">
             <thead>
               <tr className="border-b border-cc-paper">
-                <th scope="col" className="sticky left-0 z-10 bg-white px-5 py-4 text-[10px] font-bold uppercase tracking-[0.22em] text-cc-gray">
+                <th scope="col" className="sticky left-0 z-10 bg-white px-3 py-4 text-[10px] font-bold uppercase tracking-[0.22em] text-cc-gray sm:px-5">
                   Característica
                 </th>
                 {bikes.map((bike) => (
-                  <th key={bike.id} scope="col" className="min-w-[220px] px-5 py-4">
+                  <th key={bike.id} scope="col" className="min-w-[260px] px-4 py-4 sm:px-5">
                     <div className="flex items-center justify-between gap-3">
                       <div className="flex min-w-0 items-center gap-3">
                         <div className="h-14 w-20 shrink-0 overflow-hidden border border-cc-paper bg-cc-soft">
@@ -124,7 +124,7 @@ export const Compare: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => remove(bike.id)}
-                        className="flex h-8 w-8 shrink-0 items-center justify-center border border-black/20 text-cc-gray transition-colors hover:border-black hover:text-black"
+                        className="flex h-11 w-11 shrink-0 items-center justify-center border border-black/20 text-cc-gray transition-colors hover:border-black hover:text-black"
                         aria-label={`Quitar ${bike.title} del comparador`}
                       >
                         <X size={15} />
@@ -140,7 +140,7 @@ export const Compare: React.FC = () => {
                 const allEqual = values.every((value) => value === values[0]);
                 return (
                   <tr key={attr.label} className={cn('border-b border-cc-paper last:border-0', index % 2 === 1 && 'bg-cc-soft')}>
-                    <th scope="row" className="sticky left-0 z-10 bg-white px-5 py-4 text-left text-[10px] font-bold uppercase tracking-[0.2em] text-cc-gray">
+                    <th scope="row" className={cn('sticky left-0 z-10 px-3 py-4 text-left text-[10px] font-bold uppercase tracking-[0.2em] text-cc-gray sm:px-5', index % 2 === 1 ? 'bg-cc-soft' : 'bg-white')}>
                       {attr.label}
                     </th>
                     {values.map((value, valueIndex) => (

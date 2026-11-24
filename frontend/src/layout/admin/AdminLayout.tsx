@@ -27,7 +27,7 @@ export const AdminLayout = () => {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-cc-black text-white">
+    <div className="flex h-dvh overflow-hidden bg-cc-black text-white">
       {sidebarOpen && (
         <button
           type="button"
@@ -45,7 +45,7 @@ export const AdminLayout = () => {
         <div className="flex h-[4.5rem] shrink-0 items-center justify-between border-b border-white/10 px-5">
           <Link
             to="/admin/dashboard"
-            className="flex items-center gap-3"
+            className="flex min-h-11 items-center gap-3"
             aria-label="CARLIFE — Panel administrativo"
           >
             <Logo onDark className="h-10" />
@@ -53,7 +53,7 @@ export const AdminLayout = () => {
           <button
             type="button"
             onClick={() => setSidebarOpen(false)}
-            className="p-2 text-white/50 transition-colors hover:text-white md:hidden"
+            className="flex min-h-11 min-w-11 items-center justify-center text-white/50 transition-colors hover:text-white md:hidden"
             aria-label="Cerrar menú"
           >
             <X size={22} />
@@ -92,7 +92,7 @@ export const AdminLayout = () => {
         <div className="shrink-0 border-t border-white/10 p-3">
           <Link
             to="/"
-            className="flex items-center gap-3 px-3 py-3 text-[10px] font-bold uppercase tracking-[0.2em] text-white/50 transition-colors hover:text-white"
+            className="flex min-h-11 items-center gap-3 px-3 py-3 text-[10px] font-bold uppercase tracking-[0.2em] text-white/50 transition-colors hover:text-white"
           >
             ← Ver sitio público
           </Link>
@@ -112,17 +112,19 @@ export const AdminLayout = () => {
             <button
               type="button"
               onClick={() => setSidebarOpen(true)}
-              className="p-2 text-white/60 transition-colors hover:bg-white/10 hover:text-white md:hidden"
+              className="flex min-h-11 min-w-11 items-center justify-center text-white/60 transition-colors hover:bg-white/10 hover:text-white md:hidden"
               aria-label="Abrir menú"
             >
               <Menu size={22} />
             </button>
             <span className="truncate text-[10px] font-bold uppercase tracking-[0.22em] text-white/50">
-              Panel administrativo <span className="text-white/25">/</span> CARLIFE
+              <span className="hidden sm:inline">Panel administrativo <span className="text-white/25">/</span> </span>CARLIFE
             </span>
           </div>
           <Link
             to="/admin/motos/nuevo"
+            aria-label="Nuevo vehículo"
+            title="Nuevo vehículo"
             className="btn btn-light h-9 px-4"
           >
             <Plus size={15} />

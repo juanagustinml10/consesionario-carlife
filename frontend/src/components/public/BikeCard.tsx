@@ -110,7 +110,7 @@ export const BikeCard: React.FC<BikeCardProps> = ({ bike, className, tone = 'lig
           <span className={cn('data-num text-xs', light ? 'text-cc-metal' : 'text-white/45')}>{bike.year}</span>
         </div>
 
-        <Link to={`/motos/${bike.slug}`} className="mt-2 block">
+        <Link to={`/motos/${bike.slug}`} className="mt-1 inline-flex min-h-11 items-center">
           <h3
             className={cn(
               'break-words font-display font-bold uppercase leading-[0.98] tracking-[-0.045em] transition-colors duration-300',
@@ -152,7 +152,7 @@ export const BikeCard: React.FC<BikeCardProps> = ({ bike, className, tone = 'lig
         <Link
           to={`/motos/${bike.slug}`}
           className={cn(
-            'mt-5 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] transition-colors',
+            'mt-3 inline-flex min-h-11 items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] transition-colors sm:mt-5',
             light ? 'text-cc-black hover:text-cc-metal' : 'text-white/60 hover:text-white',
           )}
         >

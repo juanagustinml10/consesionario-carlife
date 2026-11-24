@@ -5,8 +5,7 @@ import { Link } from '@/components/shared/Link';
 import { Logo } from '@/components/shared/Logo';
 import { BUSINESS } from '@/lib/constants';
 import { WhatsAppButton } from '@/components/shared/WhatsAppButton';
-import { authService } from '@/services/auth';
-import { ArrowUpRight, LockKeyhole, Menu, X } from 'lucide-react';
+import { ArrowUpRight, Menu, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const NAV_LINKS = [
@@ -23,7 +22,7 @@ export const Navbar: React.FC = () => {
   const location = useLocation();
   const triggerRef = useRef<HTMLButtonElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
-  const adminLink = authService.isAuthenticated() ? '/admin' : '/admin/login';
+  const restoreFocusRef = useRef(true);
 
   const isLinkActive = (to: string) =>
     location.pathname === to || location.pathname.startsWith(`${to}/`);
@@ -43,20 +42,57 @@ export const Navbar: React.FC = () => {
     };
   }, []);
 
+  const closeMenu = (restoreFocus: boolean) => {
+    restoreFocusRef.current = restoreFocus;
+    setOpen(false);
+  };
+
   useEffect(() => {
     if (!open) return;
     const trigger = triggerRef.current;
+    const dialog = closeRef.current?.closest('[role="dialog"]') as HTMLElement | null;
     closeRef.current?.focus();
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpen(false);
+      if (e.key === 'Escape') {
+        closeMenu(true);
+        return;
+      }
+      if (e.key !== 'Tab' || !dialog) return;
+      const focusables = Array.from(
+        dialog.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])',
+        ),
+      ).filter((el) => el.offsetParent !== null);
+      if (!focusables.length) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
     };
-    const previousOverflow = document.body.style.overflow;
+    // Si se rota la tablet o se agranda la ventana con el menú abierto,
+    // el overlay se oculta por CSS: hay que cerrarlo también en estado.
+    const mq = window.matchMedia('(min-width: 1024px)');
+    const onBreakpoint = () => {
+      if (mq.matches) closeMenu(false);
+    };
+    const previousBodyOverflow = document.body.style.overflow;
+    const previousHtmlOverflow = document.documentElement.style.overflow;
     document.addEventListener('keydown', onKeyDown);
+    mq.addEventListener('change', onBreakpoint);
     document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
     return () => {
       document.removeEventListener('keydown', onKeyDown);
-      document.body.style.overflow = previousOverflow;
-      trigger?.focus();
+      mq.removeEventListener('change', onBreakpoint);
+      document.body.style.overflow = previousBodyOverflow;
+      document.documentElement.style.overflow = previousHtmlOverflow;
+      if (restoreFocusRef.current) trigger?.focus();
+      restoreFocusRef.current = true;
     };
   }, [open]);
 
@@ -69,7 +105,7 @@ export const Navbar: React.FC = () => {
     >
       <div className="container-cc relative z-10">
         <div className="grid h-16 grid-cols-[1fr_auto] items-center gap-6 lg:h-[4.75rem] lg:grid-cols-[1fr_auto_1fr]">
-          <Link to="/" aria-label="CARLIFE — Inicio" className="shrink-0">
+          <Link to="/" aria-label="CARLIFE — Inicio" className="flex min-h-11 shrink-0 items-center">
             <Logo onDark className="h-9 w-auto sm:h-10 lg:h-11" />
           </Link>
 
@@ -98,19 +134,11 @@ export const Navbar: React.FC = () => {
           </nav>
 
           <div className="flex items-center justify-end gap-2">
-            <Link
-              to={adminLink}
-              aria-label="Acceso administrativo"
-              title="Acceso administrativo"
-              className="hidden h-10 w-10 items-center justify-center border border-white/20 text-white/60 transition-colors hover:border-white hover:text-white lg:flex"
-            >
-              <LockKeyhole size={15} />
-            </Link>
             <WhatsAppButton size="sm" label="Contacto" className="hidden px-5 lg:inline-flex" />
             <button
               ref={triggerRef}
               onClick={() => setOpen(true)}
-              className="flex h-10 w-10 items-center justify-center text-white transition-colors hover:bg-white/10 lg:hidden"
+              className="flex h-11 w-11 items-center justify-center text-white transition-colors hover:bg-white/10 lg:hidden"
               aria-label="Abrir menú"
               aria-expanded={open}
               aria-controls="menu-movil"
@@ -137,10 +165,10 @@ export const Navbar: React.FC = () => {
             className="absolute inset-0 flex flex-col overflow-y-auto bg-cc-black"
           >
             <div className="flex h-16 shrink-0 items-center justify-between border-b border-white/10 px-5">
-              <Logo onDark className="h-9 w-auto" />
+              <Logo onDark className="h-10 w-auto" />
               <button
                 ref={closeRef}
-                onClick={() => setOpen(false)}
+                onClick={() => closeMenu(true)}
                 className="flex h-11 w-11 items-center justify-center text-white transition-colors hover:bg-white/10"
                 aria-label="Cerrar menú"
               >
@@ -155,8 +183,8 @@ export const Navbar: React.FC = () => {
                   <Link
                     key={link.to}
                     to={link.to}
-                    onClick={() => setOpen(false)}
-                    className="animate-fade-up flex items-center justify-between border-b border-white/10 py-5"
+                    onClick={() => closeMenu(false)}
+                    className="animate-fade-up flex min-h-14 items-center justify-between gap-3 border-b border-white/10 py-5"
                     style={{ animationDelay: `${50 + index * 45}ms` }}
                     aria-current={isLinkActive(link.to) ? 'page' : undefined}
                   >
@@ -179,16 +207,9 @@ export const Navbar: React.FC = () => {
 
             <div className="shrink-0 border-t border-white/10 p-5">
               <WhatsAppButton label="Consultar por WhatsApp" className="w-full py-4" />
-              <div className="mt-5 flex items-center justify-between gap-4 text-[10px] uppercase tracking-[0.14em] text-white/40">
-                <span className="min-w-0 truncate">{BUSINESS.address}</span>
-                <Link
-                  to={adminLink}
-                  onClick={() => setOpen(false)}
-                  className="shrink-0 border-b border-white/30 pb-0.5 text-white/70"
-                >
-                  Admin
-                </Link>
-              </div>
+              <p className="mt-5 truncate text-[10px] uppercase tracking-[0.14em] text-white/40">
+                {BUSINESS.address}
+              </p>
             </div>
           </div>
         </div>
