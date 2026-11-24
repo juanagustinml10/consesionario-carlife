@@ -379,13 +379,13 @@ export const Home: React.FC = () => {
               Información clara, decisiones <span className="text-cc-metal">simples</span>
             </h2>
             <p className="mt-7 max-w-xl text-sm leading-relaxed text-cc-slate">
-              En CARLIFE trabajamos con autos usados seleccionados. Mirá cada publicación, compará modelos y escribinos cuando quieras saber más.
+              En CARLIFE trabajamos con autos usados seleccionados. Mirá cada publicación, guardá tus favoritos y escribinos cuando quieras saber más.
             </p>
             <ul className="mt-9 grid gap-3 sm:grid-cols-2">
               {[
                 'Fotos y datos de cada unidad',
                 'Ficha individual con características',
-                'Comparador y favoritos',
+                'Favoritos para volver después',
                 BUSINESS.shippingLabel,
               ].map((item) => (
                 <li key={item} className="flex items-start gap-3 border-b border-black/10 pb-3 text-xs leading-relaxed text-cc-slate">

@@ -1,10 +1,9 @@
 import * as React from 'react';
-import { ArrowUpRight, Heart, Scale } from 'lucide-react';
+import { ArrowUpRight, Heart } from 'lucide-react';
 import { Link } from '@/components/shared/Link';
 import { ImagePlaceholder } from '@/components/shared/ImagePlaceholder';
 import { WhatsAppButton } from '@/components/shared/WhatsAppButton';
 import { useFavoritesStore } from '@/stores/favorites';
-import { useCompareStore } from '@/stores/compare';
 import { cn } from '@/lib/utils';
 import { fuelLabel, formatMileage, formatPrice, vehicleCategoryLabel } from '@/lib/format';
 import { getThumbnailUrl } from '@/lib/images';
@@ -23,19 +22,10 @@ interface BikeCardProps {
 export const BikeCard: React.FC<BikeCardProps> = ({ bike, className, tone = 'light', feature = false }) => {
   const isFavorite = useFavoritesStore((state) => state.isFavorite(bike.id));
   const toggleFavorite = useFavoritesStore((state) => state.toggle);
-  const inCompare = useCompareStore((state) => state.isInCompare(bike.id));
-  const addToCompare = useCompareStore((state) => state.add);
-  const removeFromCompare = useCompareStore((state) => state.remove);
-  const canAdd = useCompareStore((state) => state.canAdd);
 
   const images = bike.images ?? [];
   const primaryImage = images.find((img) => img.isPrimary) ?? images[0];
   const light = tone === 'light';
-
-  const toggleCompare = () => {
-    if (inCompare) removeFromCompare(bike.id);
-    else if (canAdd()) addToCompare(bike);
-  };
 
   return (
     <article
@@ -66,21 +56,6 @@ export const BikeCard: React.FC<BikeCardProps> = ({ bike, className, tone = 'lig
         </div>
 
         <div className="absolute right-4 top-4 flex gap-2">
-          <button
-            type="button"
-            onClick={toggleCompare}
-            aria-label={inCompare ? 'Quitar del comparador' : 'Agregar al comparador'}
-            aria-pressed={inCompare}
-            title="Comparar"
-            className={cn(
-              'flex h-10 w-10 items-center justify-center border bg-white/95 transition-colors',
-              inCompare
-                ? 'border-cc-black bg-cc-black text-white'
-                : 'border-black/10 text-cc-black hover:bg-cc-black hover:text-white',
-            )}
-          >
-            <Scale size={16} strokeWidth={1.7} />
-          </button>
           <button
             type="button"
             onClick={() => toggleFavorite(bike.id)}

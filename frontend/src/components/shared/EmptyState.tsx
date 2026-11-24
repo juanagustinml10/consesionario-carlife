@@ -11,7 +11,7 @@ interface EmptyStateProps {
   className?: string;
 }
 
-/** Estado vacío con la misma voz visual en catálogo, comparador y favoritos. */
+/** Estado vacío con la misma voz visual en catálogo y favoritos. */
 export const EmptyState: React.FC<EmptyStateProps> = ({
   icon,
   code,

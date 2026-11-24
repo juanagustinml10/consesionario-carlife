@@ -111,11 +111,8 @@ export const About: React.FC = () => (
           <span className="eyebrow eyebrow-light">En movimiento</span>
           <h2 className="display-lg mt-6 text-white">Nos gustan los vehículos que se usan</h2>
           <p className="mt-6 max-w-md text-sm leading-relaxed text-white/60">
-            Mirá el catálogo, compará modelos y elegí el que mejor va con vos. Si querés verlo en persona, estamos en Yerba Buena.
+            Mirá el catálogo y elegí el vehículo que mejor va con vos. Si querés verlo en persona, estamos en Yerba Buena.
           </p>
-          <Link to="/comparador" className="btn btn-outline mt-9">
-            Comparar modelos <ArrowRight size={16} />
-          </Link>
         </Reveal>
       </div>
     </section>
