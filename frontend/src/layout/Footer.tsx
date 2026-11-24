@@ -100,9 +100,6 @@ export const Footer: React.FC = () => {
               <ArrowUpRight size={12} className="opacity-60 transition-opacity group-hover:opacity-100" />
             </Link>
           </div>
-          <p className="max-w-2xl text-xs leading-relaxed text-white/35 lg:text-right">
-            Fotografías: Beta RR Freenduro (CC BY 4.0, Jimmy Boakes / Jix31), KTM forest (CC BY 3.0, Tim Gotzkowsky) y Toyota Corolla SE (CC BY-SA 4.0, Kevauto / Wikimedia Commons, imagen adaptada). Otras imágenes: Unsplash y Wikimedia Commons. Precios y condiciones sujetos a confirmación.
-          </p>
         </div>
       </div>
     </footer>
