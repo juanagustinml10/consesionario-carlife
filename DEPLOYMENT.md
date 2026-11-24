@@ -33,6 +33,11 @@ Los datos del catálogo se **copiaron** del Neon heredado (`sf-motos`) al Neon f
 2 features, 86 visitas y el usuario `ADMIN`. El frontend público filtra
 `condition=USADA` para mostrar solo unidades usadas.
 
+> Las 10 imágenes heredadas conservan su `BikeImage.url` con el host del backend
+> heredado (`sf-motos-livid.vercel.app`); los bytes también están copiados en el
+> Neon `carlife` y la misma clave responde en el backend nuevo. Las imágenes
+> subidas desde ahora usan `PUBLIC_BASE_URL` del backend final.
+
 ---
 
 ## 2. Backend (Vercel)
