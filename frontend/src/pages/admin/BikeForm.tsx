@@ -769,7 +769,7 @@ export const BikeForm: React.FC = () => {
                 </div>
                 <button
                   type="button"
-                  disabled={customFeatures.length >= 30}
+                  disabled={customFeatures.length + equipment.length >= 30}
                   onClick={() => setCustomFeatures((prev) => [...prev, { key: '', value: '' }])}
                   className={cn(buttonClass, 'w-full border-white/15 text-white/70 hover:border-white hover:text-white sm:w-auto')}
                 >
