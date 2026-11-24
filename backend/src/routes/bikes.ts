@@ -23,7 +23,7 @@ import { isAllowedImageFilename, isAllowedImageMimeType } from '../services/stor
 
 const router = Router();
 
-const vehicleCategorySchema = z.enum(['AUTO', 'CAMIONETA', 'SUV']);
+const vehicleCategorySchema = z.enum(['AUTO', 'CAMIONETA_SUV']);
 const fuelTypeSchema = z.enum(['NAFTA', 'DIESEL', 'HIBRIDO', 'ELECTRICO', 'GNC', 'OTRO']);
 const transmissionTypeSchema = z.enum(['MANUAL', 'AUTOMATICA']);
 const driveTypeSchema = z.enum(['X2', 'X4', 'DELANTERA', 'TRASERA', 'INTEGRAL']);

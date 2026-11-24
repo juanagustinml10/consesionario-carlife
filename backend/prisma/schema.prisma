@@ -22,8 +22,7 @@ enum BikeUsage {
 /** Tipo de vehículo ofrecido por CARLIFE. NULL en publicaciones anteriores al campo. */
 enum VehicleCategory {
   AUTO
-  CAMIONETA
-  SUV
+  CAMIONETA_SUV
 }
 
 /** Combustible del vehículo. */

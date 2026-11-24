@@ -6,7 +6,7 @@ export { saveUploadedFile, deleteUploadedFile } from './storage.service.js';
 export type { StoredUpload } from './storage.service.js';
 
 type BikeStatusValue = 'BORRADOR' | 'DISPONIBLE' | 'RESERVADA' | 'VENDIDA';
-export type VehicleCategoryValue = 'AUTO' | 'CAMIONETA' | 'SUV';
+export type VehicleCategoryValue = 'AUTO' | 'CAMIONETA_SUV';
 export type FuelTypeValue = 'NAFTA' | 'DIESEL' | 'HIBRIDO' | 'ELECTRICO' | 'GNC' | 'OTRO';
 export type TransmissionTypeValue = 'MANUAL' | 'AUTOMATICA';
 export type DriveTypeValue = 'X2' | 'X4' | 'DELANTERA' | 'TRASERA' | 'INTEGRAL';

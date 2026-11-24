@@ -7,7 +7,7 @@
 export type BikeCondition = 'NUEVA' | 'USADA';
 
 /** Tipo de vehículo; null en publicaciones anteriores al campo. */
-export type VehicleCategory = 'AUTO' | 'CAMIONETA' | 'SUV';
+export type VehicleCategory = 'AUTO' | 'CAMIONETA_SUV';
 
 /** Combustible declarado del vehículo. */
 export type FuelType = 'NAFTA' | 'DIESEL' | 'HIBRIDO' | 'ELECTRICO' | 'GNC' | 'OTRO';

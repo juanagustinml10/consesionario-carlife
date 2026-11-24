@@ -41,9 +41,8 @@ export const MAX_IMAGES_PER_BIKE = 10;
 
 /** Tipos de vehículo aceptados por el catálogo de CARLIFE. */
 export const VEHICLE_CATEGORIES = [
-  { value: 'AUTO', label: 'Auto' },
-  { value: 'CAMIONETA', label: 'Camioneta' },
-  { value: 'SUV', label: 'SUV' },
+  { value: 'AUTO', label: 'Autos' },
+  { value: 'CAMIONETA_SUV', label: 'Camionetas/SUV' },
 ] as const;
 
 /** Estado del vehículo. CARLIFE comercializa únicamente unidades usadas. */

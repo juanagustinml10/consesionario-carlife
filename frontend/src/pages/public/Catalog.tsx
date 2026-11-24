@@ -22,13 +22,10 @@ import { SkeletonCard } from '@/components/shared/SkeletonCard';
 import { bikesService, type BikeFilters } from '@/services/bikes';
 import type { Bike, BikeStatus, VehicleCategory } from '@/types';
 import { cn } from '@/lib/utils';
-import { MODEL_YEARS } from '@/lib/constants';
+import { MODEL_YEARS, VEHICLE_CATEGORIES } from '@/lib/constants';
 
-const CATEGORIES: { value: VehicleCategory; label: string }[] = [
-  { value: 'AUTO', label: 'Autos' },
-  { value: 'CAMIONETA', label: 'Camionetas' },
-  { value: 'SUV', label: 'SUV' },
-];
+/** Misma fuente de verdad que el panel: solo Autos y Camionetas/SUV. */
+const CATEGORIES = VEHICLE_CATEGORIES;
 
 const STATUSES: { value: BikeStatus; label: string }[] = [
   { value: 'DISPONIBLE', label: 'Disponible' },
@@ -95,7 +92,7 @@ export const Catalog: React.FC = () => {
       ...(brand ? { brand } : {}),
       ...(model ? { model } : {}),
       ...(condition === 'USADA' ? { condition } : {}),
-      ...(category === 'AUTO' || category === 'CAMIONETA' || category === 'SUV'
+      ...(CATEGORIES.some((item) => item.value === category)
         ? { category: category as VehicleCategory }
         : {}),
       ...(status === 'DISPONIBLE' || status === 'RESERVADA' || status === 'VENDIDA' ? { status } : {}),
@@ -361,7 +358,7 @@ export const Catalog: React.FC = () => {
 
           <div className="mb-10">
             <p className="eyebrow eyebrow-dark mb-4">Explorá por categoría</p>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               {CATEGORIES.map((item) => {
                 const active = filters.category === item.value;
                 return (
