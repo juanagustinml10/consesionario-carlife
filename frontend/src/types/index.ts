@@ -6,8 +6,17 @@
 /** Condición del vehículo */
 export type BikeCondition = 'NUEVA' | 'USADA';
 
-/** Clasificación de uso del vehículo; null = sin definir. */
-export type BikeUsage = 'ENDURO_CROSS' | 'RUTA';
+/** Tipo de vehículo; null en publicaciones anteriores al campo. */
+export type VehicleCategory = 'AUTO' | 'CAMIONETA' | 'SUV';
+
+/** Combustible declarado del vehículo. */
+export type FuelType = 'NAFTA' | 'DIESEL' | 'HIBRIDO' | 'ELECTRICO' | 'GNC' | 'OTRO';
+
+/** Tipo de caja. */
+export type TransmissionType = 'MANUAL' | 'AUTOMATICA';
+
+/** Tracción. `X2`/`X4` equivalen a 4x2 y 4x4 en la interfaz. */
+export type DriveType = 'X2' | 'X4' | 'DELANTERA' | 'TRASERA' | 'INTEGRAL';
 
 /** Estado de disponibilidad de la publicación */
 export type BikeStatus = 'BORRADOR' | 'DISPONIBLE' | 'RESERVADA' | 'VENDIDA';
@@ -45,14 +54,20 @@ export interface Bike {
   brandId: string;
   brand?: Brand;
   model: string;
+  version: string | null;
   year: number;
+  vehicleCategory: VehicleCategory | null;
   condition: BikeCondition;
-  /** null en las publicaciones anteriores al campo; se muestra como "Sin definir". */
-  usage: BikeUsage | null;
-  displacementCc: number | null;
+  color: string | null;
+  fuel: FuelType | null;
+  transmission: TransmissionType | null;
+  drive: DriveType | null;
+  engine: string | null;
+  powerHp: number | null;
+  doors: number | null;
+  seats: number | null;
   mileageKm: number | null;
-  /** Horas de uso declaradas en vehículos usados; null/0 significa "sin dato". */
-  usageHours: number | null;
+  financingAvailable: boolean;
   price: number;
   currency: string;
   description: string | null;

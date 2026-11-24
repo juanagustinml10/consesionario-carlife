@@ -38,7 +38,7 @@ export const getBySlug = asyncHandler(async (req: Request, res: Response) => {
   const { slug } = req.params as { slug: string };
   const bike = await getBikeBySlug(slug);
   if (!bike) {
-    const err: any = new Error('Moto no encontrada');
+    const err: any = new Error('Vehículo no encontrado');
     err.statusCode = 404;
     throw err;
   }
@@ -55,7 +55,7 @@ export const getById = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params as { id: string };
   const bike = await getBikeById(id);
   if (!bike) {
-    const err: any = new Error('Moto no encontrada');
+    const err: any = new Error('Vehículo no encontrado');
     err.statusCode = 404;
     throw err;
   }
@@ -82,13 +82,13 @@ export const remove = asyncHandler(async (req: AuthenticatedRequest, res: Respon
   const { id } = req.params as { id: string };
   const bike = await prisma.bike.findUnique({ where: { id }, select: { id: true } });
   if (!bike) {
-    const err: any = new Error('Moto no encontrada');
+    const err: any = new Error('Vehículo no encontrado');
     err.statusCode = 404;
     throw err;
   }
 
   // En `db` los bytes se van con la fila (ON DELETE CASCADE). En local/S3 hay
-  // que borrar también el full y la miniatura antes de eliminar la moto.
+  // que borrar también el full y la miniatura antes de eliminar la publicación.
   const images = await prisma.bikeImage.findMany({
     where: { bikeId: id },
     select: { url: true },
@@ -115,7 +115,7 @@ export const uploadImages = asyncHandler(async (req: AuthenticatedRequest, res: 
 
   const bike = await getBikeById(id);
   if (!bike) {
-    const err: any = new Error('Moto no encontrada');
+    const err: any = new Error('Vehículo no encontrado');
     err.statusCode = 404;
     throw err;
   }
@@ -126,7 +126,7 @@ export const setPrimary = asyncHandler(async (req: AuthenticatedRequest, res: Re
   const { id, imageId } = req.params as { id: string; imageId: string };
   const bike = await setPrimaryImage(id, imageId);
   if (!bike) {
-    const err: any = new Error('Moto no encontrada');
+    const err: any = new Error('Vehículo no encontrado');
     err.statusCode = 404;
     throw err;
   }
@@ -156,7 +156,7 @@ export const reorderImages = asyncHandler(async (req: AuthenticatedRequest, res:
   const { ids } = (req as ValidatedRequest).validated as { ids: string[] };
   const bike = await reorderBikeImages(id, ids);
   if (!bike) {
-    const err: any = new Error('Moto no encontrada');
+    const err: any = new Error('Vehículo no encontrado');
     err.statusCode = 404;
     throw err;
   }

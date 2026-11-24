@@ -8,14 +8,17 @@ import {
   ChevronLeft,
   ChevronRight,
   Clock,
+  DoorOpen,
   Fuel,
   Gauge,
   Heart,
+  Palette,
   Phone,
   Route,
+  Settings2,
   Share2,
   Tag,
-  Timer,
+  Zap,
 } from 'lucide-react';
 import { Link } from '@/components/shared/Link';
 import { BikeCard } from '@/components/public/BikeCard';
@@ -32,12 +35,16 @@ import type { Bike } from '@/types';
 import { BUSINESS } from '@/lib/constants';
 import {
   conditionLabel,
+  driveLabel,
   featureLabel,
-  formatDisplacement,
+  formatCount,
+  formatEngine,
   formatMileage,
+  formatPower,
   formatPrice,
-  formatUsageHours,
-  usageLabel,
+  fuelLabel,
+  transmissionLabel,
+  vehicleCategoryLabel,
 } from '@/lib/format';
 import { cn } from '@/lib/utils';
 
@@ -151,15 +158,23 @@ export const BikeDetail: React.FC = () => {
     }
   };
 
-  // null y 0 se consideran "sin dato": nunca se muestran como horas cargadas.
-  const usageHours = formatUsageHours(bike.usageHours);
   const specs = [
     { icon: <Calendar size={18} strokeWidth={1.6} />, label: 'Año', value: String(bike.year) },
-    { icon: <Gauge size={18} strokeWidth={1.6} />, label: 'Motor', value: formatDisplacement(bike.displacementCc) },
-    { icon: <Fuel size={18} strokeWidth={1.6} />, label: 'Kilómetros', value: formatMileage(bike.mileageKm) },
-    ...(usageHours ? [{ icon: <Timer size={18} strokeWidth={1.6} />, label: 'Horas de uso', value: usageHours }] : []),
-    ...(bike.usage ? [{ icon: <Route size={18} strokeWidth={1.6} />, label: 'Uso', value: usageLabel(bike.usage) }] : []),
-    { icon: <Tag size={18} strokeWidth={1.6} />, label: 'Categoría', value: conditionLabel(bike.condition) },
+    { icon: <CarIcon size={18} strokeWidth={1.6} />, label: 'Tipo de vehículo', value: vehicleCategoryLabel(bike.vehicleCategory) },
+    { icon: <Tag size={18} strokeWidth={1.6} />, label: 'Estado', value: conditionLabel(bike.condition) },
+    { icon: <Gauge size={18} strokeWidth={1.6} />, label: 'Kilómetros', value: formatMileage(bike.mileageKm) },
+    { icon: <Fuel size={18} strokeWidth={1.6} />, label: 'Combustible', value: fuelLabel(bike.fuel) },
+    { icon: <Settings2 size={18} strokeWidth={1.6} />, label: 'Transmisión', value: transmissionLabel(bike.transmission) },
+    { icon: <Route size={18} strokeWidth={1.6} />, label: 'Tracción', value: driveLabel(bike.drive) },
+    ...(bike.engine || bike.powerHp ? [
+      { icon: <Zap size={18} strokeWidth={1.6} />, label: 'Motor / potencia', value: `${formatEngine(bike.engine)} · ${formatPower(bike.powerHp)}` },
+    ] : []),
+    ...(bike.doors != null || bike.seats != null ? [
+      { icon: <DoorOpen size={18} strokeWidth={1.6} />, label: 'Puertas / asientos', value: `${formatCount(bike.doors)} / ${formatCount(bike.seats)}` },
+    ] : []),
+    ...(bike.color ? [
+      { icon: <Palette size={18} strokeWidth={1.6} />, label: 'Color', value: bike.color },
+    ] : []),
   ];
 
   return (
@@ -280,7 +295,9 @@ export const BikeDetail: React.FC = () => {
             <h1 className="mt-3 break-words font-display text-5xl font-bold uppercase leading-[0.92] tracking-[-0.045em] text-cc-black sm:text-6xl lg:text-7xl">
               {bike.model || bike.title}
             </h1>
-            <p className="mt-3 text-sm text-cc-gray">{bike.title}</p>
+            <p className="mt-3 text-sm text-cc-gray">
+              {bike.title}{bike.version ? ` · ${bike.version}` : ''}
+            </p>
 
             <div className="relative mt-8 border-y border-cc-paper bg-white py-7 pl-6 pr-5">
               <div className="absolute inset-y-0 left-0 w-[2px] bg-cc-black" aria-hidden="true" />
@@ -304,7 +321,7 @@ export const BikeDetail: React.FC = () => {
                 <span className="h-px w-10 bg-black/20" />
                 <span className="eyebrow eyebrow-dark !gap-0 !before:hidden">Datos principales</span>
               </div>
-              <div className={cn('grid grid-cols-2 gap-px border border-cc-paper bg-cc-paper sm:grid-cols-3 lg:grid-cols-2', usageHours ? 'xl:grid-cols-5' : 'xl:grid-cols-4')}>
+              <div className="grid grid-cols-2 gap-px border border-cc-paper bg-cc-paper sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3">
                 {specs.map((spec) => (
                   <div key={spec.label} className="min-w-0 bg-white p-4">
                     <div className="text-cc-gray">{spec.icon}</div>
@@ -356,16 +373,18 @@ export const BikeDetail: React.FC = () => {
               </div>
             </div>
 
-            <div className="mt-4 border-l-2 border-cc-red bg-white p-5">
-              <p className="text-sm font-semibold uppercase tracking-wider text-cc-black">Créditos prendarios</p>
-              <p className="mt-2 text-xs leading-relaxed text-cc-gray">{BUSINESS.financingMessage}</p>
-              <Link
-                to="/financiacion"
-                className="mt-4 inline-flex min-h-11 items-center gap-2 self-start text-[10px] font-bold uppercase tracking-[0.2em] text-cc-red-dark transition-colors hover:text-cc-red"
-              >
-                Ver financiación <ArrowRight size={14} />
-              </Link>
-            </div>
+            {bike.financingAvailable && (
+              <div className="mt-4 border-l-2 border-cc-red bg-white p-5">
+                <p className="text-sm font-semibold uppercase tracking-wider text-cc-black">Créditos prendarios</p>
+                <p className="mt-2 text-xs leading-relaxed text-cc-gray">{BUSINESS.financingMessage}</p>
+                <Link
+                  to="/financiacion"
+                  className="mt-4 inline-flex min-h-11 items-center gap-2 self-start text-[10px] font-bold uppercase tracking-[0.2em] text-cc-red-dark transition-colors hover:text-cc-red"
+                >
+                  Ver financiación <ArrowRight size={14} />
+                </Link>
+              </div>
+            )}
 
             <p className="mt-6 flex items-center gap-2 text-[10px] uppercase tracking-[0.22em] text-cc-gray">
               <Clock size={12} /> Publicada el {new Date(bike.createdAt).toLocaleDateString('es-AR')}

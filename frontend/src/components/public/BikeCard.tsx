@@ -6,7 +6,7 @@ import { WhatsAppButton } from '@/components/shared/WhatsAppButton';
 import { useFavoritesStore } from '@/stores/favorites';
 import { useCompareStore } from '@/stores/compare';
 import { cn } from '@/lib/utils';
-import { formatDisplacement, formatMileage, formatPrice } from '@/lib/format';
+import { fuelLabel, formatMileage, formatPrice, vehicleCategoryLabel } from '@/lib/format';
 import { getThumbnailUrl } from '@/lib/images';
 import { ConditionTag, FeaturedTag, StatusTag } from '@/components/public/BikeBadges';
 import type { Bike } from '@/types';
@@ -127,7 +127,9 @@ export const BikeCard: React.FC<BikeCardProps> = ({ bike, className, tone = 'lig
         </p>
 
         <div className={cn('mt-5 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs', light ? 'text-cc-slate' : 'text-white/55')}>
-          <span>{formatDisplacement(bike.displacementCc)}</span>
+          <span>{vehicleCategoryLabel(bike.vehicleCategory)}</span>
+          <span aria-hidden="true" className={cn('h-1 w-1', light ? 'bg-black/20' : 'bg-white/30')} />
+          <span>{bike.fuel ? fuelLabel(bike.fuel) : 'Combustible a confirmar'}</span>
           <span aria-hidden="true" className={cn('h-1 w-1', light ? 'bg-black/20' : 'bg-white/30')} />
           <span>{formatMileage(bike.mileageKm)}</span>
         </div>

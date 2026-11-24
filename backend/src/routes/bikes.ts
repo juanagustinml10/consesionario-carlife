@@ -23,13 +23,21 @@ import { isAllowedImageFilename, isAllowedImageMimeType } from '../services/stor
 
 const router = Router();
 
+const vehicleCategorySchema = z.enum(['AUTO', 'CAMIONETA', 'SUV']);
+const fuelTypeSchema = z.enum(['NAFTA', 'DIESEL', 'HIBRIDO', 'ELECTRICO', 'GNC', 'OTRO']);
+const transmissionTypeSchema = z.enum(['MANUAL', 'AUTOMATICA']);
+const driveTypeSchema = z.enum(['X2', 'X4', 'DELANTERA', 'TRASERA', 'INTEGRAL']);
+
 const bikeQuerySchema = z.object({
   q: z.string().optional(),
   brand: z.string().optional(),
   model: z.string().optional(),
   year: z.coerce.number().int().optional(),
+  category: vehicleCategorySchema.optional(),
   condition: z.enum(['NUEVA', 'USADA']).optional(),
-  usage: z.enum(['ENDURO_CROSS', 'RUTA']).optional(),
+  fuel: fuelTypeSchema.optional(),
+  transmission: transmissionTypeSchema.optional(),
+  drive: driveTypeSchema.optional(),
   priceMin: z.coerce.number().nonnegative().optional(),
   priceMax: z.coerce.number().nonnegative().optional(),
   status: z.enum(['BORRADOR', 'DISPONIBLE', 'RESERVADA', 'VENDIDA']).optional(),
@@ -38,10 +46,10 @@ const bikeQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).default(12),
 });
 
-const bikeIdSchema = z.object({ id: z.string().cuid('ID de moto inválido') });
+const bikeIdSchema = z.object({ id: z.string().cuid('ID de vehículo inválido') });
 const slugSchema = z.object({ slug: z.string().min(1) });
 const imageSchema = z.object({
-  id: z.string().cuid('ID de moto inválido'),
+  id: z.string().cuid('ID de vehículo inválido'),
   imageId: z.string().cuid('ID de imagen inválido'),
 });
 const reorderSchema = z.object({
@@ -52,14 +60,20 @@ const createBikeSchema = z.object({
   title: z.string().min(2, 'El título es requerido').max(140),
   brandId: z.string().cuid('ID de marca inválido'),
   model: z.string().min(1, 'El modelo es requerido').max(100),
+  version: z.string().max(100).optional().nullable(),
   year: z.coerce.number().int().min(1900).max(2100, 'Año inválido'),
+  vehicleCategory: vehicleCategorySchema,
   condition: z.enum(['NUEVA', 'USADA']),
-  // null permite volver a "Sin definir" desde el panel.
-  usage: z.enum(['ENDURO_CROSS', 'RUTA']).optional().nullable(),
-  displacementCc: z.coerce.number().int().positive().optional().nullable(),
+  color: z.string().max(60).optional().nullable(),
+  fuel: fuelTypeSchema.optional().nullable(),
+  transmission: transmissionTypeSchema.optional().nullable(),
+  drive: driveTypeSchema.optional().nullable(),
+  engine: z.string().max(100).optional().nullable(),
+  powerHp: z.coerce.number().int().positive().optional().nullable(),
+  doors: z.coerce.number().int().positive().max(10).optional().nullable(),
+  seats: z.coerce.number().int().positive().max(20).optional().nullable(),
   mileageKm: z.coerce.number().int().nonnegative().optional().nullable(),
-  // Opcional y decimal. Solo se muestra en fichas de motos usadas con valor > 0.
-  usageHours: z.coerce.number().nonnegative('Las horas de uso no pueden ser negativas').optional().nullable(),
+  financingAvailable: z.coerce.boolean().default(false),
   price: z.coerce.number().positive('El precio debe ser mayor a 0'),
   currency: z.string().length(3, 'Moneda inválida').default('ARS'),
   description: z.string().optional().nullable(),

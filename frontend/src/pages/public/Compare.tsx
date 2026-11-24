@@ -8,20 +8,39 @@ import { ImagePlaceholder } from '@/components/shared/ImagePlaceholder';
 import { ConditionTag } from '@/components/public/BikeBadges';
 import { WhatsAppButton } from '@/components/shared/WhatsAppButton';
 import { getThumbnailUrl } from '@/lib/images';
-import { conditionLabel, formatDisplacement, formatMileage, formatPrice, statusLabel, usageLabel } from '@/lib/format';
+import {
+  conditionLabel,
+  driveLabel,
+  formatEngine,
+  formatMileage,
+  formatPower,
+  formatPrice,
+  fuelLabel,
+  statusLabel,
+  transmissionLabel,
+  vehicleCategoryLabel,
+} from '@/lib/format';
 import { useCompareStore } from '@/stores/compare';
 import type { Bike } from '@/types';
 import { cn } from '@/lib/utils';
 
-type AttrKey = 'brand' | 'model' | 'year' | 'condition' | 'usage' | 'displacementCc' | 'mileageKm' | 'price' | 'status';
+type AttrKey =
+  | 'brand' | 'model' | 'version' | 'category' | 'year' | 'condition'
+  | 'fuel' | 'transmission' | 'drive' | 'engine' | 'powerHp'
+  | 'mileageKm' | 'price' | 'status';
 
 const ATTRS: Array<{ key: AttrKey; label: string }> = [
   { key: 'brand', label: 'Marca' },
   { key: 'model', label: 'Modelo' },
+  { key: 'version', label: 'Versión' },
+  { key: 'category', label: 'Tipo de vehículo' },
   { key: 'year', label: 'Año' },
-  { key: 'condition', label: 'Categoría' },
-  { key: 'usage', label: 'Uso' },
-  { key: 'displacementCc', label: 'Motor' },
+  { key: 'condition', label: 'Estado' },
+  { key: 'fuel', label: 'Combustible' },
+  { key: 'transmission', label: 'Transmisión' },
+  { key: 'drive', label: 'Tracción' },
+  { key: 'engine', label: 'Motor / cilindrada' },
+  { key: 'powerHp', label: 'Potencia' },
   { key: 'mileageKm', label: 'Kilometraje' },
   { key: 'price', label: 'Precio' },
   { key: 'status', label: 'Disponibilidad' },
@@ -31,11 +50,16 @@ const renderValue = (bike: Bike, key: AttrKey): string => {
   switch (key) {
     case 'price': return formatPrice(bike.price, bike.currency);
     case 'condition': return conditionLabel(bike.condition);
-    case 'usage': return usageLabel(bike.usage);
+    case 'category': return vehicleCategoryLabel(bike.vehicleCategory);
+    case 'fuel': return fuelLabel(bike.fuel);
+    case 'transmission': return transmissionLabel(bike.transmission);
+    case 'drive': return driveLabel(bike.drive);
+    case 'engine': return formatEngine(bike.engine);
+    case 'powerHp': return formatPower(bike.powerHp);
     case 'brand': return bike.brand?.name ?? '—';
-    case 'displacementCc': return formatDisplacement(bike.displacementCc);
     case 'mileageKm': return formatMileage(bike.mileageKm);
     case 'status': return statusLabel(bike.status);
+    case 'version': return bike.version ?? '—';
     default: return String(bike[key] ?? '—');
   }
 };

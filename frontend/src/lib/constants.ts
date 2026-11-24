@@ -39,10 +39,62 @@ export const MODEL_YEARS = Array.from(
 /** Cantidad máxima de fotografías por publicación. */
 export const MAX_IMAGES_PER_BIKE = 10;
 
-/** Usos/disciplinas disponibles para clasificar una publicación. */
-export const BIKE_USAGES = [
-  { value: 'ENDURO_CROSS', label: 'Todoterreno', title: 'TODOTERRENO' },
-  { value: 'RUTA', label: 'Ruta', title: 'RUTA' },
+/** Tipos de vehículo aceptados por el catálogo de CARLIFE. */
+export const VEHICLE_CATEGORIES = [
+  { value: 'AUTO', label: 'Auto' },
+  { value: 'CAMIONETA', label: 'Camioneta' },
+  { value: 'SUV', label: 'SUV' },
+] as const;
+
+/** Estado del vehículo. CARLIFE comercializa únicamente unidades usadas. */
+export const VEHICLE_CONDITIONS = [{ value: 'USADA', label: 'Usado' }] as const;
+
+/** Combustibles disponibles en el panel y en los filtros. */
+export const FUEL_TYPES = [
+  { value: 'NAFTA', label: 'Nafta' },
+  { value: 'DIESEL', label: 'Diésel' },
+  { value: 'HIBRIDO', label: 'Híbrido' },
+  { value: 'ELECTRICO', label: 'Eléctrico' },
+  { value: 'GNC', label: 'GNC' },
+  { value: 'OTRO', label: 'Otro' },
+] as const;
+
+/** Transmisiones disponibles. */
+export const TRANSMISSIONS = [
+  { value: 'MANUAL', label: 'Manual' },
+  { value: 'AUTOMATICA', label: 'Automática' },
+] as const;
+
+/** Tracciones disponibles. X2/X4 son los valores internos de 4x2 y 4x4. */
+export const DRIVE_TYPES = [
+  { value: 'X2', label: '4x2' },
+  { value: 'X4', label: '4x4' },
+  { value: 'DELANTERA', label: 'Delantera' },
+  { value: 'TRASERA', label: 'Trasera' },
+  { value: 'INTEGRAL', label: 'Integral' },
+] as const;
+
+/** Equipamiento canónico. Se guarda en `BikeFeature` como clave + valor «Sí». */
+export const VEHICLE_EQUIPMENT = [
+  { key: 'aire_acondicionado', label: 'Aire acondicionado' },
+  { key: 'direccion_asistida', label: 'Dirección asistida' },
+  { key: 'levantavidrios_electricos', label: 'Levantavidrios eléctricos' },
+  { key: 'cierre_centralizado', label: 'Cierre centralizado' },
+  { key: 'airbags', label: 'Airbags' },
+  { key: 'abs', label: 'ABS' },
+  { key: 'control_estabilidad', label: 'Control de estabilidad' },
+  { key: 'control_traccion', label: 'Control de tracción' },
+  { key: 'pantalla_multimedia', label: 'Pantalla multimedia' },
+  { key: 'bluetooth', label: 'Bluetooth' },
+  { key: 'camara_retroceso', label: 'Cámara de retroceso' },
+  { key: 'sensores_estacionamiento', label: 'Sensores de estacionamiento' },
+  { key: 'velocidad_crucero', label: 'Control de velocidad crucero' },
+  { key: 'techo_solar', label: 'Techo solar' },
+  { key: 'tapizado_cuero', label: 'Tapizado de cuero' },
+  { key: 'asientos_electricos', label: 'Asientos eléctricos' },
+  { key: 'sensores_lluvia', label: 'Sensores de lluvia' },
+  { key: 'faros_led', label: 'Faros LED' },
+  { key: 'isofix', label: 'ISOFIX' },
 ] as const;
 
 export const buildWhatsAppLink = (message: string) =>

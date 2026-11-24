@@ -6,7 +6,10 @@ export { saveUploadedFile, deleteUploadedFile } from './storage.service.js';
 export type { StoredUpload } from './storage.service.js';
 
 type BikeStatusValue = 'BORRADOR' | 'DISPONIBLE' | 'RESERVADA' | 'VENDIDA';
-type BikeUsageValue = 'ENDURO_CROSS' | 'RUTA';
+export type VehicleCategoryValue = 'AUTO' | 'CAMIONETA' | 'SUV';
+export type FuelTypeValue = 'NAFTA' | 'DIESEL' | 'HIBRIDO' | 'ELECTRICO' | 'GNC' | 'OTRO';
+export type TransmissionTypeValue = 'MANUAL' | 'AUTOMATICA';
+export type DriveTypeValue = 'X2' | 'X4' | 'DELANTERA' | 'TRASERA' | 'INTEGRAL';
 
 /** Máximo de fotografías por publicación (galería del panel y ficha pública). */
 export const MAX_IMAGES_PER_BIKE = 10;
@@ -16,8 +19,11 @@ export interface ListBikesFilters {
   brand?: string;
   model?: string;
   year?: number;
+  category?: VehicleCategoryValue;
   condition?: 'NUEVA' | 'USADA';
-  usage?: BikeUsageValue;
+  fuel?: FuelTypeValue;
+  transmission?: TransmissionTypeValue;
+  drive?: DriveTypeValue;
   priceMin?: number;
   priceMax?: number;
   status?: BikeStatusValue;
@@ -31,13 +37,20 @@ export interface CreateBikeInput {
   title: string;
   brandId: string;
   model: string;
+  version?: string | null;
   year: number;
+  vehicleCategory: VehicleCategoryValue;
   condition: 'NUEVA' | 'USADA';
-  usage?: BikeUsageValue | null;
-  displacementCc?: number | null;
+  color?: string | null;
+  fuel?: FuelTypeValue | null;
+  transmission?: TransmissionTypeValue | null;
+  drive?: DriveTypeValue | null;
+  engine?: string | null;
+  powerHp?: number | null;
+  doors?: number | null;
+  seats?: number | null;
   mileageKm?: number | null;
-  /** Horas de uso: opcional, decimal y solo relevante en motos usadas. */
-  usageHours?: number | null;
+  financingAvailable?: boolean;
   price: number;
   currency: string;
   description?: string | null;
@@ -60,12 +73,20 @@ const bikeSelect: Prisma.BikeSelect = {
   brandId: true,
   brand: true,
   model: true,
+  version: true,
   year: true,
+  vehicleCategory: true,
   condition: true,
-  usage: true,
-  displacementCc: true,
+  color: true,
+  fuel: true,
+  transmission: true,
+  drive: true,
+  engine: true,
+  powerHp: true,
+  doors: true,
+  seats: true,
   mileageKm: true,
-  usageHours: true,
+  financingAvailable: true,
   price: true,
   currency: true,
   description: true,
@@ -90,7 +111,7 @@ const slugify = (text: string) =>
     .replace(/^-+|-+$/g, '');
 
 export const generateSlug = (title: string) => {
-  const base = slugify(title) || 'moto';
+  const base = slugify(title) || 'vehiculo';
   const suffix = crypto.randomBytes(3).toString('hex');
   return `${base}-${suffix}`;
 };
@@ -100,7 +121,7 @@ export const generateSlug = (title: string) => {
  * intenta filtrar por `status=BORRADOR` en la query.
  */
 export const listBikes = async (filters: ListBikesFilters, includeDrafts = false) => {
-  const { q, brand, model, year, condition, usage, priceMin, priceMax, status, featured, page, limit } = filters;
+  const { q, brand, model, year, category, condition, fuel, transmission, drive, priceMin, priceMax, status, featured, page, limit } = filters;
   const skip = (page - 1) * limit;
 
   const where: Record<string, unknown> = {};
@@ -115,8 +136,11 @@ export const listBikes = async (filters: ListBikesFilters, includeDrafts = false
   if (brand) where.brandId = brand;
   if (model) where.model = { contains: model, mode: 'insensitive' };
   if (year) where.year = year;
+  if (category) where.vehicleCategory = category;
   if (condition) where.condition = condition;
-  if (usage) where.usage = usage;
+  if (fuel) where.fuel = fuel;
+  if (transmission) where.transmission = transmission;
+  if (drive) where.drive = drive;
   if (featured === true) where.featured = true;
   if (priceMin !== undefined || priceMax !== undefined) {
     const price: Record<string, number> = {};
@@ -183,13 +207,20 @@ export const createBike = async (input: CreateBikeInput) => {
       title: input.title,
       brandId: input.brandId,
       model: input.model,
+      version: input.version ?? null,
       year: input.year,
+      vehicleCategory: input.vehicleCategory,
       condition: input.condition,
-      usage: input.usage ?? null,
-      displacementCc: input.displacementCc ?? null,
+      color: input.color ?? null,
+      fuel: input.fuel ?? null,
+      transmission: input.transmission ?? null,
+      drive: input.drive ?? null,
+      engine: input.engine ?? null,
+      powerHp: input.powerHp ?? null,
+      doors: input.doors ?? null,
+      seats: input.seats ?? null,
       mileageKm: input.mileageKm ?? null,
-      // Sin kilometraje declarado no se informan horas de uso: se normaliza a null.
-      usageHours: input.condition === 'NUEVA' ? null : (input.usageHours ?? null),
+      financingAvailable: input.financingAvailable ?? false,
       price: input.price,
       currency: input.currency,
       description: input.description ?? null,
@@ -222,31 +253,35 @@ export const updateBike = async (id: string, input: UpdateBikeInput) => {
   if (input.title !== undefined) data.title = input.title;
   if (input.brandId !== undefined) data.brandId = input.brandId;
   if (input.model !== undefined) data.model = input.model;
+  if (input.version !== undefined) data.version = input.version;
   if (input.year !== undefined) data.year = input.year;
+  if (input.vehicleCategory !== undefined) data.vehicleCategory = input.vehicleCategory;
   if (input.condition !== undefined) data.condition = input.condition;
-  // null también es un cambio válido: permite volver a "Sin definir".
-  if (input.usage !== undefined) data.usage = input.usage;
-  if (input.displacementCc !== undefined) data.displacementCc = input.displacementCc;
+  if (input.color !== undefined) data.color = input.color;
+  if (input.fuel !== undefined) data.fuel = input.fuel;
+  if (input.transmission !== undefined) data.transmission = input.transmission;
+  if (input.drive !== undefined) data.drive = input.drive;
+  if (input.engine !== undefined) data.engine = input.engine;
+  if (input.powerHp !== undefined) data.powerHp = input.powerHp;
+  if (input.doors !== undefined) data.doors = input.doors;
+  if (input.seats !== undefined) data.seats = input.seats;
   if (input.mileageKm !== undefined) data.mileageKm = input.mileageKm;
-  if (input.usageHours !== undefined) data.usageHours = input.usageHours;
+  if (input.financingAvailable !== undefined) data.financingAvailable = input.financingAvailable;
   if (input.price !== undefined) data.price = input.price;
   if (input.currency !== undefined) data.currency = input.currency;
   if (input.description !== undefined) data.description = input.description;
   if (input.status !== undefined) data.status = input.status;
   if (input.featured !== undefined) data.featured = input.featured;
 
-  // Si la condición interna no admite horas de uso, se normalizan a null.
   const current = await prisma.bike.findUnique({
     where: { id },
-    select: { condition: true },
+    select: { id: true },
   });
   if (!current) {
     const err: any = new Error('Vehículo no encontrado');
     err.statusCode = 404;
     throw err;
   }
-  const finalCondition = input.condition ?? current.condition;
-  if (finalCondition === 'NUEVA') data.usageHours = null;
 
   const hasScalarChanges = Object.keys(data).length > 0;
   if (!hasScalarChanges && input.features === undefined) {
@@ -405,7 +440,7 @@ export const removeBikeImage = async (bikeId: string, imageId: string) => {
   await prisma.bikeImage.delete({ where: { id: imageId } });
 };
 
-/** Reordena las fotos existentes. Exige el listado completo de IDs de la moto. */
+/** Reordena las fotos existentes. Exige el listado completo de IDs del vehículo. */
 export const reorderBikeImages = async (bikeId: string, ids: string[]) => {
   const images = await prisma.bikeImage.findMany({
     where: { bikeId },
@@ -413,7 +448,7 @@ export const reorderBikeImages = async (bikeId: string, ids: string[]) => {
   });
   const owned = new Set(images.map((image) => image.id));
   if (ids.length !== owned.size || ids.some((id) => !owned.has(id))) {
-    const err: any = new Error('El orden debe incluir todas las fotografías de la moto');
+    const err: any = new Error('El orden debe incluir todas las fotografías del vehículo');
     err.statusCode = 400;
     throw err;
   }

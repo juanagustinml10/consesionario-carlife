@@ -11,7 +11,9 @@ import {
 import { Link } from '@/components/shared/Link';
 import { bikesService } from '@/services/bikes';
 import { getThumbnailUrl } from '@/lib/images';
-import type { Bike, BikeStatus } from '@/types';
+import type { Bike, BikeStatus, VehicleCategory } from '@/types';
+import { VEHICLE_CATEGORIES } from '@/lib/constants';
+import { vehicleCategoryLabel } from '@/lib/format';
 
 const STATUS_LABELS: Record<BikeStatus, string> = {
   BORRADOR: 'Borrador',
@@ -34,6 +36,7 @@ export const Bikes = () => {
   const [bikes, setBikes] = useState<Bike[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<BikeStatus | 'TODOS'>('TODOS');
+  const [categoryFilter, setCategoryFilter] = useState<VehicleCategory | 'TODOS'>('TODOS');
   const [query, setQuery] = useState('');
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [bikeToDelete, setBikeToDelete] = useState<Bike | null>(null);
@@ -47,6 +50,7 @@ export const Bikes = () => {
       const response = await bikesService.listAdmin({
         limit: 100,
         status: statusFilter === 'TODOS' ? undefined : statusFilter,
+        category: categoryFilter === 'TODOS' ? undefined : categoryFilter,
       });
       setBikes(response.data);
     } catch {
@@ -54,7 +58,7 @@ export const Bikes = () => {
     } finally {
       setLoading(false);
     }
-  }, [statusFilter]);
+  }, [statusFilter, categoryFilter]);
 
   useEffect(() => {
     void load();
@@ -179,6 +183,20 @@ export const Bikes = () => {
               <option value="RESERVADA">Reservadas</option>
               <option value="VENDIDA">Vendidas</option>
             </select>
+            <select
+              value={categoryFilter}
+              onChange={(event) => {
+                setLoading(true);
+                setCategoryFilter(event.target.value as VehicleCategory | 'TODOS');
+              }}
+              aria-label="Filtrar por tipo de vehículo"
+              className="field md:min-w-52"
+            >
+              <option value="TODOS">Todos los tipos</option>
+              {VEHICLE_CATEGORIES.map((item) => (
+                <option key={item.value} value={item.value}>{item.label}</option>
+              ))}
+            </select>
           </div>
           <div className="mt-4 flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-white/45">
             <CarFront size={13} className="text-white/60" />
@@ -212,7 +230,7 @@ export const Bikes = () => {
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-semibold text-white">{bike.title}</p>
                       <p className="mt-1 truncate text-[11px] text-white/45">
-                        {bike.brand?.name ?? ''} {bike.model} · {bike.year}
+                        {vehicleCategoryLabel(bike.vehicleCategory)} · {bike.brand?.name ?? ''} {bike.model} · {bike.year}
                       </p>
                       <select
                         value={bike.status}
@@ -291,7 +309,9 @@ export const Bikes = () => {
                           </div>
                           <div className="min-w-0">
                             <p className="truncate font-semibold text-white">{bike.title}</p>
-                            <p className="mt-0.5 truncate text-[11px] text-white/45">{bike.brand?.name ?? ''} {bike.model}</p>
+                            <p className="mt-0.5 truncate text-[11px] text-white/45">
+                              {vehicleCategoryLabel(bike.vehicleCategory)} · {bike.brand?.name ?? ''} {bike.model}
+                            </p>
                           </div>
                         </div>
                       </td>

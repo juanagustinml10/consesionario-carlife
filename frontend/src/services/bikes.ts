@@ -5,7 +5,10 @@ import type {
   BikeImage,
   BikeCondition,
   BikeStatus,
-  BikeUsage,
+  DriveType,
+  FuelType,
+  TransmissionType,
+  VehicleCategory,
 } from '@/types';
 
 export interface BikeFilters {
@@ -13,10 +16,11 @@ export interface BikeFilters {
   brand?: string;
   model?: string;
   year?: number;
+  category?: VehicleCategory;
   condition?: BikeCondition;
-  usage?: BikeUsage;
-  displacementMin?: number;
-  displacementMax?: number;
+  fuel?: FuelType;
+  transmission?: TransmissionType;
+  drive?: DriveType;
   priceMin?: number;
   priceMax?: number;
   status?: BikeStatus;
@@ -29,14 +33,20 @@ export interface CreateBikeInput {
   title: string;
   brandId: string;
   model: string;
+  version?: string | null;
   year: number;
+  vehicleCategory: VehicleCategory;
   condition: BikeCondition;
-  /** null vuelve a dejar el vehículo sin clasificar. */
-  usage?: BikeUsage | null;
-  displacementCc?: number | null;
+  color?: string | null;
+  fuel?: FuelType | null;
+  transmission?: TransmissionType | null;
+  drive?: DriveType | null;
+  engine?: string | null;
+  powerHp?: number | null;
+  doors?: number | null;
+  seats?: number | null;
   mileageKm?: number | null;
-  /** Decimal opcional; se envía null cuando no hay dato. */
-  usageHours?: number | null;
+  financingAvailable?: boolean;
   price: number;
   currency?: string;
   description?: string | null;

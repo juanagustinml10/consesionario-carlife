@@ -13,10 +13,42 @@ enum BikeCondition {
   USADA
 }
 
-/** Uso/disciplina de la moto. NULL = sin definir (motos cargadas antes del campo). */
+/** Uso/disciplina heredado. Se conserva en la BD por compatibilidad; la UI no lo usa. */
 enum BikeUsage {
   ENDURO_CROSS
   RUTA
+}
+
+/** Tipo de vehículo ofrecido por CARLIFE. NULL en publicaciones anteriores al campo. */
+enum VehicleCategory {
+  AUTO
+  CAMIONETA
+  SUV
+}
+
+/** Combustible del vehículo. */
+enum FuelType {
+  NAFTA
+  DIESEL
+  HIBRIDO
+  ELECTRICO
+  GNC
+  OTRO
+}
+
+/** Tipo de caja. */
+enum TransmissionType {
+  MANUAL
+  AUTOMATICA
+}
+
+/** Tipo de tracción. X2/X4 son los valores internos de 4x2 y 4x4. */
+enum DriveType {
+  X2
+  X4
+  DELANTERA
+  TRASERA
+  INTEGRAL
 }
 
 enum BikeStatus {
@@ -46,11 +78,27 @@ model Bike {
   model         String
   year          Int
   condition     BikeCondition
+  /// Campos heredados: se conservan en la BD, pero el panel y el catálogo no los usan.
   usage         BikeUsage?
   displacementCc Int?
-  mileageKm     Int?
-  /// Horas de uso declaradas para motocicletas usadas (opcional, decimal).
+  /// Horas de uso declaradas en el proyecto original (opcional, decimal).
   usageHours    Float?
+
+  /// Datos específicos de autos, camionetas y SUV. Los enums son nullable
+  /// para que las publicaciones anteriores sigan siendo válidas sin backfill.
+  vehicleCategory    VehicleCategory?
+  version            String?
+  color              String?
+  fuel               FuelType?
+  transmission       TransmissionType?
+  drive              DriveType?
+  engine             String?
+  powerHp            Int?
+  doors              Int?
+  seats              Int?
+  mileageKm          Int?
+  financingAvailable Boolean           @default(false)
+
   price         Float
   currency      String      @default("ARS")
   description   String?
@@ -67,6 +115,7 @@ model Bike {
   @@index([slug])
   @@index([status])
   @@index([usage])
+  @@index([vehicleCategory])
   @@index([featured])
   @@index([createdAt])
 }

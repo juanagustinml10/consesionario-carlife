@@ -20,17 +20,14 @@ import { EmptyState } from '@/components/shared/EmptyState';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { SkeletonCard } from '@/components/shared/SkeletonCard';
 import { bikesService, type BikeFilters } from '@/services/bikes';
-import type { Bike, BikeCondition, BikeStatus } from '@/types';
+import type { Bike, BikeStatus, VehicleCategory } from '@/types';
 import { cn } from '@/lib/utils';
 import { MODEL_YEARS } from '@/lib/constants';
 
-const CONDITIONS: { value: BikeCondition; label: string }[] = [
-  { value: 'USADA', label: 'Autos usados' },
-];
-
-const CATEGORIES: { key: 'condition' | 'status'; value: BikeCondition | BikeStatus; label: string }[] = [
-  { key: 'condition', value: 'USADA', label: 'Autos' },
-  { key: 'status', value: 'DISPONIBLE', label: 'Camionetas/SUV' },
+const CATEGORIES: { value: VehicleCategory; label: string }[] = [
+  { value: 'AUTO', label: 'Autos' },
+  { value: 'CAMIONETA', label: 'Camionetas' },
+  { value: 'SUV', label: 'SUV' },
 ];
 
 const STATUSES: { value: BikeStatus; label: string }[] = [
@@ -88,6 +85,7 @@ export const Catalog: React.FC = () => {
     const brand = value('brand');
     const model = value('model');
     const condition = value('condition');
+    const category = value('category');
     const status = value('status');
     const year = Number(value('year'));
     const priceMin = Number(value('priceMin'));
@@ -97,6 +95,9 @@ export const Catalog: React.FC = () => {
       ...(brand ? { brand } : {}),
       ...(model ? { model } : {}),
       ...(condition === 'USADA' ? { condition } : {}),
+      ...(category === 'AUTO' || category === 'CAMIONETA' || category === 'SUV'
+        ? { category: category as VehicleCategory }
+        : {}),
       ...(status === 'DISPONIBLE' || status === 'RESERVADA' || status === 'VENDIDA' ? { status } : {}),
       ...(value('year') && Number.isInteger(year) ? { year } : {}),
       ...(value('priceMin') && Number.isFinite(priceMin) ? { priceMin } : {}),
@@ -188,7 +189,7 @@ export const Catalog: React.FC = () => {
   }, []);
 
   const hasActiveFilters = useMemo(() => {
-    const keys: Array<keyof BikeFilters> = ['q', 'brand', 'model', 'year', 'condition', 'priceMin', 'priceMax', 'status', 'featured'];
+    const keys: Array<keyof BikeFilters> = ['q', 'brand', 'model', 'year', 'category', 'condition', 'priceMin', 'priceMax', 'status', 'featured'];
     return keys.some((key) => filters[key] !== undefined && filters[key] !== null);
   }, [filters]);
 
@@ -232,10 +233,10 @@ export const Catalog: React.FC = () => {
         </div>
 
         <div className="space-y-2 md:col-span-2">
-          <label className="field-label" htmlFor={`${prefix}-categoria`}>Tipo</label>
-          <select id={`${prefix}-categoria`} value={filters.condition ?? ''} onChange={(e) => setFilter('condition', e.target.value || undefined)} className="field field-light">
+          <label className="field-label" htmlFor={`${prefix}-categoria`}>Tipo de vehículo</label>
+          <select id={`${prefix}-categoria`} value={filters.category ?? ''} onChange={(e) => setFilter('category', e.target.value || undefined)} className="field field-light">
             <option value="">Todos</option>
-            {CONDITIONS.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
+            {CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
           </select>
         </div>
 
@@ -360,15 +361,15 @@ export const Catalog: React.FC = () => {
 
           <div className="mb-10">
             <p className="eyebrow eyebrow-dark mb-4">Explorá por categoría</p>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               {CATEGORIES.map((item) => {
-                const active = filters[item.key] === item.value;
+                const active = filters.category === item.value;
                 return (
                   <button
                     key={item.label}
                     type="button"
                     aria-pressed={active}
-                    onClick={() => setFilter(item.key, active ? undefined : item.value)}
+                    onClick={() => setFilter('category', active ? undefined : item.value)}
                     className={cn(
                       'group relative flex min-h-[150px] flex-col items-start justify-between border p-5 text-left transition-colors sm:p-6',
                       active
